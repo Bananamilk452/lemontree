@@ -1,0 +1,20 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [vector]
+}
+
+model Diary {
+  id        Int                    @id @default(autoincrement())
+  content   String
+  createdAt DateTime               @default(now())
+  embedding Unsupported("vector")?
+  sentiment String?
+  summary   String?
+  keywords  String[]
+}
