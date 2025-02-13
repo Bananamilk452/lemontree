@@ -8,7 +8,8 @@
     "start": "react-router-serve ./build/server/index.js",
     "typecheck": "react-router typegen && tsc",
     "lint": "prettier --write --cache .",
-    "prisma": "prisma"
+    "prisma": "prisma",
+    "prepare": "husky"
   },
   "dependencies": {
     "@hookform/resolvers": "^4.0.0",
@@ -36,6 +37,7 @@
     "@types/node": "^20",
     "@types/react": "^19.0.1",
     "@types/react-dom": "^19.0.1",
+    "husky": "^9.1.7",
     "prettier": "^3.5.0",
     "prettier-plugin-tailwindcss": "^0.6.11",
     "prisma": "^6.3.1",
