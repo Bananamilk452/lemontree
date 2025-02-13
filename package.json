@@ -18,6 +18,7 @@
     "@radix-ui/react-slot": "^1.1.2",
     "@react-router/node": "^7.1.5",
     "@react-router/serve": "^7.1.5",
+    "bullmq": "^5.40.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "isbot": "^5.1.17",
@@ -29,6 +30,7 @@
     "react-router": "^7.1.5",
     "tailwind-merge": "^3.0.1",
     "tailwindcss-animate": "^1.0.7",
+    "winston": "^3.17.0",
     "zod": "^3.24.2"
   },
   "devDependencies": {
