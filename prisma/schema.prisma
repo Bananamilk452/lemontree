@@ -13,6 +13,7 @@ model Diary {
   id        Int                    @id @default(autoincrement())
   content   String
   createdAt DateTime               @default(now())
+  updatedAt DateTime               @updatedAt @default(now())
   embedding Unsupported("vector")?
   sentiment String?
   summary   String?
