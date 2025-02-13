@@ -1,3 +1,4 @@
+import { prisma } from "~/lib/utils/db";
 import type { Route } from "./+types/home";
 
 export function meta({}: Route.MetaArgs) {
@@ -7,10 +8,22 @@ export function meta({}: Route.MetaArgs) {
   ];
 }
 
-export default function Home() {
+export async function loader() {
+  const diarys = prisma.diary.findMany();
+  return diarys;
+}
+
+export default function Home({ loaderData }: Route.ComponentProps) {
+  const diarys = loaderData;
+
   return (
     <>
-      <h1 className="text-lg font-bold">Hello, World!</h1>
+      {diarys.map((diary) => (
+        <div key={diary.id}>
+          <h1>{diary.createdAt.toLocaleString()}</h1>
+          <p>{diary.content}</p>
+        </div>
+      ))}
     </>
   );
 }
