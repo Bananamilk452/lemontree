@@ -10,10 +10,10 @@ datasource db {
 }
 
 model Diary {
-  id        Int                    @id @default(autoincrement())
+  id        String                 @id @default(uuid(7))
   content   String
   createdAt DateTime               @default(now())
-  updatedAt DateTime               @updatedAt @default(now())
+  updatedAt DateTime?              @updatedAt
   embedding Unsupported("vector")?
   sentiment String?
   summary   String?
