@@ -1,10 +1,10 @@
-import { Job, Queue, Worker } from "bullmq";
+import { Job, Queue, Worker, type JobsOptions } from "bullmq";
 import { logger } from "./logger";
 
 export abstract class QueueFactory<Input> {
   private queueName: string;
-  private queue;
-  private worker;
+  queue;
+  worker;
 
   constructor(queueName: string) {
     const connection = {
@@ -13,7 +13,7 @@ export abstract class QueueFactory<Input> {
     };
 
     this.queueName = queueName;
-    this.queue = new Queue(queueName, {
+    this.queue = new Queue<Job<Input>, unknown>(queueName, {
       connection,
     });
     this.worker = new Worker(queueName, this.process.bind(this), {
@@ -29,8 +29,14 @@ export abstract class QueueFactory<Input> {
     });
 
     this.worker.on("completed", (job) => {
+      let returnvalue = job.returnvalue;
+
+      if (typeof returnvalue === "object" || Array.isArray(returnvalue)) {
+        returnvalue = JSON.stringify(job.returnvalue, null, 2);
+      }
+
       logger.info(
-        `Job ${job.name}#${job.id} completed with result ${job.returnvalue}`,
+        `Job ${job.name}#${job.id} completed with result ${returnvalue}`,
       );
     });
 
@@ -41,8 +47,8 @@ export abstract class QueueFactory<Input> {
     });
   }
 
-  public async addJob(data: Input) {
-    const job = await this.queue.add(this.queueName, data);
+  public async addJob(data: Input, options?: JobsOptions) {
+    const job = await this.queue.add(this.queueName, data, options);
     return job;
   }
 
