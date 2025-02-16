@@ -1,5 +1,9 @@
-import { prisma } from "~/lib/utils/db";
 import type { Route } from "./+types/home";
+import { Form } from "react-router";
+import { Button } from "~/components/ui/button";
+import { Textarea } from "~/components/ui/textarea";
+import { DiaryService, getAllDiary } from "~/lib/models/diary.server";
+import { DiaryCard } from "~/components/diary/DiaryCard";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -9,20 +13,44 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export async function loader() {
-  const diarys = prisma.diary.findMany();
+  const diarys = getAllDiary();
   return diarys;
 }
 
-export default function Home({ loaderData }: Route.ComponentProps) {
+export async function action({ request }: Route.ActionArgs) {
+  const formData = await request.formData();
+  const content = formData.get("content") as string;
+
+  const diaryService = new DiaryService();
+
+  const jobs = await diaryService.createDiary(content);
+
+  return jobs.map((job) => {
+    return { id: job.id, name: job.name };
+  });
+}
+
+export default function Home({ loaderData, actionData }: Route.ComponentProps) {
   const diarys = loaderData;
 
   return (
     <>
+      <div className="size-96">
+        <Form method="POST" className="flex h-full flex-col gap-2">
+          <h1 className="text-lg font-semibold">일기 쓰기!</h1>
+          <Textarea
+            name="content"
+            className="mt-2 flex-grow resize-none"
+            placeholder="오늘은 어떤 일이 있었나요?"
+          />
+          <Button type="submit">일기 쓰기</Button>
+        </Form>
+      </div>
+
+      {actionData && <pre>{JSON.stringify(actionData, null, 2)}</pre>}
+
       {diarys.map((diary) => (
-        <div key={diary.id}>
-          <h1>{diary.createdAt.toLocaleString()}</h1>
-          <p>{diary.content}</p>
-        </div>
+        <DiaryCard diary={diary} key={diary.id} />
       ))}
     </>
   );
