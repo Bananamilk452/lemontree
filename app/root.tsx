@@ -3,12 +3,14 @@ import {
   Links,
   Meta,
   Outlet,
+  redirect,
   Scripts,
   ScrollRestoration,
 } from "react-router";
 
 import type { Route } from "./+types/root";
 import "./app.css";
+import { auth } from "./lib/auth.server";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -39,6 +41,22 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </body>
     </html>
   );
+}
+
+export async function loader({ request }: Route.LoaderArgs) {
+  const session = await auth.api.getSession({
+    headers: request.headers,
+  });
+
+  const publicPaths = ["/sign-in", "/sign-up"];
+  const pathname = new URL(request.url).pathname;
+
+  if (!session && !publicPaths.includes(pathname)) {
+    const searchParams = new URLSearchParams({ redirectTo: pathname });
+    return redirect(`/sign-in?${searchParams}`);
+  }
+
+  return { session };
 }
 
 export default function App() {
