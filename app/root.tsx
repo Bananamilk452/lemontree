@@ -56,7 +56,7 @@ export async function loader({ request }: Route.LoaderArgs) {
     return redirect(`/sign-in?${searchParams}`);
   }
 
-  return { session };
+  return session;
 }
 
 export default function App() {

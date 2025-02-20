@@ -1,7 +1,8 @@
-import type { Session } from "better-auth";
+import type { Session, User } from "better-auth";
 import { clsx, type ClassValue } from "clsx";
 import { useRouteLoaderData } from "react-router";
 import { twMerge } from "tailwind-merge";
+import { authClient } from "../auth";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -31,11 +32,14 @@ export function safeRedirect(
   return to;
 }
 
-export function useOptionalSession() {
-  const data = useRouteLoaderData("root");
-  if (!data) {
-    return undefined;
-  }
+export function useUserData() {
+  const loaderData = useRouteLoaderData("root") as {
+    session: Session;
+    user: User;
+  };
 
-  return data.session as Session;
+  const { data } = authClient.useSession();
+
+  const result = data ?? loaderData;
+  return result;
 }
