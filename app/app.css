@@ -16,6 +16,50 @@
   --font-sans:
     "Gyeonggi_Batang_Regular", ui-sans-serif, system-ui, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+  @keyframes lemonwave {
+    0% {
+      transform: translate(-90px);
+    }
+    100% {
+      transform: translate(85px);
+    }
+  }
+
+  @keyframes lemonfloat {
+    0% {
+      transform: rotate(-10deg) translateY(-5vh);
+    }
+    100% {
+      transform: rotate(8deg) translateY(5vh);
+    }
+  }
+
+  @keyframes icefloat {
+    0% {
+      transform: rotate(8deg) translateY(-5vh);
+    }
+    100% {
+      transform: rotate(-10deg) translateY(5vh);
+    }
+  }
+
+  --animate-lemonwave-1: lemonwave 5s cubic-bezier(0.55, 0.5, 0.45, 0.5)
+    infinite;
+  --animate-lemonwave-2: lemonwave 13s cubic-bezier(0.55, 0.5, 0.45, 0.5) -4s
+    infinite;
+  --animate-lemonwave-3: lemonwave 20s cubic-bezier(0.55, 0.5, 0.45, 0.5) -5s
+    infinite;
+  --animate-lemonwave-4: lemonwave 7s cubic-bezier(0.55, 0.5, 0.45, 0.5) -2s
+    infinite;
+  --animate-lemonwave-5: lemonwave 10s cubic-bezier(0.55, 0.5, 0.45, 0.5) -3s
+    infinite;
+
+  --animate-lemonfloat: lemonfloat 4s ease-in-out alternate infinite;
+
+  --animate-icefloat-1: lemonfloat 4s ease-in-out alternate infinite;
+  --animate-icefloat-2: icefloat 6s ease-in-out alternate infinite -3s;
+  --animate-icefloat-3: icefloat 8s ease-in-out alternate infinite;
 }
 
 html,
