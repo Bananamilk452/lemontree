@@ -4,6 +4,9 @@ import { useRouteLoaderData } from "react-router";
 import { twMerge } from "tailwind-merge";
 import { authClient } from "../auth";
 
+export type ComponentVariant<T extends (...args: any) => any> =
+  Parameters<T>[0]["variant"];
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }

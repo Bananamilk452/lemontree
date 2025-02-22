@@ -48,7 +48,12 @@ export async function loader({ request }: Route.LoaderArgs) {
     headers: request.headers,
   });
 
-  const publicPaths = ["/sign-in", "/sign-up"];
+  const publicPaths = [
+    "/sign-in",
+    "/sign-up",
+    "/forgot-password",
+    "/reset-password",
+  ];
   const pathname = new URL(request.url).pathname;
 
   if (!session && !publicPaths.includes(pathname)) {
