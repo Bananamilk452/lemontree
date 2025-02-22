@@ -2,7 +2,8 @@ import type { Session, User } from "better-auth";
 import { clsx, type ClassValue } from "clsx";
 import { useRouteLoaderData } from "react-router";
 import { twMerge } from "tailwind-merge";
-import { authClient } from "../auth";
+
+import { authClient } from "~/lib/auth";
 
 export type ComponentVariant<T extends (...args: any) => any> =
   Parameters<T>[0]["variant"];

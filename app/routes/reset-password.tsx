@@ -1,7 +1,25 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { Link, useSearchParams } from "react-router";
 import { z } from "zod";
 
+import { authClient } from "~/lib/auth";
+import { redirectIfAuthenticated } from "~/lib/auth.server";
+import {
+  AUTH_MESSAGES,
+  ZOD_MESSAGES,
+  type AuthMessageKeys,
+} from "~/lib/messages";
+import type { ComponentVariant } from "~/lib/utils";
+
+import {
+  AuthBox,
+  AuthBoxDescription,
+  AuthBoxTitle,
+} from "~/components/auth/AuthBox";
+import { AuthContainer } from "~/components/auth/AuthContainer";
+import { Spinner } from "~/components/Spinner";
 import { Button } from "~/components/ui/button";
 import {
   Form,
@@ -12,25 +30,9 @@ import {
   FormMessage,
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
-import { authClient } from "~/lib/auth";
-import { redirectIfAuthenticated } from "~/lib/auth.server";
-import type { Route } from "./+types/sign-up";
-import { Spinner } from "~/components/Spinner";
-import { Link, useSearchParams } from "react-router";
-import { useState } from "react";
 import { Note } from "~/components/ui/note";
-import type { ComponentVariant } from "~/lib/utils";
-import {
-  AUTH_MESSAGES,
-  ZOD_MESSAGES,
-  type AuthMessageKeys,
-} from "~/lib/messages";
-import {
-  AuthBox,
-  AuthBoxDescription,
-  AuthBoxTitle,
-} from "~/components/auth/AuthBox";
-import { AuthContainer } from "~/components/auth/AuthContainer";
+
+import type { Route } from "./+types/sign-up";
 
 const formSchema = z
   .object({

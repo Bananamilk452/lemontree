@@ -1,5 +1,6 @@
 import { Job, Queue, Worker, type JobsOptions } from "bullmq";
-import { logger } from "./logger";
+
+import { logger } from "~/lib/utils/logger";
 
 export abstract class QueueFactory<Input> {
   private queueName: string;

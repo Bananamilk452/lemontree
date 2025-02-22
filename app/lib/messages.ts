@@ -1,4 +1,4 @@
-import type { authClient } from "./auth";
+import type { authClient } from "~/lib/auth";
 
 export const ZOD_MESSAGES = {
   REQUIRED: "필수 입력 항목입니다",

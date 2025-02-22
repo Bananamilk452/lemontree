@@ -1,4 +1,5 @@
 import { Outlet } from "react-router";
+
 import { AppSidebar } from "~/components/AppSidebar";
 import { SidebarProvider } from "~/components/ui/sidebar";
 

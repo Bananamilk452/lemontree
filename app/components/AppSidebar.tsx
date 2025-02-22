@@ -1,10 +1,23 @@
+import {
+  ChevronUpIcon,
+  HomeIcon,
+  LogOutIcon,
+  MenuIcon,
+  PencilLineIcon,
+  TableOfContentsIcon,
+  UserIcon,
+} from "lucide-react";
+import { Link, useNavigate } from "react-router";
+
 import { authClient } from "~/lib/auth";
+import { useUserData } from "~/lib/utils";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
+} from "~/components/ui/dropdown-menu";
 import {
   Sidebar,
   SidebarContent,
@@ -15,18 +28,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "./ui/sidebar";
-import { useUserData } from "~/lib/utils";
-import { Link, useNavigate } from "react-router";
-import {
-  ChevronUpIcon,
-  HomeIcon,
-  LogOutIcon,
-  MenuIcon,
-  PencilLineIcon,
-  TableOfContentsIcon,
-  UserIcon,
-} from "lucide-react";
+} from "~/components/ui/sidebar";
 
 export function AppSidebar() {
   const { user } = useUserData();

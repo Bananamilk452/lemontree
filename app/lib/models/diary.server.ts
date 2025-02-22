@@ -1,10 +1,11 @@
 import type { Diary } from "@prisma/client";
-import { createEmbeddingQueue } from "./diary/createEmbedding";
-import { analyzeSentimentQueue } from "./diary/analyzeSentiment";
-import { extractKeywordsQueue } from "./diary/extractKeywords";
-import { createSummaryQueue } from "./diary/createSummary";
-import { prisma } from "~/lib/utils/db.server";
 import type { JobsOptions } from "bullmq";
+
+import { analyzeSentimentQueue } from "~/lib/models/diary/analyzeSentiment";
+import { createEmbeddingQueue } from "~/lib/models/diary/createEmbedding";
+import { createSummaryQueue } from "~/lib/models/diary/createSummary";
+import { extractKeywordsQueue } from "~/lib/models/diary/extractKeywords";
+import { prisma } from "~/lib/utils/db.server";
 
 export interface DiaryWithEmbedding extends Diary {
   embedding: string[];

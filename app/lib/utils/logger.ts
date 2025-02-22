@@ -1,5 +1,6 @@
 import { createLogger, format, transports } from "winston";
-import { singleton } from "./singleton";
+
+import { singleton } from "~/lib/utils/singleton";
 
 export const logger = singleton("logger", () =>
   createLogger({

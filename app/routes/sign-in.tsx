@@ -1,7 +1,22 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { Link, useNavigate } from "react-router";
 import { z } from "zod";
 
+import { authClient } from "~/lib/auth";
+import { redirectIfAuthenticated } from "~/lib/auth.server";
+import {
+  AUTH_MESSAGES,
+  ZOD_MESSAGES,
+  type AuthMessageKeys,
+} from "~/lib/messages";
+import type { ComponentVariant } from "~/lib/utils";
+
+import { AuthBox } from "~/components/auth/AuthBox";
+import { AuthContainer } from "~/components/auth/AuthContainer";
+import { LemonTreeLogo } from "~/components/LemonTreeLogo";
+import { Spinner } from "~/components/Spinner";
 import { Button } from "~/components/ui/button";
 import {
   Form,
@@ -12,22 +27,9 @@ import {
   FormMessage,
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
-import { authClient } from "~/lib/auth";
-import { redirectIfAuthenticated } from "~/lib/auth.server";
-import type { Route } from "./+types/sign-in";
-import { Link, useNavigate } from "react-router";
-import { Spinner } from "~/components/Spinner";
 import { Note } from "~/components/ui/note";
-import { useState } from "react";
-import type { ComponentVariant } from "~/lib/utils";
-import {
-  AUTH_MESSAGES,
-  ZOD_MESSAGES,
-  type AuthMessageKeys,
-} from "~/lib/messages";
-import { AuthContainer } from "~/components/auth/AuthContainer";
-import { AuthBox } from "~/components/auth/AuthBox";
-import { LemonTreeLogo } from "~/components/LemonTreeLogo";
+
+import type { Route } from "./+types/sign-in";
 
 const formSchema = z.object({
   email: z

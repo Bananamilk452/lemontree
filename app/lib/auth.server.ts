@@ -1,9 +1,10 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
-import { prisma } from "./utils/db.server";
-import { safeRedirect } from "./utils";
 import { redirect } from "react-router";
-import { sendEmail } from "./utils/sendEmail";
+
+import { safeRedirect } from "~/lib/utils";
+import { prisma } from "~/lib/utils/db.server";
+import { sendEmail } from "~/lib/utils/sendEmail";
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {

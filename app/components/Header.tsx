@@ -1,5 +1,6 @@
 import { MenuIcon } from "lucide-react";
-import { useSidebar } from "./ui/sidebar";
+
+import { useSidebar } from "~/components/ui/sidebar";
 
 export function Header({ children }: { children: React.ReactNode }) {
   const { toggleSidebar, open } = useSidebar();

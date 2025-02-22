@@ -1,6 +1,8 @@
-import { PrismaClient } from "@prisma/client";
 import { readFileSync } from "fs";
+import { PrismaClient } from "@prisma/client";
+
 import type { DiaryWithEmbedding } from "~/lib/models/diary.server";
+
 const prisma = new PrismaClient();
 
 async function main() {
