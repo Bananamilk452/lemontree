@@ -16,6 +16,12 @@ services:
       - OPENAI_API_KEY=sk-1234567890
       - VALKEY_HOST=rag-diary-valkey-1
       - VALKEY_PORT=6379
+      - BETTER_AUTH_SECRET=superrandomsecret
+      - BETTER_AUTH_URL=http://example.com
+      - VITE_BASE_URL=http://example.com
+      - MAILGUN_API_KEY=key-1234567890
+      - MAILGUN_DOMAIN=example.com
+      - MAILGUN_FROM=Sender <sender@example.com>
 
   valkey:
     image: valkey:8.0-alpine
