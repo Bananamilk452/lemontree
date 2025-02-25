@@ -52,7 +52,7 @@ export function AppSidebar() {
           <SidebarHeader>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton>
+                <SidebarMenuButton asChild>
                   <div className="flex items-center gap-2">
                     <button
                       className="hover:bg-sidebar-accent cursor-pointer rounded-md"
