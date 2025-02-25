@@ -52,19 +52,17 @@ export function AppSidebar() {
           <SidebarHeader>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <div className="flex items-center gap-2">
-                    <button
-                      className="hover:bg-sidebar-accent cursor-pointer rounded-md"
-                      onClick={toggleSidebar}
-                    >
-                      <MenuIcon className="size-5" />
-                    </button>
-                    <h1 className="flex items-center gap-1 text-lg font-bold">
-                      <span className="text-xl">🍋</span> 레몬트리
-                    </h1>
-                  </div>
-                </SidebarMenuButton>
+                <div className="flex items-center gap-4">
+                  <button
+                    className="hover:bg-sidebar-accent cursor-pointer rounded-md p-2 -ml-2"
+                    onClick={toggleSidebar}
+                  >
+                    <MenuIcon className="size-5" />
+                  </button>
+                  <h1 className="flex items-center gap-1 text-xl font-bold">
+                    🍋 레몬트리
+                  </h1>
+                </div>
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarHeader>
@@ -72,7 +70,7 @@ export function AppSidebar() {
             <SidebarGroup>
               <SidebarMenu>
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton size="lg" asChild>
                     <Link to="/">
                       <HomeIcon />
                       <span>홈</span>
@@ -80,7 +78,7 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton size="lg" asChild>
                     <Link to="/new">
                       <PencilLineIcon />
                       <span>일기 쓰기</span>
@@ -88,7 +86,7 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton size="lg" asChild>
                     <Link to="/list">
                       <TableOfContentsIcon />
                       <span>일기 목록</span>
@@ -104,7 +102,7 @@ export function AppSidebar() {
               <SidebarMenuItem>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <SidebarMenuButton>
+                    <SidebarMenuButton size="lg">
                       <UserIcon />
                       <span>{user.name} 님</span>
                       <ChevronUpIcon className="ml-auto" />

@@ -40,7 +40,7 @@ export default function Home({ loaderData, actionData }: Route.ComponentProps) {
   return (
     <>
       <Header>
-        <h1 className="text-lg">📔 일기장</h1>
+        <h1 className="text-2xl font-bold">일기장</h1>
       </Header>
 
       <div className="p-4">
