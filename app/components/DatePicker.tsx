@@ -12,15 +12,13 @@ import {
   PopoverTrigger,
 } from "~/components/ui/popover";
 
-export function DatePicker({ defaultValue }: { defaultValue?: Date }) {
-  const [date, setDate] = React.useState<Date>();
-
-  React.useEffect(() => {
-    if (defaultValue) {
-      setDate(defaultValue);
-    }
-  }, [defaultValue]);
-
+export function DatePicker({
+  value,
+  onChange,
+}: {
+  value?: Date;
+  onChange?: (date: Date | undefined) => void;
+}) {
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -28,11 +26,11 @@ export function DatePicker({ defaultValue }: { defaultValue?: Date }) {
           variant={"outline"}
           className={cn(
             "justify-start text-left font-normal",
-            !date && "text-muted-foreground",
+            !value && "text-muted-foreground",
           )}
         >
-          {date ? (
-            format(date, "PPP", { locale: ko })
+          {value ? (
+            format(value, "PPP", { locale: ko })
           ) : (
             <span>날짜를 선택하세요</span>
           )}
@@ -41,8 +39,8 @@ export function DatePicker({ defaultValue }: { defaultValue?: Date }) {
       <PopoverContent className="w-auto p-0">
         <Calendar
           mode="single"
-          selected={date}
-          onSelect={setDate}
+          selected={value}
+          onSelect={onChange}
           initialFocus
         />
       </PopoverContent>

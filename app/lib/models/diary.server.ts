@@ -35,11 +35,12 @@ export class DiaryService {
     this.extractKeywordsQueue = new extractKeywordsQueue();
   }
 
-  async createDiary(content: string) {
+  async createDiary({ content, date }: { content: string; date: Date }) {
     // content만 들어간 Diary 생성
     const diary = await prisma.diary.create({
       data: {
         content,
+        date,
       },
     });
 

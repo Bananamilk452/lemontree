@@ -1,4 +1,4 @@
-import type { Session, User } from "better-auth";
+import { type Session, type User } from "better-auth";
 import { clsx, type ClassValue } from "clsx";
 import { useRouteLoaderData } from "react-router";
 import { twMerge } from "tailwind-merge";
@@ -46,4 +46,18 @@ export function useUserData() {
 
   const result = data ?? loaderData;
   return result;
+}
+
+export function parseFormData<FormSchema>(formData: FormData) {
+  const parsedData: Partial<Record<keyof FormSchema, string | File>> = {};
+
+  for (const [key, value] of formData.entries()) {
+    if (value instanceof File) {
+      parsedData[key as keyof FormSchema] = value as never;
+    } else if (typeof value === "string") {
+      parsedData[key as keyof FormSchema] = value as never;
+    }
+  }
+
+  return parsedData as Record<keyof FormSchema, string | File>;
 }

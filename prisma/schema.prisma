@@ -1,4 +1,3 @@
-
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["postgresqlExtensions"]
@@ -13,6 +12,7 @@ datasource db {
 model Diary {
   id        String                 @id @default(uuid(7))
   content   String
+  date      DateTime               @default(now())
   createdAt DateTime               @default(now())
   updatedAt DateTime?              @updatedAt
   embedding Unsupported("vector")?

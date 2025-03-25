@@ -1,8 +1,12 @@
 import { DiaryService } from "~/lib/models/diary.server";
+import { parseFormData } from "~/lib/utils";
 import { prisma } from "~/lib/utils/db.server";
 
 import { DiaryCard } from "~/components/diary/DiaryCard";
-import { DiaryWriter } from "~/components/diary/DiaryWriter";
+import {
+  DiaryWriter,
+  type DiaryWriterForm,
+} from "~/components/diary/DiaryWriter";
 import { Header } from "~/components/Header";
 import { Button } from "~/components/ui/button";
 
@@ -24,11 +28,17 @@ export async function loader() {
 
 export async function action({ request }: Route.ActionArgs) {
   const formData = await request.formData();
+  const data = parseFormData<DiaryWriterForm>(formData);
+
+  const date = new Date(data.date);
   const content = formData.get("content") as string;
 
   const diaryService = new DiaryService();
 
-  const diary = await diaryService.createDiary(content);
+  const diary = await diaryService.createDiary({
+    date,
+    content,
+  });
 
   return diary;
 }
