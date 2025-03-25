@@ -6,15 +6,23 @@ interface DiaryCardProps {
 
 export function DiaryCard({ diary }: DiaryCardProps) {
   return (
-    <div className="flex w-[500px] flex-col gap-2 rounded-lg border p-4">
-      <h1 className="text-lg font-semibold">
+    <div className="flex flex-col gap-3 rounded-xl shadow border p-4 transition-all hover:shadow-md hover:-translate-y-1">
+      <p className="text-sm text-gray-600">
         {diary.createdAt.toLocaleString()}
-      </h1>
-      <p>{diary.content}</p>
-      <p className="text-sm">
-        감정: {diary.sentiment} / 요약: {diary.summary}
       </p>
-      <p className="text-sm">키워드: {diary.keywords.join(", ")}</p>
+
+      <p className="line-clamp-3">{diary.content}</p>
+
+      <div className="flex flex-wrap gap-2">
+        {diary.keywords.map((keyword) => (
+          <span
+            key={keyword}
+            className="bg-gray-200 text-gray-700 text-xs font-medium px-2 py-1 rounded-full"
+          >
+            {keyword}
+          </span>
+        ))}
+      </div>
     </div>
   );
 }

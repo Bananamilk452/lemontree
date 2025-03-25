@@ -43,14 +43,16 @@ export class DiaryService {
       },
     });
 
-    const promises = [
-      this.createEmbedding(diary.id, content),
-      this.analyzeSentiment(diary.id, content),
-      this.createSummary(diary.id, content),
-      this.extractKeywords(diary.id, content),
-    ];
+    // const promises = [
+    //   this.createEmbedding(diary.id, content),
+    //   this.analyzeSentiment(diary.id, content),
+    //   this.createSummary(diary.id, content),
+    //   this.extractKeywords(diary.id, content),
+    // ];
 
-    return Promise.all(promises);
+    // return Promise.all(promises);
+
+    return diary;
   }
 
   async createEmbedding(diaryId: string, content: string) {

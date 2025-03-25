@@ -1,11 +1,10 @@
-import { Form } from "react-router";
-
-import { DiaryService, getAllDiary } from "~/lib/models/diary.server";
+import { DiaryService } from "~/lib/models/diary.server";
+import { prisma } from "~/lib/utils/db.server";
 
 import { DiaryCard } from "~/components/diary/DiaryCard";
+import { DiaryWriter } from "~/components/diary/DiaryWriter";
 import { Header } from "~/components/Header";
 import { Button } from "~/components/ui/button";
-import { Textarea } from "~/components/ui/textarea";
 
 import type { Route } from "./+types/home";
 
@@ -17,7 +16,9 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export async function loader() {
-  const diarys = getAllDiary();
+  const diarys = await prisma.diary.findMany({
+    orderBy: { createdAt: "desc" },
+  });
   return diarys;
 }
 
@@ -27,41 +28,33 @@ export async function action({ request }: Route.ActionArgs) {
 
   const diaryService = new DiaryService();
 
-  const jobs = await diaryService.createDiary(content);
+  const diary = await diaryService.createDiary(content);
 
-  return jobs.map((job) => {
-    return { id: job.id, name: job.name };
-  });
+  return diary;
 }
 
 export default function Home({ loaderData, actionData }: Route.ComponentProps) {
   const diarys = loaderData;
 
   return (
-    <>
+    <div className="w-full sm:w-3/4 xl:w-1/2 mx-auto">
       <Header>
         <h1 className="text-2xl font-bold">일기장</h1>
       </Header>
 
-      <div className="p-4">
-        <div className="size-96">
-          <Form method="POST" className="flex h-full flex-col gap-2">
-            <h1 className="text-lg font-semibold">일기 쓰기!</h1>
-            <Textarea
-              name="content"
-              className="mt-2 flex-grow resize-none"
-              placeholder="오늘은 어떤 일이 있었나요?"
-            />
-            <Button type="submit">일기 쓰기</Button>
-          </Form>
-        </div>
+      <div className="flex flex-col gap-4 px-6">
+        <DiaryWriter />
 
         {actionData && <pre>{JSON.stringify(actionData, null, 2)}</pre>}
+
+        <hr className="my-4" />
+
+        <h2 className="text-lg font-medium">최근 일기</h2>
 
         {diarys.map((diary) => (
           <DiaryCard diary={diary} key={diary.id} />
         ))}
       </div>
-    </>
+    </div>
   );
 }
