@@ -4,27 +4,29 @@ services:
       context: .
       dockerfile: prod.Dockerfile
     expose:
-      - "80"
+      - "3000"
     depends_on:
       valkey:
         condition: service_healthy
       postgres:
         condition: service_healthy
     restart: unless-stopped
-    environment:
-      - DATABASE_URL=postgres://postgres:mysecretpassword@postgres:5432/rag-diary?schema=public
-      - OPENAI_API_KEY=sk-1234567890
-      - VALKEY_HOST=rag-diary-valkey-1
-      - VALKEY_PORT=6379
-      - BETTER_AUTH_SECRET=superrandomsecret
-      - BETTER_AUTH_URL=http://example.com
-      - VITE_BASE_URL=http://example.com
-      - MAILGUN_API_KEY=key-1234567890
-      - MAILGUN_DOMAIN=example.com
-      - MAILGUN_FROM=Sender <sender@example.com>
+    env_file:
+      - .env
+    # environment:
+    #   - DATABASE_URL=postgres://postgres:mysecretpassword@postgres:5432/rag-diary?schema=public
+    #   - OPENAI_API_KEY=sk-1234567890
+    #   - VALKEY_HOST=rag-diary-valkey-1
+    #   - VALKEY_PORT=6379
+    #   - BETTER_AUTH_SECRET=superrandomsecret
+    #   - BETTER_AUTH_URL=http://example.com
+    #   - VITE_BASE_URL=http://example.com
+    #   - MAILGUN_API_KEY=key-1234567890
+    #   - MAILGUN_DOMAIN=example.com
+    #   - MAILGUN_FROM=Sender <sender@example.com>
 
   valkey:
-    image: valkey:8.0-alpine
+    image: valkey/valkey:8.0-alpine
     expose:
       - "6379"
     healthcheck:
@@ -38,11 +40,13 @@ services:
     command: "valkey-server --save 60 1 --loglevel warning --maxmemory-policy noeviction"
 
   postgres:
-    image: pgvector:pg17
+    image: pgvector/pgvector:pg17
     expose:
       - "5432"
-    environment:
-      - POSTGRES_PASSWORD=mysecretpassword
+    env_file:
+      - .env
+    # environment:
+    #   - POSTGRES_PASSWORD=mysecretpassword
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s

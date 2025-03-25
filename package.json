@@ -9,7 +9,8 @@
     "typecheck": "react-router typegen && tsc",
     "lint": "prettier --write --cache .",
     "prisma": "prisma",
-    "prepare": "husky"
+    "prepare": "husky",
+    "migrateandstart": "bun prisma migrate deploy && bun prisma generate && bun start"
   },
   "dependencies": {
     "@hookform/resolvers": "^4.1.0",

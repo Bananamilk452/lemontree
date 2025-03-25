@@ -4,12 +4,8 @@ WORKDIR /app
 
 COPY . .
 
-RUN bun install
+RUN bun install --frozen-lockfile
 
-RUN bun build
+RUN bun run build
 
-# Prisma init
-RUN bun prisma migrate deploy
-RUN bun prisma generate
-
-CMD ["bun", "start"]
+CMD ["bun", "migrateandstart"]
