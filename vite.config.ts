@@ -8,4 +8,12 @@ export default defineConfig({
   optimizeDeps: {
     include: ["bullmq"],
   },
+  resolve:
+    process.env.NODE_ENV === "development"
+      ? {}
+      : {
+          alias: {
+            "react-dom/server": "react-dom/server.node",
+          },
+        },
 });
