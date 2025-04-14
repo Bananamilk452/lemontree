@@ -1,8 +1,8 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { ComponentVariant } from "~/utils";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -10,9 +10,12 @@ import { z } from "zod";
 import { authClient } from "~/lib/auth-client";
 import { AUTH_MESSAGES, ZOD_MESSAGES } from "~/lib/messages";
 
-import { AuthBox } from "~/components/auth/AuthBox";
+import {
+  AuthBox,
+  AuthBoxDescription,
+  AuthBoxTitle,
+} from "~/components/auth/AuthBox";
 import { AuthContainer } from "~/components/auth/AuthContainer";
-import { LemonTreeLogo } from "~/components/LemonTreeLogo";
 import { Spinner } from "~/components/Spinner";
 import { Button } from "~/components/ui/button";
 import {
@@ -27,14 +30,12 @@ import { Input } from "~/components/ui/input";
 import { Note } from "~/components/ui/note";
 
 import type { AuthMessageKeys } from "~/lib/messages";
-import type { ComponentVariant } from "~/utils";
 
 const formSchema = z.object({
   email: z.string().email(ZOD_MESSAGES.INVALID_EMAIL),
-  password: z.string().nonempty(ZOD_MESSAGES.REQUIRED),
 });
 
-export default function SignIn() {
+export default function ForgotPassword() {
   const [note, setNote] = useState<{
     content: string;
     variant: ComponentVariant<typeof Note>;
@@ -45,55 +46,45 @@ export default function SignIn() {
     visible: false,
   });
 
-  const router = useRouter();
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
-      password: "",
     },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setNote({ ...note, visible: false });
 
-    const { error } = await authClient.signIn.email(
-      {
-        email: values.email,
-        password: values.password,
-      },
-      {
-        onSuccess: (ctx) => {
-          router.replace("/");
-        },
-      },
-    );
+    const { error } = await authClient.forgetPassword({
+      email: values.email,
+      redirectTo: "/reset-password",
+    });
 
     if (error?.code) {
       const code = error.code as AuthMessageKeys;
-
-      // 이메일 인증이 필요한 경우만 info로 표시
-      if (code === "EMAIL_NOT_VERIFIED") {
-        setNote({
-          content: AUTH_MESSAGES[code],
-          variant: "info",
-          visible: true,
-        });
-      } else {
-        setNote({
-          content: AUTH_MESSAGES[code],
-          variant: "error",
-          visible: true,
-        });
-      }
+      setNote({
+        content: AUTH_MESSAGES[code],
+        variant: "error",
+        visible: true,
+      });
+    } else {
+      setNote({
+        content: AUTH_MESSAGES.FORGOT_PASSWORD_SUCCESS,
+        variant: "success",
+        visible: true,
+      });
     }
   }
 
   return (
     <AuthContainer>
       <AuthBox>
-        <LemonTreeLogo />
+        <AuthBoxTitle>비밀번호 찾기</AuthBoxTitle>
+        <AuthBoxDescription>
+          가입한 계정의 이메일을 입력해주세요. 비밀번호를 재설정할 수 있는
+          링크를 보내드립니다.
+        </AuthBoxDescription>
 
         <Form {...form}>
           <form
@@ -110,9 +101,8 @@ export default function SignIn() {
                   <FormControl>
                     <Input
                       type="email"
-                      placeholder="이메일"
                       autoComplete="email"
-                      autoFocus
+                      placeholder="이메일"
                       {...field}
                     />
                   </FormControl>
@@ -120,41 +110,24 @@ export default function SignIn() {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>비밀번호</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="password"
-                      placeholder="비밀번호"
-                      autoComplete="current-password"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+
             <Button
               type="submit"
               size="lg"
               disabled={form.formState.isSubmitting}
             >
               {form.formState.isSubmitting && <Spinner />}
-              로그인
+              비밀번호 찾기
             </Button>
           </form>
         </Form>
 
         <div className="flex flex-wrap justify-between gap-4 text-sm text-gray-600">
-          <Link href="/forgot-password" className="hover:underline">
-            비밀번호 찾기
-          </Link>
           <Link href="/sign-up" className="hover:underline">
             회원가입
+          </Link>
+          <Link href="/sign-in" className="hover:underline">
+            로그인
           </Link>
         </div>
       </AuthBox>
