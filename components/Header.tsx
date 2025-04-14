@@ -1,3 +1,5 @@
+"use client";
+
 import { MenuIcon } from "lucide-react";
 
 import { useSidebar } from "~/components/ui/sidebar";

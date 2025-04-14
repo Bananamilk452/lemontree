@@ -1,8 +1,9 @@
+"use client";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CalendarIcon } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useSubmit } from "react-router";
 import { z } from "zod";
 
 import { ZOD_MESSAGES } from "~/lib/messages";
@@ -20,14 +21,13 @@ import {
 import { Textarea } from "~/components/ui/textarea";
 
 const FormSchema = z.object({
-  date: z.date(),
+  date: z.date({ required_error: ZOD_MESSAGES.REQUIRED }),
   content: z.string().min(1, ZOD_MESSAGES.REQUIRED),
 });
 
 export type DiaryWriterForm = z.infer<typeof FormSchema>;
 
 export function DiaryWriter() {
-  const submit = useSubmit();
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<DiaryWriterForm>({
@@ -46,7 +46,6 @@ export function DiaryWriter() {
     formData.append("date", data.date.toISOString());
     formData.append("content", data.content);
 
-    await submit(formData, { method: "post" });
     setIsLoading(false);
   }
 
