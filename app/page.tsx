@@ -1,6 +1,7 @@
 import { prisma } from "~/utils/db";
 
 import { DiaryCard } from "~/components/diary/DiaryCard";
+import { DiaryEmpty } from "~/components/diary/DiaryEmpty";
 import { DiaryWriter } from "~/components/diary/DiaryWriter";
 import { Header } from "~/components/Header";
 
@@ -22,9 +23,11 @@ export default async function Home() {
 
         <h2 className="text-lg font-medium">최근 일기</h2>
 
-        {diarys.map((diary) => (
-          <DiaryCard diary={diary} key={diary.id} />
-        ))}
+        {diarys.length ? (
+          diarys.map((diary) => <DiaryCard diary={diary} key={diary.id} />)
+        ) : (
+          <DiaryEmpty />
+        )}
       </div>
     </div>
   );

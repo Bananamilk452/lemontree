@@ -1,3 +1,5 @@
+"use client";
+
 import { cn } from "~/utils";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";

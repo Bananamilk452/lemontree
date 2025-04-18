@@ -1,6 +1,8 @@
 "use client";
 
 import { cn } from "~/utils";
+import { format } from "date-fns";
+import { ko } from "date-fns/locale";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import * as React from "react";
 import { DayPicker } from "react-day-picker";
@@ -15,6 +17,12 @@ function Calendar({
 }: React.ComponentProps<typeof DayPicker>) {
   return (
     <DayPicker
+      locale={ko}
+      formatters={{
+        formatCaption: (day) => {
+          return format(day, "yyyy년 M월", { locale: ko });
+        },
+      }}
       showOutsideDays={showOutsideDays}
       className={cn("p-3", className)}
       classNames={{

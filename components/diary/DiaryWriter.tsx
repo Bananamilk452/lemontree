@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, CircleAlert } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -20,7 +20,7 @@ import {
 } from "~/components/ui/form";
 import { Textarea } from "~/components/ui/textarea";
 
-const FormSchema = z.object({
+export const FormSchema = z.object({
   date: z.date({ required_error: ZOD_MESSAGES.REQUIRED }),
   content: z.string().min(1, ZOD_MESSAGES.REQUIRED),
 });
@@ -94,7 +94,12 @@ export function DiaryWriter() {
           )}
         />
 
-        <div className="flex justify-end">
+        <div className="flex justify-end gap-4">
+          {/* <div className="flex items-center gap-2 text-gray-600">
+            <CircleAlert className="size-4" />
+            <p className="text-xs">일기는 오전 12시에 자동으로 처리됩니다.</p>
+          </div> */}
+
           <Button
             type="submit"
             size="lg"

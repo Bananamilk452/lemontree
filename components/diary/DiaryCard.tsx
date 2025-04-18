@@ -1,7 +1,7 @@
-import type { DiaryWithIsEmbeddingNull } from "~/lib/models/diary.server";
+import type { Diary } from "~/lib/models/diary";
 
 interface DiaryCardProps {
-  diary: DiaryWithIsEmbeddingNull;
+  diary: Diary;
 }
 
 export function DiaryCard({ diary }: DiaryCardProps) {
