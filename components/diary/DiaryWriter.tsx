@@ -1,12 +1,15 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import createDiary from "~/app/actions/diary/createDiary";
+import {
+  DiaryWriterForm,
+  DiaryWriterFormSchema,
+} from "~/types/zod/DiaryWriterFormSchema";
 import { CalendarIcon, CircleAlert } from "lucide-react";
-import { useState } from "react";
+import { useActionState, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-
-import { ZOD_MESSAGES } from "~/lib/messages";
 
 import { DatePicker } from "~/components/DatePicker";
 import { Spinner } from "~/components/Spinner";
@@ -20,33 +23,23 @@ import {
 } from "~/components/ui/form";
 import { Textarea } from "~/components/ui/textarea";
 
-export const FormSchema = z.object({
-  date: z.date({ required_error: ZOD_MESSAGES.REQUIRED }),
-  content: z.string().min(1, ZOD_MESSAGES.REQUIRED),
-});
-
-export type DiaryWriterForm = z.infer<typeof FormSchema>;
-
 export function DiaryWriter() {
-  const [isLoading, setIsLoading] = useState(false);
-
   const form = useForm<DiaryWriterForm>({
-    resolver: zodResolver(FormSchema),
+    resolver: zodResolver(DiaryWriterFormSchema),
     defaultValues: {
       date: new Date(),
       content: "",
     },
   });
 
-  async function onSubmit(data: z.infer<typeof FormSchema>) {
-    setIsLoading(true);
+  async function onSubmit(data: z.infer<typeof DiaryWriterFormSchema>) {
+    const res = await createDiary(data);
+    console.log("res", res);
 
-    const formData = new FormData();
-
-    formData.append("date", data.date.toISOString());
-    formData.append("content", data.content);
-
-    setIsLoading(false);
+    if (res.success) {
+    } else {
+      console.error(res.error);
+    }
   }
 
   return (
@@ -104,10 +97,10 @@ export function DiaryWriter() {
             type="submit"
             size="lg"
             className="flex gap-2"
-            disabled={isLoading}
+            disabled={form.formState.isSubmitting}
           >
             일기 쓰기
-            {isLoading && <Spinner />}
+            {form.formState.isSubmitting && <Spinner />}
           </Button>
         </div>
       </form>
