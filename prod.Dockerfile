@@ -1,11 +1,14 @@
-FROM oven/bun:latest
+FROM node:20-alpine
 
 WORKDIR /app
 
+RUN npm install -g pnpm
+
+COPY package.json pnpm-lock.yaml* ./
+RUN pnpm install --frozen-lockfile
+
 COPY . .
 
-RUN bun install --frozen-lockfile
+RUN pnpm run build
 
-RUN bun run build
-
-CMD ["bun", "migrateandstart"]
+CMD ["pnpm", "migrateandstart"]
