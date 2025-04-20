@@ -1,6 +1,17 @@
 import { createLogger, format, transports } from "winston";
 
+import "winston-daily-rotate-file";
+
 import { singleton } from "~/utils/singleton";
+
+const transport = new transports.DailyRotateFile({
+  filename: "lemontree-%DATE%.log",
+  datePattern: "YYYY-MM-DD-HH",
+  zippedArchive: true,
+  maxSize: "20m",
+  maxFiles: "14d",
+  dirname: "logs",
+});
 
 export const logger = singleton("logger", () =>
   createLogger({
@@ -13,8 +24,8 @@ export const logger = singleton("logger", () =>
       format.splat(),
       format.json(),
     ),
-    defaultMeta: { service: "rag-diary" },
-    transports: [new transports.File({ filename: "rag-diary.log" })],
+    defaultMeta: { service: "lemontree" },
+    transports: [transport],
   }),
 );
 

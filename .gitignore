@@ -1,5 +1,8 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
+# GCP Credentials
+credentials.json
+
 # dependencies
 /node_modules
 /.pnp
@@ -9,6 +12,7 @@
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
+.pnpm-store
 
 # testing
 /coverage
