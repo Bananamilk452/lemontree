@@ -10,15 +10,25 @@ datasource db {
 }
 
 model Diary {
-  id        String                 @id @default(uuid(7))
+  id        String    @id @default(uuid(7))
   content   String
-  date      DateTime               @default(now())
-  createdAt DateTime               @default(now())
-  updatedAt DateTime?              @updatedAt
-  embedding Unsupported("vector")?
+  date      DateTime  @default(now())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
   sentiment String?
   summary   String?
   keywords  String[]
+  vectors   Vector[]
+}
+
+model Vector {
+  id        String                 @id @default(uuid(7))
+  vector    Unsupported("vector")?
+  content   String
+  diaryId   String
+  diary     Diary                  @relation(fields: [diaryId], references: [id])
+  createdAt DateTime               @default(now())
+  updatedAt DateTime?              @updatedAt
 }
 
 model User {
