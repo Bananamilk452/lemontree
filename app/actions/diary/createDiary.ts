@@ -6,9 +6,7 @@ import {
 } from "~/types/zod/DiaryWriterFormSchema";
 import { revalidatePath } from "next/cache";
 
-import { DiaryService } from "~/lib/models/diary";
-
-import { singleton } from "~/utils/singleton";
+import { diary } from "~/lib/models/diary";
 
 export default async function createDiary(data: DiaryWriterForm) {
   const validatedFields = DiaryWriterFormSchema.safeParse(data);
@@ -21,9 +19,8 @@ export default async function createDiary(data: DiaryWriterForm) {
   }
 
   const { date, content } = validatedFields.data;
-  const diaryService = singleton("DiaryService", () => new DiaryService());
 
-  await diaryService.createDiary({
+  await diary.createDiary({
     content,
     date,
   });
