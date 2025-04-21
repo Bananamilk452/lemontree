@@ -79,7 +79,7 @@ export function AppSidebarClient({ initialSession }: AppSidebarClientProps) {
               <SidebarMenu>
                 <SidebarMenuItem>
                   <SidebarMenuButton size="lg" asChild>
-                    <Link href="/">
+                    <Link href="/home">
                       <HomeIcon />
                       <span>홈</span>
                     </Link>

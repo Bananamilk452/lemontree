@@ -8,7 +8,7 @@ export function DiaryEmpty() {
       <h2 className="text-lg">
         아직 작성된 일기가 없어요. 오늘의 일기를 작성해보세요!
       </h2>
-      <Link href="/" className="hover:underline">
+      <Link href="/home" className="hover:underline">
         <Button>일기 쓰러 가기</Button>
       </Link>
     </div>

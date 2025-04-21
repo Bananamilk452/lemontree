@@ -10,7 +10,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-const DEFAULT_REDIRECT = "/";
+const DEFAULT_REDIRECT = "/home";
 
 /**
  * This should be used any time the redirect path is user-provided
