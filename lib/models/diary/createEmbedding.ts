@@ -1,5 +1,6 @@
 import { PrismaVectorStore } from "@langchain/community/vectorstores/prisma";
 import { VertexAIEmbeddings } from "@langchain/google-vertexai";
+import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 import { Prisma, Vector } from "@prisma/client";
 
 import { prisma } from "~/utils/db";
@@ -37,7 +38,15 @@ export class createEmbeddingQueue extends QueueFactory<Data> {
         },
       );
 
-      const texts = ["Hello world", "Bye bye", "What's this?"];
+      const separators = ["\n\n", "\n", ".", "!", "?", ",", " ", ""];
+
+      const splitter = new RecursiveCharacterTextSplitter({
+        separators,
+        chunkSize: 400,
+        chunkOverlap: 70,
+      });
+
+      const texts = await splitter.splitText(job.data.content);
       const vectors = await prisma.$transaction(
         texts.map((content) =>
           prisma.vector.create({
@@ -49,6 +58,10 @@ export class createEmbeddingQueue extends QueueFactory<Data> {
       try {
         // 2. 벡터 변환 및 저장 시도
         await vectorStore.addModels(vectors);
+        return {
+          content: job.data.content,
+          vectorCount: vectors.length,
+        };
       } catch (vectorError) {
         logger.error("벡터 변환 중 오류 발생:", vectorError);
 
