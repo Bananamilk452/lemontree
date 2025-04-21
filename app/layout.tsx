@@ -35,10 +35,7 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body className={`${gyonggiBatangFont.className} antialiased`}>
-        <SidebarProvider>
-          <AppSidebar />
-          <main className="w-full">{children}</main>
-        </SidebarProvider>
+        <main className="w-full">{children}</main>
       </body>
     </html>
   );

@@ -65,7 +65,7 @@ export default function SignIn() {
       },
       {
         onSuccess: (ctx) => {
-          router.replace("/");
+          router.replace("/home");
         },
       },
     );

@@ -25,7 +25,7 @@ export default async function createDiary(data: DiaryWriterForm) {
     date,
   });
 
-  revalidatePath("/");
+  revalidatePath("/home");
 
   return {
     success: true,

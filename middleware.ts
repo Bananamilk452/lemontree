@@ -41,7 +41,7 @@ export async function middleware(request: NextRequest) {
     AUTH_PAGES.some((page) => request.nextUrl.pathname.startsWith(page))
   ) {
     // 홈 페이지로 리디렉션
-    return NextResponse.redirect(new URL("/", request.url));
+    return NextResponse.redirect(new URL("/home", request.url));
   }
 
   return NextResponse.next();
