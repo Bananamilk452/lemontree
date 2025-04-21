@@ -8,7 +8,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { authClient } from "~/lib/auth-client";
-import { AUTH_MESSAGES, ZOD_MESSAGES } from "~/lib/messages";
+import { AUTH_MESSAGES } from "~/lib/messages";
 
 import { AuthBox } from "~/components/auth/AuthBox";
 import { AuthContainer } from "~/components/auth/AuthContainer";
@@ -30,8 +30,8 @@ import type { AuthMessageKeys } from "~/lib/messages";
 import type { ComponentVariant } from "~/utils";
 
 const formSchema = z.object({
-  email: z.string().email(ZOD_MESSAGES.INVALID_EMAIL),
-  password: z.string().nonempty(ZOD_MESSAGES.REQUIRED),
+  email: z.string().email(),
+  password: z.string().nonempty(),
 });
 
 export default function SignIn() {
