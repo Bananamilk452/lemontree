@@ -8,7 +8,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { authClient } from "~/lib/auth-client";
-import { AUTH_MESSAGES, ZOD_MESSAGES } from "~/lib/messages";
+import { AUTH_MESSAGES, zodErrorMap } from "~/lib/messages";
 
 import {
   AuthBox,
@@ -32,8 +32,10 @@ import { Note } from "~/components/ui/note";
 import type { AuthMessageKeys } from "~/lib/messages";
 
 const formSchema = z.object({
-  email: z.string().email(ZOD_MESSAGES.INVALID_EMAIL),
+  email: z.string().email(),
 });
+
+z.setErrorMap(zodErrorMap);
 
 export default function ForgotPassword() {
   const [note, setNote] = useState<{

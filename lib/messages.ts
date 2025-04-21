@@ -1,10 +1,32 @@
-import type { authClient } from "~/lib/auth";
+import { z } from "zod";
 
-export const ZOD_MESSAGES = {
-  REQUIRED: "필수 입력 항목입니다",
-  INVALID_EMAIL: "올바른 이메일 주소를 입력하세요",
-  LEAST_CHARACTERS: (count: number) => `${count}자 이상 입력하세요`,
-  PASSWORDS_DO_NOT_MATCH: "비밀번호가 일치하지 않습니다",
+import { authClient } from "~/lib/auth-client";
+
+export const zodErrorMap: z.ZodErrorMap = (issue, ctx) => {
+  switch (issue.code) {
+    case z.ZodIssueCode.invalid_type:
+      if (issue.received === "undefined" || issue.received === "null")
+        return { message: "필수 입력 항목입니다." };
+      if (issue.expected === "number")
+        return { message: "숫자만 입력 가능합니다." };
+      break;
+    case z.ZodIssueCode.too_small:
+      return { message: `최소 ${issue.minimum}자 이상 입력해주세요.` };
+    case z.ZodIssueCode.too_big:
+      return { message: `최대 ${issue.maximum}자까지 입력 가능합니다.` };
+    case z.ZodIssueCode.invalid_string:
+      if (issue.validation === "email")
+        return { message: "올바른 이메일 주소를 입력하세요." };
+      break;
+    case z.ZodIssueCode.custom:
+      if (issue.params?.code === "passwords-do-not-match") {
+        return { message: "비밀번호가 일치하지 않습니다." };
+      }
+    default:
+      return { message: ctx.defaultError };
+  }
+
+  return { message: ctx.defaultError };
 };
 
 type AuthMessages = Record<

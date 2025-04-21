@@ -9,7 +9,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { authClient } from "~/lib/auth-client";
-import { AUTH_MESSAGES, ZOD_MESSAGES } from "~/lib/messages";
+import { AUTH_MESSAGES } from "~/lib/messages";
 
 import {
   AuthBox,
@@ -34,11 +34,11 @@ import type { AuthMessageKeys } from "~/lib/messages";
 
 const formSchema = z
   .object({
-    password: z.string().min(8, ZOD_MESSAGES.LEAST_CHARACTERS(8)),
-    passwordConfirm: z.string().min(8, ZOD_MESSAGES.LEAST_CHARACTERS(8)),
+    password: z.string().min(8),
+    passwordConfirm: z.string().min(8),
   })
   .refine(({ password, passwordConfirm }) => password === passwordConfirm, {
-    message: ZOD_MESSAGES.PASSWORDS_DO_NOT_MATCH,
+    params: { code: "passwords-do-not-match" },
     path: ["passwordConfirm"],
   });
 
