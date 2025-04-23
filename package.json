@@ -46,22 +46,22 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3",
+    "@eslint/eslintrc": "^3.3.1",
     "@ianvs/prettier-plugin-sort-imports": "^4.4.1",
     "@prisma/client": "^6.5.0",
-    "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
+    "@tailwindcss/postcss": "^4.0.17",
+    "@types/node": "^20.17.27",
+    "@types/react": "^19.0.12",
+    "@types/react-dom": "^19.0.4",
     "clsx": "^2.1.1",
-    "eslint": "^9",
+    "eslint": "^9.23.0",
     "eslint-config-next": "15.2.4",
     "husky": "^9.1.7",
     "prettier": "^3.5.3",
     "prettier-plugin-tailwindcss": "^0.6.11",
     "tailwind-merge": "^3.0.2",
-    "tailwindcss": "^4",
-    "typescript": "^5"
+    "tailwindcss": "^4.0.17",
+    "typescript": "^5.8.2"
   },
   "packageManager": "pnpm@10.2.1+sha512.398035c7bd696d0ba0b10a688ed558285329d27ea994804a52bad9167d8e3a72bcb993f9699585d3ca25779ac64949ef422757a6c31102c12ab932e5cbe5cc92",
   "pnpm": {
