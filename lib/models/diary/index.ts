@@ -42,4 +42,24 @@ export const diary = {
 
     return diary;
   },
+
+  async getDiaryById(id: string) {
+    const diary = await prisma.diary.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    return diary;
+  },
+
+  async getDiaryByDate(date: Date) {
+    const diary = await prisma.diary.findFirst({
+      where: {
+        date,
+      },
+    });
+
+    return diary;
+  },
 };

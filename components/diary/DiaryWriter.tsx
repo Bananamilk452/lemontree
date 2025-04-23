@@ -1,14 +1,14 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createDiary } from "~/app/actions/diary";
+import { createDiary, getDiaryByDate } from "~/app/actions/diary";
 import {
   DiaryWriterForm,
   DiaryWriterFormSchema,
 } from "~/types/zod/DiaryWriterFormSchema";
 import { CalendarIcon, SaveIcon } from "lucide-react";
-import { useActionState, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useEffect, useState } from "react";
+import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 
 import { DatePicker } from "~/components/DatePicker";
@@ -50,6 +50,29 @@ export function DiaryWriter() {
     }
   }
 
+  const [isTextareaDisabled, setIsTextareaDisabled] = useState(false);
+  const date = useWatch({
+    control: form.control,
+    name: "date",
+  });
+
+  useEffect(() => {
+    if (date) {
+      setIsTextareaDisabled(true);
+      getDiaryByDate(date)
+        .then((diary) => {
+          if (diary) {
+            form.setValue("content", diary.content);
+          } else {
+            form.setValue("content", "");
+          }
+        })
+        .finally(() => {
+          setIsTextareaDisabled(false);
+        });
+    }
+  }, [date]);
+
   return (
     <Form {...form}>
       <form className="flex flex-col gap-4">
@@ -83,8 +106,13 @@ export function DiaryWriter() {
               <FormControl>
                 <Textarea
                   {...field}
+                  disabled={isTextareaDisabled}
                   className="shadow-md rounded-xl resize-none h-72 p-4 !text-base"
-                  placeholder="오늘은 어떤 일이 있었나요? 기분 좋은 일, 감사한 일, 또는 오늘 배운 것을 자유롭게 적어보세요."
+                  placeholder={
+                    isTextareaDisabled
+                      ? "일기를 불러오는 중입니다..."
+                      : "오늘은 어떤 일이 있었나요? 기분 좋은 일, 감사한 일, 또는 오늘 배운 것을 자유롭게 적어보세요."
+                  }
                 />
               </FormControl>
               <FormMessage />

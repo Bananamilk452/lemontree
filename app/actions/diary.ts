@@ -41,3 +41,24 @@ export async function createDiary(
     success: true,
   };
 }
+
+export async function getDiaryById(id: string) {
+  const data = await diary.getDiaryById(id);
+
+  if (!data) {
+    return null;
+  }
+
+  return data;
+}
+
+export async function getDiaryByDate(date: Date) {
+  const data = await diary.getDiaryByDate(date);
+  console.log("getDiaryByDate", date);
+
+  if (!data) {
+    return null;
+  }
+
+  return data;
+}
