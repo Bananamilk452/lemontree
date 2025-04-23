@@ -6,7 +6,7 @@ import {
   DiaryWriterForm,
   DiaryWriterFormSchema,
 } from "~/types/zod/DiaryWriterFormSchema";
-import { CalendarIcon, CircleAlert } from "lucide-react";
+import { CalendarIcon, SaveIcon } from "lucide-react";
 import { useActionState, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -32,9 +32,17 @@ export function DiaryWriter() {
     },
   });
 
-  async function onSubmit(data: z.infer<typeof DiaryWriterFormSchema>) {
+  async function onSave(data: z.infer<typeof DiaryWriterFormSchema>) {
     const res = await createDiary(data);
-    console.log("res", res);
+
+    if (res.success) {
+    } else {
+      console.error(res.error);
+    }
+  }
+
+  async function onTempSave(data: z.infer<typeof DiaryWriterFormSchema>) {
+    const res = await createDiary(data, { temp: true });
 
     if (res.success) {
     } else {
@@ -44,10 +52,7 @@ export function DiaryWriter() {
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="flex flex-col gap-4"
-      >
+      <form className="flex flex-col gap-4">
         <div className="border px-4 py-3 shadow-md rounded-lg">
           <FormField
             control={form.control}
@@ -63,7 +68,7 @@ export function DiaryWriter() {
                     }}
                   />
                 </FormControl>
-                일기에요!
+                의 일기에요!
                 <FormMessage />
               </FormItem>
             )}
@@ -88,18 +93,25 @@ export function DiaryWriter() {
         />
 
         <div className="flex justify-end gap-4">
-          {/* <div className="flex items-center gap-2 text-gray-600">
-            <CircleAlert className="size-4" />
-            <p className="text-xs">일기는 오전 12시에 자동으로 처리됩니다.</p>
-          </div> */}
+          <Button
+            onClick={form.handleSubmit(onTempSave)}
+            size="lg"
+            className="flex gap-2"
+            variant="secondary"
+            disabled={form.formState.isSubmitting}
+          >
+            임시 저장
+            {form.formState.isSubmitting && <Spinner />}
+          </Button>
 
           <Button
-            type="submit"
+            onClick={form.handleSubmit(onSave)}
             size="lg"
             className="flex gap-2"
             disabled={form.formState.isSubmitting}
           >
-            일기 쓰기
+            <SaveIcon strokeWidth={1.5} className="size-5" />
+            일기 저장
             {form.formState.isSubmitting && <Spinner />}
           </Button>
         </div>
