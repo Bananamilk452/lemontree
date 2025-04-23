@@ -8,7 +8,10 @@ import { revalidatePath } from "next/cache";
 
 import { diary } from "~/lib/models/diary";
 
-export default async function createDiary(data: DiaryWriterForm) {
+export async function createDiary(
+  data: DiaryWriterForm,
+  options: { temp?: boolean } = {},
+) {
   const validatedFields = DiaryWriterFormSchema.safeParse(data);
 
   if (!validatedFields.success) {
@@ -20,10 +23,17 @@ export default async function createDiary(data: DiaryWriterForm) {
 
   const { date, content } = validatedFields.data;
 
-  await diary.createDiary({
-    content,
-    date,
-  });
+  if (options.temp) {
+    await diary.tempSaveDiary({
+      content,
+      date,
+    });
+  } else {
+    await diary.createDiary({
+      content,
+      date,
+    });
+  }
 
   revalidatePath("/home");
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import createDiary from "~/app/actions/diary/createDiary";
+import { createDiary } from "~/app/actions/diary";
 import {
   DiaryWriterForm,
   DiaryWriterFormSchema,
