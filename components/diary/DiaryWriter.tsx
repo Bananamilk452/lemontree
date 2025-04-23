@@ -83,7 +83,7 @@ export function DiaryWriter() {
               <FormControl>
                 <Textarea
                   {...field}
-                  className="shadow-md rounded-xl resize-none h-72 p-4 text-base"
+                  className="shadow-md rounded-xl resize-none h-72 p-4 !text-base"
                   placeholder="오늘은 어떤 일이 있었나요? 기분 좋은 일, 감사한 일, 또는 오늘 배운 것을 자유롭게 적어보세요."
                 />
               </FormControl>
