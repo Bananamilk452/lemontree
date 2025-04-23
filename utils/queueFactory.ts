@@ -4,56 +4,56 @@ import { logger } from "~/utils/logger";
 
 import type { JobsOptions } from "bullmq";
 
-export abstract class QueueFactory<Input> {
-  private queueName: string;
-  queue;
-  worker;
+export interface QueueHandler<Input> {
+  addJob: (data: Input, options?: JobsOptions) => Promise<Job>;
+  process: (job: Job<Input>) => Promise<unknown>;
+}
 
-  constructor(queueName: string) {
-    const connection = {
-      host: process.env.VALKEY_HOST,
-      port: Number(process.env.VALKEY_PORT),
-    };
+export function createQueue<Input>(
+  queueName: string,
+  processHandler: (job: Job<Input>) => Promise<unknown>,
+): QueueHandler<Input> {
+  const connection = {
+    host: process.env.VALKEY_HOST,
+    port: Number(process.env.VALKEY_PORT),
+  };
 
-    this.queueName = queueName;
-    this.queue = new Queue<Job<Input>, unknown>(queueName, {
-      connection,
-    });
-    this.worker = new Worker(queueName, this.process.bind(this), {
-      connection,
-      removeOnComplete: {
-        age: 3600,
-        count: 1000,
-      },
-      removeOnFail: {
-        age: 3600,
-        count: 1000,
-      },
-    });
+  const queue = new Queue<Job<Input>, unknown>(queueName, {
+    connection,
+  });
 
-    this.worker.on("completed", (job) => {
-      let returnvalue = job.returnvalue;
+  const worker = new Worker(queueName, processHandler, {
+    connection,
+    removeOnComplete: {
+      age: 3600,
+      count: 1000,
+    },
+    removeOnFail: {
+      age: 3600,
+      count: 1000,
+    },
+  });
 
-      if (typeof returnvalue === "object" || Array.isArray(returnvalue)) {
-        returnvalue = JSON.stringify(job.returnvalue, null, 2);
-      }
+  worker.on("completed", (job) => {
+    let returnvalue = job.returnvalue;
+    if (typeof returnvalue === "object" || Array.isArray(returnvalue)) {
+      returnvalue = JSON.stringify(job.returnvalue, null, 2);
+    }
+    logger.info(
+      `Job ${job.name}#${job.id} completed with result ${returnvalue}`,
+    );
+  });
 
-      logger.info(
-        `Job ${job.name}#${job.id} completed with result ${returnvalue}`,
-      );
-    });
+  worker.on("failed", (job, err) => {
+    logger.error(
+      `Job ${job?.name}#${job?.id} failed with error ${err.message}`,
+    );
+  });
 
-    this.worker.on("failed", (job, err) => {
-      logger.error(
-        `Job ${job?.name}#${job?.id} failed with error ${err.message}`,
-      );
-    });
-  }
-
-  public async addJob(data: Input, options?: JobsOptions) {
-    const job = await this.queue.add(this.queueName, data, options);
-    return job;
-  }
-
-  abstract process(job: Job<Input>): Promise<unknown>;
+  return {
+    addJob: async (data: Input, options?: JobsOptions) => {
+      return queue.add(queueName, data, options);
+    },
+    process: processHandler,
+  };
 }
