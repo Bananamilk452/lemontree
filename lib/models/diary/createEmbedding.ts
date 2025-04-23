@@ -5,7 +5,7 @@ import { Prisma, Vector } from "@prisma/client";
 
 import { prisma } from "~/utils/db";
 import { logger } from "~/utils/logger";
-import { QueueFactory } from "~/utils/queueFactory";
+import { createQueue } from "~/utils/queueFactory";
 
 import type { Job } from "bullmq";
 
@@ -14,66 +14,62 @@ interface Data {
   content: string;
 }
 
-export class createEmbeddingQueue extends QueueFactory<Data> {
-  constructor() {
-    super("createEmbedding");
-  }
+async function processEmbedding(job: Job<Data>) {
+  logger.info(`Job ${job.name}#${job.id} 임베딩 생성 진행`);
 
-  async process(job: Job<Data>) {
-    logger.info(`Job ${job.name}#${job.id} 임베딩 생성 진행`);
-
-    const vectorStore = PrismaVectorStore.withModel<Vector>(prisma).create(
-      new VertexAIEmbeddings({
-        model: "text-multilingual-embedding-002",
-      }),
-      {
-        prisma: Prisma,
-        tableName: "Vector",
-        vectorColumnName: "vector",
-        columns: {
-          id: PrismaVectorStore.IdColumn,
-          content: PrismaVectorStore.ContentColumn,
-        },
+  const vectorStore = PrismaVectorStore.withModel<Vector>(prisma).create(
+    new VertexAIEmbeddings({
+      model: "text-multilingual-embedding-002",
+    }),
+    {
+      prisma: Prisma,
+      tableName: "Vector",
+      vectorColumnName: "vector",
+      columns: {
+        id: PrismaVectorStore.IdColumn,
+        content: PrismaVectorStore.ContentColumn,
       },
-    );
+    },
+  );
 
-    const separators = ["\n\n", "\n", ".", "!", "?", ",", " ", ""];
+  const separators = ["\n\n", "\n", ".", "!", "?", ",", " ", ""];
 
-    const splitter = new RecursiveCharacterTextSplitter({
-      separators,
-      chunkSize: 400,
-      chunkOverlap: 70,
+  const splitter = new RecursiveCharacterTextSplitter({
+    separators,
+    chunkSize: 400,
+    chunkOverlap: 70,
+  });
+
+  const texts = await splitter.splitText(job.data.content);
+  const vectors = await prisma.$transaction(
+    texts.map((content) =>
+      prisma.vector.create({
+        data: { content, diaryId: job.data.diaryId },
+      }),
+    ),
+  );
+
+  try {
+    await vectorStore.addModels(vectors);
+    return {
+      content: job.data.content,
+      vectorCount: vectors.length,
+    };
+  } catch (vectorError) {
+    logger.error("벡터 변환 중 오류 발생:", vectorError);
+
+    const vectorIds = vectors.map((doc) => doc.id);
+    await prisma.vector.deleteMany({
+      where: {
+        id: { in: vectorIds },
+      },
     });
 
-    const texts = await splitter.splitText(job.data.content);
-    const vectors = await prisma.$transaction(
-      texts.map((content) =>
-        prisma.vector.create({
-          data: { content, diaryId: job.data.diaryId },
-        }),
-      ),
-    );
-
-    try {
-      // 2. 벡터 변환 및 저장 시도
-      await vectorStore.addModels(vectors);
-      return {
-        content: job.data.content,
-        vectorCount: vectors.length,
-      };
-    } catch (vectorError) {
-      logger.error("벡터 변환 중 오류 발생:", vectorError);
-
-      // 3. 벡터 변환 실패 시 생성했던 문서들 삭제
-      const vectorIds = vectors.map((doc) => doc.id);
-      await prisma.vector.deleteMany({
-        where: {
-          id: { in: vectorIds },
-        },
-      });
-
-      // 오류 다시 던지기
-      throw new Error(`벡터 변환 실패로 문서 생성이 롤백됨: ${vectorError}`);
-    }
+    throw new Error(`벡터 변환 실패로 문서 생성이 롤백됨: ${vectorError}`);
   }
 }
+
+export const createEmbeddingQueue = createQueue<Data>(
+  "createEmbedding",
+  processEmbedding,
+);

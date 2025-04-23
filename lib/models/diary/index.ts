@@ -24,11 +24,6 @@ const jobOptions: JobsOptions = {
   },
 };
 
-const embeddingQueue = singleton(
-  "embeddingQueue",
-  () => new createEmbeddingQueue(),
-);
-
 export const diary = {
   async createDiary({ content, date }: { content: string; date: Date }) {
     const diary = await prisma.diary.create({
@@ -39,7 +34,7 @@ export const diary = {
     });
 
     const promises = [
-      embeddingQueue.addJob({ diaryId: diary.id, content }, jobOptions),
+      createEmbeddingQueue.addJob({ diaryId: diary.id, content }, jobOptions),
     ];
 
     Promise.all(promises);
