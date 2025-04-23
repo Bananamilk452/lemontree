@@ -11,7 +11,7 @@ export default async function Home() {
   });
 
   return (
-    <div className="w-full sm:w-3/4 xl:w-1/2 mx-auto">
+    <div className="w-full sm:w-3/4 md:w-3/5 xl:w-1/2 mx-auto">
       <Header>
         <h1 className="text-2xl font-bold">일기장</h1>
       </Header>
