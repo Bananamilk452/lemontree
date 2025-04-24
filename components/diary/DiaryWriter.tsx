@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { utcDateNow } from "~/utils";
 import { CalendarIcon, SaveIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
@@ -28,7 +29,7 @@ export function DiaryWriter() {
   const form = useForm<DiaryWriterForm>({
     resolver: zodResolver(DiaryWriterFormSchema),
     defaultValues: {
-      date: new Date(),
+      date: utcDateNow,
       content: "",
     },
   });
@@ -112,7 +113,7 @@ export function DiaryWriter() {
                 <Textarea
                   {...field}
                   disabled={isTextareaDisabled}
-                  className="shadow-md rounded-xl resize-none h-72 p-4 !text-base"
+                  className="shadow-md rounded-xl resize-none h-[500px] p-4 !text-base"
                   placeholder={
                     isTextareaDisabled
                       ? "일기를 불러오는 중입니다..."
