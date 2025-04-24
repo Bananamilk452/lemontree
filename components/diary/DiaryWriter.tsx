@@ -9,6 +9,7 @@ import {
 import { CalendarIcon, SaveIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 
 import { DatePicker } from "~/components/DatePicker";
@@ -36,7 +37,9 @@ export function DiaryWriter() {
     const res = await createDiary(data);
 
     if (res.success) {
+      toast.success("일기가 저장되었습니다.");
     } else {
+      toast.error("일기 저장에 실패했습니다.");
       console.error(res.error);
     }
   }
@@ -45,7 +48,9 @@ export function DiaryWriter() {
     const res = await createDiary(data, { temp: true });
 
     if (res.success) {
+      toast.success("임시 저장되었습니다.");
     } else {
+      toast.error("임시 저장에 실패했습니다.");
       console.error(res.error);
     }
   }

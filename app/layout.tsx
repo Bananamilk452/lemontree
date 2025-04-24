@@ -4,8 +4,7 @@ import type { Metadata } from "next";
 
 import "./globals.css";
 
-import { AppSidebar } from "~/components/AppSidebar";
-import { SidebarProvider } from "~/components/ui/sidebar";
+import { Toaster } from "~/components/ui/sonner";
 
 const gyonggiBatangFont = localFont({
   src: [
@@ -36,6 +35,7 @@ export default function RootLayout({
     <html lang="ko">
       <body className={`${gyonggiBatangFont.className} antialiased`}>
         <main className="w-full">{children}</main>
+        <Toaster />
       </body>
     </html>
   );

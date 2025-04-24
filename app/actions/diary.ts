@@ -54,7 +54,6 @@ export async function getDiaryById(id: string) {
 
 export async function getDiaryByDate(date: Date) {
   const data = await diary.getDiaryByDate(date);
-  console.log("getDiaryByDate", date);
 
   if (!data) {
     return null;
