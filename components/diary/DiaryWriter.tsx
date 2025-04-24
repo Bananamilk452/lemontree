@@ -1,14 +1,15 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import createDiary from "~/app/actions/diary/createDiary";
+import { createDiary, getDiaryByDate } from "~/app/actions/diary";
 import {
   DiaryWriterForm,
   DiaryWriterFormSchema,
 } from "~/types/zod/DiaryWriterFormSchema";
-import { CalendarIcon, CircleAlert } from "lucide-react";
-import { useActionState, useState } from "react";
-import { useForm } from "react-hook-form";
+import { CalendarIcon, SaveIcon } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useForm, useWatch } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 
 import { DatePicker } from "~/components/DatePicker";
@@ -32,22 +33,54 @@ export function DiaryWriter() {
     },
   });
 
-  async function onSubmit(data: z.infer<typeof DiaryWriterFormSchema>) {
+  async function onSave(data: z.infer<typeof DiaryWriterFormSchema>) {
     const res = await createDiary(data);
-    console.log("res", res);
 
     if (res.success) {
+      toast.success("일기가 저장되었습니다.");
     } else {
+      toast.error("일기 저장에 실패했습니다.");
       console.error(res.error);
     }
   }
 
+  async function onTempSave(data: z.infer<typeof DiaryWriterFormSchema>) {
+    const res = await createDiary(data, { temp: true });
+
+    if (res.success) {
+      toast.success("임시 저장되었습니다.");
+    } else {
+      toast.error("임시 저장에 실패했습니다.");
+      console.error(res.error);
+    }
+  }
+
+  const [isTextareaDisabled, setIsTextareaDisabled] = useState(false);
+  const date = useWatch({
+    control: form.control,
+    name: "date",
+  });
+
+  useEffect(() => {
+    if (date) {
+      setIsTextareaDisabled(true);
+      getDiaryByDate(date)
+        .then((diary) => {
+          if (diary) {
+            form.setValue("content", diary.content);
+          } else {
+            form.setValue("content", "");
+          }
+        })
+        .finally(() => {
+          setIsTextareaDisabled(false);
+        });
+    }
+  }, [date]);
+
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="flex flex-col gap-4"
-      >
+      <form className="flex flex-col gap-4">
         <div className="border px-4 py-3 shadow-md rounded-lg">
           <FormField
             control={form.control}
@@ -63,7 +96,7 @@ export function DiaryWriter() {
                     }}
                   />
                 </FormControl>
-                일기에요!
+                의 일기에요!
                 <FormMessage />
               </FormItem>
             )}
@@ -78,8 +111,13 @@ export function DiaryWriter() {
               <FormControl>
                 <Textarea
                   {...field}
-                  className="shadow-md rounded-xl resize-none h-72 p-4 text-base"
-                  placeholder="오늘은 어떤 일이 있었나요? 기분 좋은 일, 감사한 일, 또는 오늘 배운 것을 자유롭게 적어보세요."
+                  disabled={isTextareaDisabled}
+                  className="shadow-md rounded-xl resize-none h-72 p-4 !text-base"
+                  placeholder={
+                    isTextareaDisabled
+                      ? "일기를 불러오는 중입니다..."
+                      : "오늘은 어떤 일이 있었나요? 기분 좋은 일, 감사한 일, 또는 오늘 배운 것을 자유롭게 적어보세요."
+                  }
                 />
               </FormControl>
               <FormMessage />
@@ -88,18 +126,25 @@ export function DiaryWriter() {
         />
 
         <div className="flex justify-end gap-4">
-          {/* <div className="flex items-center gap-2 text-gray-600">
-            <CircleAlert className="size-4" />
-            <p className="text-xs">일기는 오전 12시에 자동으로 처리됩니다.</p>
-          </div> */}
+          <Button
+            onClick={form.handleSubmit(onTempSave)}
+            size="lg"
+            className="flex gap-2"
+            variant="secondary"
+            disabled={form.formState.isSubmitting}
+          >
+            임시 저장
+            {form.formState.isSubmitting && <Spinner />}
+          </Button>
 
           <Button
-            type="submit"
+            onClick={form.handleSubmit(onSave)}
             size="lg"
             className="flex gap-2"
             disabled={form.formState.isSubmitting}
           >
-            일기 쓰기
+            <SaveIcon strokeWidth={1.5} className="size-5" />
+            일기 저장
             {form.formState.isSubmitting && <Spinner />}
           </Button>
         </div>
