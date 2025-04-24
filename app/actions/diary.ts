@@ -1,5 +1,6 @@
 "use server";
 
+import { removeTimeFromDate } from "~/utils";
 import { revalidatePath } from "next/cache";
 
 import { diary } from "~/lib/models/diary";
@@ -23,15 +24,18 @@ export async function createDiary(
 
   const { date, content } = validatedFields.data;
 
+  // 시간 정보 제거
+  const dateWithoutTime = removeTimeFromDate(date);
+
   if (options.temp) {
     await diary.tempSaveDiary({
       content,
-      date,
+      date: dateWithoutTime,
     });
   } else {
     await diary.createDiary({
       content,
-      date,
+      date: dateWithoutTime,
     });
   }
 
@@ -54,6 +58,16 @@ export async function getDiaryById(id: string) {
 
 export async function getDiaryByDate(date: Date) {
   const data = await diary.getDiaryByDate(date);
+
+  if (!data) {
+    return null;
+  }
+
+  return data;
+}
+
+export async function getRecentDiary() {
+  const data = await diary.getRecentDiary();
 
   if (!data) {
     return null;

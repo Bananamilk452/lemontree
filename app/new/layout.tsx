@@ -1,7 +1,7 @@
 import { AppSidebar } from "~/components/AppSidebar";
 import { SidebarProvider } from "~/components/ui/sidebar";
 
-export default function HomeLayout({
+export default function NewLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;

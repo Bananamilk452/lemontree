@@ -33,3 +33,17 @@ export function safeRedirect(
 
   return to;
 }
+
+export const utcDateNow = new Date(
+  Date.UTC(
+    new Date().getFullYear(),
+    new Date().getMonth(),
+    new Date().getDate(),
+  ),
+);
+
+export function removeTimeFromDate(date: Date) {
+  return new Date(
+    Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()),
+  );
+}
