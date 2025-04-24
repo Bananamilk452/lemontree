@@ -9,7 +9,9 @@ export default function HomeLayout({
   return (
     <SidebarProvider>
       <AppSidebar />
-      {children}
+      <div className="w-full sm:w-3/4 md:w-3/5 xl:w-1/2 mx-auto">
+        {children}
+      </div>
     </SidebarProvider>
   );
 }

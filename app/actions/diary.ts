@@ -1,5 +1,6 @@
 "use server";
 
+import { removeTimeFromDate } from "~/utils";
 import { revalidatePath } from "next/cache";
 
 import { diary } from "~/lib/models/diary";
@@ -57,6 +58,16 @@ export async function getDiaryById(id: string) {
 
 export async function getDiaryByDate(date: Date) {
   const data = await diary.getDiaryByDate(date);
+
+  if (!data) {
+    return null;
+  }
+
+  return data;
+}
+
+export async function getRecentDiary() {
+  const data = await diary.getRecentDiary();
 
   if (!data) {
     return null;

@@ -1,3 +1,5 @@
+import "server-only";
+
 import { createEmbeddingQueue } from "~/lib/models/diary/createEmbedding";
 import { prisma } from "~/utils/db";
 
@@ -56,6 +58,16 @@ export const diary = {
     const diary = await prisma.diary.findFirst({
       where: {
         date,
+      },
+    });
+
+    return diary;
+  },
+
+  async getRecentDiary() {
+    const diary = await prisma.diary.findFirst({
+      orderBy: {
+        date: "desc",
       },
     });
 
