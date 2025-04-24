@@ -1,10 +1,12 @@
-import { cva, type VariantProps } from "class-variance-authority";
+import { cva } from "class-variance-authority";
 import {
   CircleAlertIcon,
   CircleCheckIcon,
   InfoIcon,
   TriangleAlertIcon,
 } from "lucide-react";
+
+import type { VariantProps } from "class-variance-authority";
 
 const noteVariants = cva("flex flex-col text-sm p-4 gap-2 rounded-md", {
   variants: {

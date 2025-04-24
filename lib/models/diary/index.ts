@@ -1,5 +1,4 @@
 import { createEmbeddingQueue } from "~/lib/models/diary/createEmbedding";
-
 import { prisma } from "~/utils/db";
 
 import type { Diary } from "@prisma/client";

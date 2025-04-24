@@ -1,12 +1,12 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
+
+import { diary } from "~/lib/models/diary";
 import {
   DiaryWriterForm,
   DiaryWriterFormSchema,
 } from "~/types/zod/DiaryWriterFormSchema";
-import { revalidatePath } from "next/cache";
-
-import { diary } from "~/lib/models/diary";
 
 export async function createDiary(
   data: DiaryWriterForm,

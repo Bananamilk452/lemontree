@@ -7,9 +7,6 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { authClient } from "~/lib/auth-client";
-import { AUTH_MESSAGES } from "~/lib/messages";
-
 import { AuthBox } from "~/components/auth/AuthBox";
 import { AuthContainer } from "~/components/auth/AuthContainer";
 import { LemonTreeLogo } from "~/components/LemonTreeLogo";
@@ -25,6 +22,8 @@ import {
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import { Note } from "~/components/ui/note";
+import { authClient } from "~/lib/auth-client";
+import { AUTH_MESSAGES } from "~/lib/messages";
 
 import type { AuthMessageKeys } from "~/lib/messages";
 import type { ComponentVariant } from "~/utils";

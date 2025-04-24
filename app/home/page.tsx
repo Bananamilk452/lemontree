@@ -1,9 +1,8 @@
-import { prisma } from "~/utils/db";
-
 import { DiaryCard } from "~/components/diary/DiaryCard";
 import { DiaryEmpty } from "~/components/diary/DiaryEmpty";
 import { DiaryWriter } from "~/components/diary/DiaryWriter";
 import { Header } from "~/components/Header";
+import { prisma } from "~/utils/db";
 
 export default async function Home() {
   const diarys = await prisma.diary.findMany({

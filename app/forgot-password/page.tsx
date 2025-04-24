@@ -7,9 +7,6 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { authClient } from "~/lib/auth-client";
-import { AUTH_MESSAGES, zodErrorMap } from "~/lib/messages";
-
 import {
   AuthBox,
   AuthBoxDescription,
@@ -28,6 +25,8 @@ import {
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import { Note } from "~/components/ui/note";
+import { authClient } from "~/lib/auth-client";
+import { AUTH_MESSAGES, zodErrorMap } from "~/lib/messages";
 
 import type { AuthMessageKeys } from "~/lib/messages";
 

@@ -1,6 +1,7 @@
+import Image from "next/image";
+
 import IceImage from "~/assets/ice.webp";
 import LemonImage from "~/assets/lemon.webp";
-import Image from "next/image";
 
 export default function AuthLayout({
   children,

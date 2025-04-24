@@ -12,8 +12,6 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-import { authClient, Session } from "~/lib/auth-client";
-
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,6 +29,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "~/components/ui/sidebar";
+import { authClient, Session } from "~/lib/auth-client";
 
 interface AppSidebarClientProps {
   initialSession: Session | null;
