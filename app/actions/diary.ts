@@ -23,15 +23,18 @@ export async function createDiary(
 
   const { date, content } = validatedFields.data;
 
+  // 시간 정보 제거
+  const dateWithoutTime = removeTimeFromDate(date);
+
   if (options.temp) {
     await diary.tempSaveDiary({
       content,
-      date,
+      date: dateWithoutTime,
     });
   } else {
     await diary.createDiary({
       content,
-      date,
+      date: dateWithoutTime,
     });
   }
 
