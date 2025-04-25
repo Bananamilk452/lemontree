@@ -39,7 +39,36 @@ export async function createDiary(
     });
   }
 
-  revalidatePath("/home");
+  // TODO: 일기 목록 페이지 만들면 그걸로 변경하기
+  // revalidatePath("/home");
+
+  return {
+    success: true,
+  };
+}
+
+export async function updateDiary(id: string, data: DiaryWriterForm) {
+  const validatedFields = DiaryWriterFormSchema.safeParse(data);
+
+  if (!validatedFields.success) {
+    return {
+      success: false,
+      error: validatedFields.error.flatten().fieldErrors,
+    };
+  }
+
+  const { date, content } = validatedFields.data;
+
+  // 시간 정보 제거
+  const dateWithoutTime = removeTimeFromDate(date);
+
+  await diary.updateDiary(id, {
+    content,
+    date: dateWithoutTime,
+  });
+
+  // TODO: 일기 목록 페이지 만들면 그걸로 변경하기
+  // revalidatePath("/home");
 
   return {
     success: true,
