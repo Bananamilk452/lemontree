@@ -1,5 +1,3 @@
-import "server-only";
-
 import { createEmbeddingQueue } from "~/lib/models/diary/createEmbedding";
 import { prisma } from "~/utils/db";
 
@@ -17,31 +15,67 @@ const jobOptions: JobsOptions = {
 };
 
 export const diary = {
-  async createDiary({ content, date }: { content: string; date: Date }) {
+  async createDiary(data: { content: string; date: Date }) {
     const diary = await prisma.diary.create({
-      data: {
-        content,
-        date,
-      },
+      data,
     });
 
     const promises = [
-      createEmbeddingQueue.addJob({ diaryId: diary.id, content }, jobOptions),
+      createEmbeddingQueue.addJob(
+        { diaryId: diary.id, content: data.content },
+        jobOptions,
+      ),
     ];
 
     Promise.all(promises);
     return diary;
   },
 
-  async tempSaveDiary({ content, date }: { content: string; date: Date }) {
+  async tempSaveDiary(data: { content: string; date: Date }) {
     const diary = await prisma.diary.create({
-      data: {
-        content,
-        date,
-      },
+      data,
     });
 
     return diary;
+  },
+
+  async updateDiary(id: string, data: { content: string; date: Date }) {
+    const diary = await prisma.diary.update({
+      where: {
+        id,
+      },
+      data,
+    });
+
+    await prisma.vector.deleteMany({
+      where: {
+        diaryId: id,
+      },
+    });
+
+    const promises = [
+      createEmbeddingQueue.addJob(
+        { diaryId: diary.id, content: data.content },
+        jobOptions,
+      ),
+    ];
+
+    Promise.all(promises);
+    return diary;
+  },
+
+  async deleteDiary(id: string) {
+    await prisma.diary.delete({
+      where: {
+        id,
+      },
+    });
+
+    await prisma.vector.deleteMany({
+      where: {
+        diaryId: id,
+      },
+    });
   },
 
   async getDiaryById(id: string) {

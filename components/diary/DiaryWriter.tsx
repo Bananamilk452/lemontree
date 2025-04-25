@@ -2,13 +2,13 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { utcDateNow } from "~/utils";
-import { CalendarIcon, SaveIcon } from "lucide-react";
+import { CalendarIcon, PencilIcon, SaveIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
-import { createDiary, getDiaryByDate } from "~/app/actions/diary";
+import { createDiary, getDiaryByDate, updateDiary } from "~/app/actions/diary";
 import { DatePicker } from "~/components/DatePicker";
 import { Spinner } from "~/components/Spinner";
 import { Button } from "~/components/ui/button";
@@ -25,6 +25,8 @@ import {
   DiaryWriterFormSchema,
 } from "~/types/zod/DiaryWriterFormSchema";
 
+import type { Diary } from "~/lib/models/diary";
+
 export function DiaryWriter() {
   const form = useForm<DiaryWriterForm>({
     resolver: zodResolver(DiaryWriterFormSchema),
@@ -35,7 +37,9 @@ export function DiaryWriter() {
   });
 
   async function onSave(data: z.infer<typeof DiaryWriterFormSchema>) {
+    setIsLoading(true);
     const res = await createDiary(data);
+    setIsLoading(false);
 
     if (res.success) {
       toast.success("일기가 저장되었습니다.");
@@ -46,7 +50,9 @@ export function DiaryWriter() {
   }
 
   async function onTempSave(data: z.infer<typeof DiaryWriterFormSchema>) {
+    setIsLoading(true);
     const res = await createDiary(data, { temp: true });
+    setIsLoading(false);
 
     if (res.success) {
       toast.success("임시 저장되었습니다.");
@@ -56,7 +62,26 @@ export function DiaryWriter() {
     }
   }
 
-  const [isTextareaDisabled, setIsTextareaDisabled] = useState(false);
+  async function onUpdate(data: z.infer<typeof DiaryWriterFormSchema>) {
+    if (!diary) {
+      toast.error("일기를 불러오는 중입니다.");
+      return;
+    }
+
+    setIsLoading(true);
+    const res = await updateDiary(diary.id, data);
+    setIsLoading(false);
+
+    if (res.success) {
+      toast.success("일기가 수정되었습니다.");
+    } else {
+      toast.error("일기 수정에 실패했습니다.");
+      console.error(res.error);
+    }
+  }
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [diary, setDiary] = useState<Diary | null>(null);
   const date = useWatch({
     control: form.control,
     name: "date",
@@ -64,20 +89,32 @@ export function DiaryWriter() {
 
   useEffect(() => {
     if (date) {
-      setIsTextareaDisabled(true);
+      setIsLoading(true);
       getDiaryByDate(date)
         .then((diary) => {
           if (diary) {
-            form.setValue("content", diary.content);
+            setDiary(diary);
           } else {
-            form.setValue("content", "");
+            setDiary(null);
           }
         })
+        .catch((error) => {
+          console.error("Error fetching diary:", error);
+          toast.error("일기를 불러오는 중 오류가 발생했습니다.");
+        })
         .finally(() => {
-          setIsTextareaDisabled(false);
+          setIsLoading(false);
         });
     }
   }, [date]);
+
+  useEffect(() => {
+    if (diary) {
+      form.setValue("content", diary.content);
+    } else {
+      form.setValue("content", "");
+    }
+  }, [diary]);
 
   return (
     <Form {...form}>
@@ -103,7 +140,6 @@ export function DiaryWriter() {
             )}
           />
         </div>
-
         <FormField
           control={form.control}
           name="content"
@@ -112,10 +148,10 @@ export function DiaryWriter() {
               <FormControl>
                 <Textarea
                   {...field}
-                  disabled={isTextareaDisabled}
+                  disabled={isLoading}
                   className="shadow-md rounded-xl resize-none h-[500px] p-4 !text-base"
                   placeholder={
-                    isTextareaDisabled
+                    isLoading
                       ? "일기를 불러오는 중입니다..."
                       : "오늘은 어떤 일이 있었나요? 기분 좋은 일, 감사한 일, 또는 오늘 배운 것을 자유롭게 적어보세요."
                   }
@@ -125,30 +161,44 @@ export function DiaryWriter() {
             </FormItem>
           )}
         />
+        {diary ? (
+          <div className="flex justify-end gap-4">
+            <Button
+              onClick={form.handleSubmit(onUpdate)}
+              size="lg"
+              className="flex gap-2"
+              disabled={form.formState.isSubmitting || isLoading}
+            >
+              <PencilIcon strokeWidth={1.5} className="size-5" />
+              일기 수정
+              {form.formState.isSubmitting && <Spinner />}
+            </Button>
+          </div>
+        ) : (
+          <div className="flex justify-end gap-4">
+            <Button
+              onClick={form.handleSubmit(onTempSave)}
+              size="lg"
+              className="flex gap-2"
+              variant="secondary"
+              disabled={form.formState.isSubmitting || isLoading}
+            >
+              임시 저장
+              {form.formState.isSubmitting && <Spinner />}
+            </Button>
 
-        <div className="flex justify-end gap-4">
-          <Button
-            onClick={form.handleSubmit(onTempSave)}
-            size="lg"
-            className="flex gap-2"
-            variant="secondary"
-            disabled={form.formState.isSubmitting}
-          >
-            임시 저장
-            {form.formState.isSubmitting && <Spinner />}
-          </Button>
-
-          <Button
-            onClick={form.handleSubmit(onSave)}
-            size="lg"
-            className="flex gap-2"
-            disabled={form.formState.isSubmitting}
-          >
-            <SaveIcon strokeWidth={1.5} className="size-5" />
-            일기 저장
-            {form.formState.isSubmitting && <Spinner />}
-          </Button>
-        </div>
+            <Button
+              onClick={form.handleSubmit(onSave)}
+              size="lg"
+              className="flex gap-2"
+              disabled={form.formState.isSubmitting || isLoading}
+            >
+              <SaveIcon strokeWidth={1.5} className="size-5" />
+              일기 저장
+              {form.formState.isSubmitting && <Spinner />}
+            </Button>
+          </div>
+        )}
       </form>
     </Form>
   );
