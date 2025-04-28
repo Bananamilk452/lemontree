@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 
 import { getDiaryByDate } from "~/app/actions/diary";
 
+import { DatePicker } from "../DatePicker";
 import { Spinner } from "../Spinner";
 import { DiaryCard } from "./DiaryCard";
 import { DiaryEmpty } from "./DiaryEmpty";
@@ -62,9 +63,15 @@ export function DiaryViewer({ diary: initialDiary }: DiaryViewerProps) {
           <ChevronLeftIcon strokeWidth={1.5} className="size-6" />
         </button>
 
-        <p className="text-lg font-semibold">
-          {format(date, "yyyy년 M월 d일")}
-        </p>
+        <DatePicker
+          value={date}
+          onChange={(date) => {
+            if (date) {
+              setDate(date);
+            }
+          }}
+        />
+
         <button
           onClick={handleNextDiary}
           className="p-1 shadow rounded-md border border-gray-300 cursor-pointer"
