@@ -1,7 +1,7 @@
 import { DiaryWriter } from "~/components/diary/DiaryWriter";
 import { Header } from "~/components/Header";
 
-export default async function Home() {
+export default async function New() {
   return (
     <>
       <Header>

@@ -29,7 +29,7 @@ export function DiaryViewer({ diary: initialDiary }: DiaryViewerProps) {
   useEffect(() => {
     // SSR로 첫 로딩되면 여기에 걸리고
     if (shouldLoadDiary === false) {
-      // 다음부턴 일기 로딩하게게
+      // 다음부턴 일기 로딩하게
       setShouldLoadDiary(true);
       return;
     }
