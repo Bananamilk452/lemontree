@@ -1,10 +1,12 @@
+import { utcDateNow } from "~/utils";
+
 import { DiaryViewer } from "~/components/diary/DiaryViewer";
 import { Header } from "~/components/Header";
 
-import { getRecentDiary } from "../actions/diary";
+import { getDiaryByDate } from "../actions/diary";
 
 export default async function Home() {
-  const diary = await getRecentDiary();
+  const todayDiary = await getDiaryByDate(utcDateNow);
 
   return (
     <>
@@ -13,7 +15,7 @@ export default async function Home() {
       </Header>
 
       <div className="flex flex-col gap-4 px-6 pb-6">
-        <DiaryViewer diary={diary} />
+        <DiaryViewer diary={todayDiary} />
       </div>
     </>
   );
