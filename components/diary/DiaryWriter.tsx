@@ -27,11 +27,15 @@ import {
 
 import type { Diary } from "~/lib/models/diary";
 
-export function DiaryWriter() {
+interface DiaryWriterProps {
+  initialDate?: Date;
+}
+
+export function DiaryWriter(props: DiaryWriterProps) {
   const form = useForm<DiaryWriterForm>({
     resolver: zodResolver(DiaryWriterFormSchema),
     defaultValues: {
-      date: utcDateNow,
+      date: props.initialDate ?? utcDateNow,
       content: "",
     },
   });

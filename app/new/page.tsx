@@ -1,7 +1,22 @@
 import { DiaryWriter } from "~/components/diary/DiaryWriter";
 import { Header } from "~/components/Header";
 
-export default async function New() {
+export default async function New({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  const date = (await searchParams).date;
+  let initialDate: Date | undefined;
+
+  if (date && !Array.isArray(date)) {
+    const d = new Date(date);
+
+    if (!isNaN(d.getTime())) {
+      initialDate = d;
+    }
+  }
+
   return (
     <>
       <Header>
@@ -9,7 +24,7 @@ export default async function New() {
       </Header>
 
       <div className="flex flex-col gap-4 px-6 pb-6">
-        <DiaryWriter />
+        <DiaryWriter initialDate={initialDate} />
       </div>
     </>
   );
