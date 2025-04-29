@@ -107,4 +107,34 @@ export const diary = {
 
     return diary;
   },
+
+  async getDiarys(options: { limit: number; page: number }) {
+    const { limit, page } = options;
+
+    const diarys = await prisma.diary.findMany({
+      include: {
+        _count: {
+          select: {
+            vectors: true,
+          },
+        },
+      },
+      orderBy: {
+        date: "desc",
+      },
+      take: limit,
+      skip: (page - 1) * limit,
+    });
+
+    const total = await prisma.diary.count();
+
+    return {
+      diarys,
+      total,
+    };
+  },
 };
+
+export type DiaryWithCount = Awaited<
+  ReturnType<typeof diary.getDiarys>
+>["diarys"][0];

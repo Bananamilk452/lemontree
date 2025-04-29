@@ -39,8 +39,9 @@ export async function createDiary(
     });
   }
 
-  // TODO: 일기 목록 페이지 만들면 그걸로 변경하기
-  // revalidatePath("/home");
+  revalidatePath("/home");
+  revalidatePath("/new");
+  revalidatePath("/list/[page]", "page");
 
   return {
     success: true,
@@ -67,8 +68,21 @@ export async function updateDiary(id: string, data: DiaryWriterForm) {
     date: dateWithoutTime,
   });
 
-  // TODO: 일기 목록 페이지 만들면 그걸로 변경하기
-  // revalidatePath("/home");
+  revalidatePath("/home");
+  revalidatePath("/new");
+  revalidatePath("/list/[page]", "page");
+
+  return {
+    success: true,
+  };
+}
+
+export async function deleteDiary(id: string) {
+  await diary.deleteDiary(id);
+
+  revalidatePath("/home");
+  revalidatePath("/new");
+  revalidatePath("/list/[page]", "page");
 
   return {
     success: true,
@@ -100,6 +114,18 @@ export async function getRecentDiary() {
 
   if (!data) {
     return null;
+  }
+
+  return data;
+}
+
+export async function getDiarys(
+  options: Parameters<typeof diary.getDiarys>[0],
+) {
+  const data = await diary.getDiarys(options);
+
+  if (!data) {
+    return { diarys: [], total: 0 };
   }
 
   return data;
