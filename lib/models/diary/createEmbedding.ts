@@ -1,7 +1,7 @@
 import { PrismaVectorStore } from "@langchain/community/vectorstores/prisma";
 import { VertexAIEmbeddings } from "@langchain/google-vertexai";
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
-import { Prisma, Vector } from "@prisma/client";
+import { Embedding, Prisma } from "@prisma/client";
 
 import { prisma } from "~/utils/db";
 import { logger } from "~/utils/logger";
@@ -17,13 +17,13 @@ interface Data {
 async function processEmbedding(job: Job<Data>) {
   logger.info(`Job ${job.name}#${job.id} 임베딩 생성 진행`);
 
-  const vectorStore = PrismaVectorStore.withModel<Vector>(prisma).create(
+  const vectorStore = PrismaVectorStore.withModel<Embedding>(prisma).create(
     new VertexAIEmbeddings({
       model: "text-multilingual-embedding-002",
     }),
     {
       prisma: Prisma,
-      tableName: "Vector",
+      tableName: "Embedding",
       vectorColumnName: "vector",
       columns: {
         id: PrismaVectorStore.IdColumn,
@@ -43,7 +43,7 @@ async function processEmbedding(job: Job<Data>) {
   const texts = await splitter.splitText(job.data.content);
   const vectors = await prisma.$transaction(
     texts.map((content) =>
-      prisma.vector.create({
+      prisma.embedding.create({
         data: { content, diaryId: job.data.diaryId },
       }),
     ),
@@ -59,7 +59,7 @@ async function processEmbedding(job: Job<Data>) {
     logger.error("벡터 변환 중 오류 발생:", vectorError);
 
     const vectorIds = vectors.map((doc) => doc.id);
-    await prisma.vector.deleteMany({
+    await prisma.embedding.deleteMany({
       where: {
         id: { in: vectorIds },
       },

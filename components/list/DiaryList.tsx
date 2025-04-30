@@ -1,12 +1,12 @@
 "use client";
 
-import { Diary } from "@prisma/client";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { getDiarys } from "~/app/actions/diary";
 import { AppPagination } from "~/components/AppPagination";
 import { DiaryListCard } from "~/components/diary/DiaryListCard";
+import { Spinner } from "~/components/Spinner";
 import { PaginationLink } from "~/components/ui/pagination";
 
 import type { DiaryWithCount } from "~/lib/models/diary";
@@ -57,18 +57,22 @@ export default function DiaryList(props: DiaryListProps) {
       .finally(() => {
         setIsLoading(false);
       });
-  }, [page]);
+  }, [page, props.limit, shouldLoadDiary]);
 
   return (
     <>
-      <div className="flex flex-col gap-7">
-        {diarys.map((diary, i) => (
-          <React.Fragment key={diary.id}>
-            <DiaryListCard diary={diary} />
-            {i !== diarys.length - 1 && <hr />}
-          </React.Fragment>
-        ))}
-      </div>
+      {isLoading ? (
+        <Spinner className="size-5" />
+      ) : (
+        <div className="flex flex-col gap-7">
+          {diarys.map((diary, i) => (
+            <React.Fragment key={diary.id}>
+              <DiaryListCard diary={diary} />
+              {i !== diarys.length - 1 && <hr />}
+            </React.Fragment>
+          ))}
+        </div>
+      )}
 
       <hr className="my-6" />
 

@@ -18,17 +18,22 @@ model Diary {
   sentiment String?
   summary   String?
   keywords  String[]
-  vectors   Vector[]
+  embeddings   Embedding[]
+
+  @@map("diary")
 }
 
-model Vector {
+model Embedding {
   id        String                 @id @default(uuid(7))
-  vector    Unsupported("vector")?
+  vector    Unsupported("vector(768)")?
   content   String
   diaryId   String
   diary     Diary                  @relation(fields: [diaryId], references: [id])
   createdAt DateTime               @default(now())
   updatedAt DateTime?              @updatedAt
+
+  @@map("embedding")
+  @@index([vector], map: "embedding_vector_HNSW")
 }
 
 model User {

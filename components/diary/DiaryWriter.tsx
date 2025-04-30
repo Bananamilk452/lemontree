@@ -118,7 +118,7 @@ export function DiaryWriter(props: DiaryWriterProps) {
     } else {
       form.setValue("content", "");
     }
-  }, [diary]);
+  }, [diary, form]);
 
   return (
     <Form {...form}>

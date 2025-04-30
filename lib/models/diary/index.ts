@@ -47,7 +47,7 @@ export const diary = {
       data,
     });
 
-    await prisma.vector.deleteMany({
+    await prisma.embedding.deleteMany({
       where: {
         diaryId: id,
       },
@@ -71,7 +71,7 @@ export const diary = {
       },
     });
 
-    await prisma.vector.deleteMany({
+    await prisma.embedding.deleteMany({
       where: {
         diaryId: id,
       },
@@ -115,7 +115,7 @@ export const diary = {
       include: {
         _count: {
           select: {
-            vectors: true,
+            embeddings: true,
           },
         },
       },
