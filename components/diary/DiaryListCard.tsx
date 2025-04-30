@@ -49,7 +49,7 @@ export function DiaryListCard({ diary }: DiaryListCardProps) {
             <dt>
               <WaypointsIcon className="size-5" />
             </dt>
-            <dd>임베딩 {diary._count.vectors}개</dd>
+            <dd>임베딩 {diary._count.embeddings}개</dd>
           </dl>
           {/* <dl className="flex gap-1.5 items-center text-sm">
             <dt>
