@@ -12,7 +12,7 @@ export const auth = betterAuth({
     enabled: true,
     autoSignIn: false,
     requireEmailVerification: true,
-    sendResetPassword: async ({ user, url, token }, request) => {
+    sendResetPassword: async ({ user, url }) => {
       await sendEmail({
         to: user.email,
         subject: "비밀번호 재설정",
@@ -21,7 +21,7 @@ export const auth = betterAuth({
     },
   },
   emailVerification: {
-    sendVerificationEmail: async ({ user, url, token }, request) => {
+    sendVerificationEmail: async ({ user, url }) => {
       await sendEmail({
         to: user.email,
         subject: "이메일 주소를 인증하세요",

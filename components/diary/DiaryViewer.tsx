@@ -1,7 +1,6 @@
 "use client";
 
 import { utcDateNow } from "~/utils";
-import { format } from "date-fns";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -39,7 +38,7 @@ export function DiaryViewer({ diary: initialDiary }: DiaryViewerProps) {
       setCurrentDiary(d);
       setIsLoading(false);
     });
-  }, [date]);
+  }, [date, shouldLoadDiary]);
 
   function handlePreviousDiary() {
     const newDate = new Date(date);

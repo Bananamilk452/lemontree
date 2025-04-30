@@ -5,6 +5,7 @@ import { format } from "date-fns";
 import {
   CaseSensitiveIcon,
   EllipsisVerticalIcon,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   MemoryStickIcon,
   PencilIcon,
   Trash2Icon,
@@ -121,7 +122,7 @@ function DiaryCard({ diary }: { diary: Diary }) {
         setIsHide(false);
       }
     }
-  }, []);
+  }, [height]);
 
   return (
     <article

@@ -63,7 +63,7 @@ export default function SignIn() {
         password: values.password,
       },
       {
-        onSuccess: (ctx) => {
+        onSuccess: () => {
           router.replace("/home");
         },
       },
