@@ -23,7 +23,8 @@ async function processEmbedding(job: Job<Data>) {
     }),
     {
       prisma: Prisma,
-      tableName: "Embedding",
+      // @ts-expect-error Embedding 테이블이 embedding으로 매핑되어있음
+      tableName: "embedding",
       vectorColumnName: "vector",
       columns: {
         id: PrismaVectorStore.IdColumn,
