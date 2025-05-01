@@ -13,9 +13,19 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useLayoutEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 
+import { processDiary } from "~/app/actions/diary";
 import { DeleteDiaryModal } from "~/components/diary/DeleteDiaryModal";
 import { Button } from "~/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "~/components/ui/dropdown-menu";
+import { Note } from "~/components/ui/note";
 
 import type { Diary, DiaryWithCount } from "~/lib/models/diary";
 
@@ -30,6 +40,16 @@ export function DiaryListCard({ diary }: DiaryListCardProps) {
 
   function handleEditButtonClick() {
     router.push(`/new?date=${format(diary.date, "yyyy-MM-dd")}`);
+  }
+
+  function handleDiaryMemorify() {
+    processDiary(diary.id)
+      .then(() => {
+        toast.success("일기를 메모리화 중입니다. 잠시 후 다시 확인해주세요.");
+      })
+      .catch(() => {
+        toast.error("일기 메모리화에 실패했습니다.");
+      });
   }
 
   return (
@@ -60,7 +80,15 @@ export function DiaryListCard({ diary }: DiaryListCardProps) {
           </dl> */}
         </div>
 
-        <div className="min-h-12"></div>
+        <div className="min-h-12 py-5">
+          {diary._count.embeddings <= 0 && (
+            <Note variant="warning" title="일기 메모리화가 필요합니다.">
+              일기의 메모리화가 필요합니다. 에디터에서 저장 버튼이나{" "}
+              <EllipsisVerticalIcon className="inline-block size-4" />을 누르고
+              &quot;일기 메모리화화&quot;을 눌러주세요.
+            </Note>
+          )}
+        </div>
 
         <div className="flex justify-between items-center">
           <p className="text-xs text-gray-600">
@@ -95,9 +123,23 @@ export function DiaryListCard({ diary }: DiaryListCardProps) {
               open={isDeleteDiaryModalOpen}
               setOpen={setIsDeleteDiaryModalOpen}
             />
-            <Button variant="ghost" size="sm">
-              <EllipsisVerticalIcon className="size-5" />
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm">
+                  <EllipsisVerticalIcon className="size-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuGroup>
+                  <DropdownMenuItem
+                    onClick={handleDiaryMemorify}
+                    disabled={diary._count.embeddings > 0}
+                  >
+                    일기 메모리화
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </div>

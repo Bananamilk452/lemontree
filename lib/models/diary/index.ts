@@ -78,6 +78,34 @@ export const diary = {
     });
   },
 
+  async processDiary(id: string) {
+    const diary = await prisma.diary.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!diary) {
+      return null;
+    }
+
+    await prisma.embedding.deleteMany({
+      where: {
+        diaryId: id,
+      },
+    });
+
+    const promises = [
+      createEmbeddingQueue.addJob(
+        { diaryId: diary.id, content: diary.content },
+        jobOptions,
+      ),
+    ];
+
+    Promise.all(promises);
+    return diary;
+  },
+
   async getDiaryById(id: string) {
     const diary = await prisma.diary.findUnique({
       where: {

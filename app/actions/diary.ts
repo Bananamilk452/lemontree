@@ -89,6 +89,22 @@ export async function deleteDiary(id: string) {
   };
 }
 
+export async function processDiary(id: string) {
+  const data = await diary.processDiary(id);
+
+  if (!data) {
+    return null;
+  }
+
+  revalidatePath("/home");
+  revalidatePath("/new");
+  revalidatePath("/list/[page]", "page");
+
+  return {
+    success: true,
+  };
+}
+
 export async function getDiaryById(id: string) {
   const data = await diary.getDiaryById(id);
 
