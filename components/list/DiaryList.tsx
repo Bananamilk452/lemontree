@@ -22,7 +22,6 @@ export default function DiaryList(props: DiaryListProps) {
   const [diarys, setDiarys] = useState<DiaryWithCount[]>(props.diarys);
   const [page, setPage] = useState(props.page);
   const [total, setTotal] = useState(props.total);
-  const [shouldLoadDiary, setShouldLoadDiary] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   // 상위 페이지 revalidate 시에 props이 바뀌면 여기서도 바뀌게
@@ -33,12 +32,8 @@ export default function DiaryList(props: DiaryListProps) {
   }, [props.diarys, props.page, props.total]);
 
   useEffect(() => {
-    // SSR로 첫 로딩되면 여기에 걸리고
-    if (shouldLoadDiary === false) {
-      // 다음부턴 일기 로딩하게
-      setShouldLoadDiary(true);
-      return;
-    }
+    // SSR로 첫 로딩되면 패스
+    if (page === props.page) return;
 
     setIsLoading(true);
     getDiarys({
@@ -57,12 +52,13 @@ export default function DiaryList(props: DiaryListProps) {
       .finally(() => {
         setIsLoading(false);
       });
-  }, [page, props.limit, shouldLoadDiary]);
-
+  }, [page, props.limit, props.page]);
   return (
     <>
       {isLoading ? (
-        <Spinner className="size-5" />
+        <div className="w-full flex justify-center">
+          <Spinner className="size-5" />
+        </div>
       ) : (
         <div className="flex flex-col gap-7">
           {diarys.map((diary, i) => (
