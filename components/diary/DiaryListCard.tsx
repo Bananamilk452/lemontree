@@ -85,7 +85,7 @@ export function DiaryListCard({ diary }: DiaryListCardProps) {
             <Note variant="warning" title="일기 메모리화가 필요합니다.">
               일기의 메모리화가 필요합니다. 에디터에서 저장 버튼이나{" "}
               <EllipsisVerticalIcon className="inline-block size-4" />을 누르고
-              &quot;일기 메모리화화&quot;을 눌러주세요.
+              &quot;일기 메모리화&quot;을 눌러주세요.
             </Note>
           )}
         </div>
