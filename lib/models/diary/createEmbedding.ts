@@ -1,11 +1,10 @@
-import { PrismaVectorStore } from "@langchain/community/vectorstores/prisma";
-import { VertexAIEmbeddings } from "@langchain/google-vertexai";
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
-import { Embedding, Prisma } from "@prisma/client";
 
+import { vectorStore } from "~/lib/langchain";
 import { prisma } from "~/utils/db";
 import { logger } from "~/utils/logger";
 import { createQueue } from "~/utils/queueFactory";
+import { singleton } from "~/utils/singleton";
 
 import type { Job } from "bullmq";
 
@@ -16,22 +15,6 @@ interface Data {
 
 async function processEmbedding(job: Job<Data>) {
   logger.info(`Job ${job.name}#${job.id} 임베딩 생성 진행`);
-
-  const vectorStore = PrismaVectorStore.withModel<Embedding>(prisma).create(
-    new VertexAIEmbeddings({
-      model: "text-multilingual-embedding-002",
-    }),
-    {
-      prisma: Prisma,
-      // @ts-expect-error Embedding 테이블이 embedding으로 매핑되어있음
-      tableName: "embedding",
-      vectorColumnName: "vector",
-      columns: {
-        id: PrismaVectorStore.IdColumn,
-        content: PrismaVectorStore.ContentColumn,
-      },
-    },
-  );
 
   const separators = ["\n\n", "\n", ".", "!", "?", ",", " ", ""];
 
@@ -70,7 +53,6 @@ async function processEmbedding(job: Job<Data>) {
   }
 }
 
-export const createEmbeddingQueue = createQueue<Data>(
-  "createEmbedding",
-  processEmbedding,
+export const createEmbeddingQueue = singleton("createEmbeddingQueue", () =>
+  createQueue<Data>("createEmbedding", processEmbedding),
 );
