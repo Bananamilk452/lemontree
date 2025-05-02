@@ -1,9 +1,9 @@
 import { ChatVertexAI } from "@langchain/google-vertexai";
 import { Memory } from "@prisma/client";
+import { getRelatedMemories as getRelatedMemoriesQuery } from "@prisma/client/sql";
 import { format } from "date-fns";
 
 import { vectorStore } from "~/lib/langchain";
-import { diary as Diary } from "~/lib/models/diary";
 import {
   createMemoryPromptTemplate,
   CreateMemorySchema,
@@ -11,22 +11,28 @@ import {
 } from "~/lib/prompts";
 import { prisma } from "~/utils/db";
 import { logger } from "~/utils/logger";
-import { createQueue } from "~/utils/queueFactory";
-import { singleton } from "~/utils/singleton";
 
-import type { Job } from "bullmq";
+export async function createMemory(diaryId: string) {
+  const jobId = crypto.randomUUID();
+  logger.info(`[${jobId}] createMemory 작업 시작: diaryId: ${diaryId}`);
 
-interface Data {
-  diaryId: string;
-}
-
-async function processMemory(job: Job<Data>) {
-  logger.info(`Job ${job.name}#${job.id} 메모리 생성 진행`);
-
-  const diary = await Diary.getDiaryById(job.data.diaryId);
+  const diary = await prisma.diary.findUnique({
+    where: { id: diaryId },
+    include: {
+      _count: {
+        select: {
+          embeddings: true,
+        },
+      },
+    },
+  });
 
   if (!diary) {
-    throw new Error(`다이어리 없음: ${job.data.diaryId}`);
+    throw new Error(`다이어리 없음: ${diaryId}`);
+  }
+
+  if (diary._count.embeddings <= 0) {
+    throw new Error(`임베딩 없음: ${diaryId}`);
   }
 
   const model = new ChatVertexAI({
@@ -37,32 +43,61 @@ async function processMemory(job: Job<Data>) {
 
   const modelWithStructure = model.withStructuredOutput(createMemorySchema);
 
-  const relatedMemories = (await Diary.getRelatedMemories(diary.id)).map(
-    (memory) => ({
-      id: memory.memoryId,
-      content: memory.content,
-    }),
+  const relatedMemories = await getRelatedMemories(diary.id);
+  logger.info(
+    `[${jobId}] 관련 메모리: ${JSON.stringify(relatedMemories, null, 2)}`,
   );
 
   const promptValue = await createMemoryPromptTemplate.invoke({
     user_text: diary.content,
     current_date: format(diary.date, "yyyy-MM-dd"),
-    similar_memories: JSON.stringify(relatedMemories, null, 2),
+    similar_memories: JSON.stringify(
+      relatedMemories.map((memory) => ({
+        id: memory.memoryId,
+        content: memory.content,
+      })),
+      null,
+      2,
+    ),
   });
 
   const { memories } = await modelWithStructure.invoke(promptValue);
+  logger.info(`[${jobId}] 추론한 메모리: ${JSON.stringify(memories, null, 2)}`);
 
-  const newMemories = await processNewMemories(job.data.diaryId, memories);
-  const updateMemories = await processUpdateMemories(memories);
-  await processDeleteMemories(memories);
+  try {
+    const newMemories = await processNewMemories(diaryId, memories);
+    const updateMemories = await processUpdateMemories(diaryId, memories);
+    await processDeleteMemories(memories);
 
-  const result = await createMemoryEmbedding(
-    job.data.diaryId,
-    newMemories,
-    updateMemories,
-  );
+    const result = await createMemoryEmbedding(newMemories, updateMemories);
 
-  return result;
+    logger.info(
+      `[${jobId}] createMemory 작업 완료: diaryId: ${diaryId}, vectorCounts: ${result.embeddings.length}`,
+    );
+    return result;
+  } catch (error) {
+    const memoryIds = memories
+      .map((memory) => memory.id)
+      .filter((id): id is string => typeof id === "string");
+
+    await prisma.memory.deleteMany({
+      where: {
+        id: { in: memoryIds },
+      },
+    });
+
+    await prisma.embedding.deleteMany({
+      where: {
+        memoryId: { in: memoryIds },
+      },
+    });
+    logger.error(
+      `[${jobId}] createMemory 작업 중 에러로 메모리 생성이 롤백됨. 에러: ${error}`,
+    );
+    throw new Error(
+      `createMemory 작업 중 에러로 메모리 생성이 롤백됨. 에러: ${error}`,
+    );
+  }
 }
 
 async function processNewMemories(
@@ -80,7 +115,11 @@ async function processNewMemories(
       prisma.memory.create({
         data: {
           content: memory.content!,
-          diaryId: diaryId,
+          diaries: {
+            connect: {
+              id: diaryId,
+            },
+          },
         },
       }),
     ),
@@ -89,7 +128,10 @@ async function processNewMemories(
   return results;
 }
 
-async function processUpdateMemories(memories: CreateMemorySchema[]) {
+async function processUpdateMemories(
+  diaryId: string,
+  memories: CreateMemorySchema[],
+) {
   const updateMemories = memories.filter(
     (memory) => memory.operation === "UPDATE",
   );
@@ -105,9 +147,14 @@ async function processUpdateMemories(memories: CreateMemorySchema[]) {
   const results = await prisma.$transaction(
     updateMemories.map((memory) =>
       prisma.memory.update({
-        where: { id: memory.id! },
+        where: { id: memory.id },
         data: {
-          content: memory.content!,
+          content: memory.content,
+          diaries: {
+            connect: {
+              id: diaryId,
+            },
+          },
         },
       }),
     ),
@@ -128,10 +175,10 @@ async function processDeleteMemories(memories: CreateMemorySchema[]) {
   const results = await prisma.$transaction(
     deleteMemories.flatMap((memory) => [
       prisma.memory.delete({
-        where: { id: memory.id! },
+        where: { id: memory.id },
       }),
       prisma.embedding.deleteMany({
-        where: { memoryId: memory.id! },
+        where: { memoryId: memory.id },
       }),
     ]),
   );
@@ -140,7 +187,6 @@ async function processDeleteMemories(memories: CreateMemorySchema[]) {
 }
 
 async function createMemoryEmbedding(
-  diaryId: string,
   newMemories: Memory[],
   updateMemories: Memory[],
 ) {
@@ -148,7 +194,7 @@ async function createMemoryEmbedding(
   await prisma.$transaction(
     updateMemories.map((memory) =>
       prisma.embedding.deleteMany({
-        where: { memoryId: memory.id! },
+        where: { memoryId: memory.id },
       }),
     ),
   );
@@ -166,29 +212,25 @@ async function createMemoryEmbedding(
     ),
   );
 
-  try {
-    await vectorStore.addModels(embeddings);
+  await vectorStore.addModels(embeddings);
 
-    return { memories, embeddings };
-  } catch (vectorError) {
-    logger.error("벡터 변환 중 오류 발생:", vectorError);
-
-    const vectorIds = embeddings.map((doc) => doc.id);
-    await prisma.embedding.deleteMany({
-      where: {
-        id: { in: vectorIds },
-      },
-    });
-    await prisma.memory.deleteMany({
-      where: {
-        id: { in: memories.map((memory) => memory.id) },
-      },
-    });
-
-    throw new Error(`벡터 변환 실패로 메모리 생성이 롤백됨: ${vectorError}`);
-  }
+  return { memories, embeddings };
 }
 
-export const createMemoryQueue = singleton("createMemoryQueue", () =>
-  createQueue<Data>("createMemory", processMemory),
-);
+async function getRelatedMemories(diaryId: string) {
+  const diary = await prisma.diary.findUnique({
+    where: {
+      id: diaryId,
+    },
+  });
+
+  if (!diary) {
+    return [];
+  }
+
+  const memories = await prisma.$queryRawTyped(
+    getRelatedMemoriesQuery(diary.id, diary.date),
+  );
+
+  return memories;
+}
