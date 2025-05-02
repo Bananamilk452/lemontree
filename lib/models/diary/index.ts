@@ -1,5 +1,11 @@
+import { getRelatedMemories as getRelatedMemoriesQuery } from "@prisma/client/sql";
+
 import { createEmbeddingQueue } from "~/lib/models/diary/createEmbedding";
+import { embedding } from "~/lib/models/embedding";
+import { memory } from "~/lib/models/memory";
 import { prisma } from "~/utils/db";
+
+import { createMemoryQueue } from "./createMemory";
 
 import type { Diary } from "@prisma/client";
 import type { JobsOptions } from "bullmq";
@@ -20,14 +26,11 @@ export const diary = {
       data,
     });
 
-    const promises = [
-      createEmbeddingQueue.addJob(
-        { diaryId: diary.id, content: data.content },
-        jobOptions,
-      ),
-    ];
-
-    Promise.all(promises);
+    createEmbeddingQueue.addJob(
+      { diaryId: diary.id, content: diary.content },
+      jobOptions,
+    );
+    createMemoryQueue.addJob({ diaryId: diary.id }, jobOptions);
     return diary;
   },
 
@@ -47,20 +50,14 @@ export const diary = {
       data,
     });
 
-    await prisma.embedding.deleteMany({
-      where: {
-        diaryId: id,
-      },
-    });
+    await embedding.removeEmbeddingByDiaryId(id);
+    await memory.removeMemoryByDiaryId(id);
 
-    const promises = [
-      createEmbeddingQueue.addJob(
-        { diaryId: diary.id, content: data.content },
-        jobOptions,
-      ),
-    ];
-
-    Promise.all(promises);
+    createEmbeddingQueue.addJob(
+      { diaryId: diary.id, content: diary.content },
+      jobOptions,
+    );
+    createMemoryQueue.addJob({ diaryId: diary.id }, jobOptions);
     return diary;
   },
 
@@ -89,20 +86,21 @@ export const diary = {
       return null;
     }
 
-    await prisma.embedding.deleteMany({
+    const embeddingCount = await prisma.embedding.count({
       where: {
         diaryId: id,
       },
     });
 
-    const promises = [
+    await memory.removeMemoryByDiaryId(id);
+
+    if (embeddingCount === 0) {
       createEmbeddingQueue.addJob(
         { diaryId: diary.id, content: diary.content },
         jobOptions,
-      ),
-    ];
-
-    Promise.all(promises);
+      );
+    }
+    createMemoryQueue.addJob({ diaryId: diary.id }, jobOptions);
     return diary;
   },
 
@@ -144,6 +142,7 @@ export const diary = {
         _count: {
           select: {
             embeddings: true,
+            memories: true,
           },
         },
       },
@@ -160,6 +159,24 @@ export const diary = {
       diarys,
       total,
     };
+  },
+
+  async getRelatedMemories(diaryId: string) {
+    const diary = await prisma.diary.findUnique({
+      where: {
+        id: diaryId,
+      },
+    });
+
+    if (!diary) {
+      return [];
+    }
+
+    const memories = await prisma.$queryRawTyped(
+      getRelatedMemoriesQuery(diary.id, diary.date),
+    );
+
+    return memories;
   },
 };
 
