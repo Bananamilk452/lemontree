@@ -1,6 +1,5 @@
 #!/bin/sh
 
-# bun prisma migrate dev
-# bun dev --host
+pnpm prisma migrate dev
 
 tail -f /dev/null
