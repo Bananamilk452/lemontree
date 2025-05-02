@@ -1,6 +1,6 @@
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["postgresqlExtensions"]
+  previewFeatures = ["postgresqlExtensions", "typedSql"]
 }
 
 datasource db {
@@ -10,30 +10,45 @@ datasource db {
 }
 
 model Diary {
-  id        String    @id @default(uuid(7))
-  content   String
-  date      DateTime  @default(now())
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
-  sentiment String?
-  summary   String?
-  keywords  String[]
-  embeddings   Embedding[]
+  id         String      @id @default(uuid(7))
+  content    String
+  date       DateTime    @default(now())
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime?   @updatedAt
+  sentiment  String?
+  summary    String?
+  keywords   String[]
+  embeddings Embedding[]
+  memories   Memory[]
 
   @@map("diary")
 }
 
 model Embedding {
-  id        String                 @id @default(uuid(7))
+  id        String                      @id @default(uuid(7))
   vector    Unsupported("vector(768)")?
   content   String
-  diaryId   String
-  diary     Diary                  @relation(fields: [diaryId], references: [id])
-  createdAt DateTime               @default(now())
-  updatedAt DateTime?              @updatedAt
+  diaryId   String?
+  diary     Diary?                      @relation(fields: [diaryId], references: [id])
+  memoryId  String?
+  memory    Memory?                     @relation(fields: [memoryId], references: [id])
+  createdAt DateTime                    @default(now())
+  updatedAt DateTime?                   @updatedAt
 
-  @@map("embedding")
   @@index([vector], map: "embedding_vector_HNSW")
+  @@map("embedding")
+}
+
+model Memory {
+  id         String      @id @default(uuid(7))
+  content    String
+  diaryId    String
+  diary      Diary       @relation(fields: [diaryId], references: [id])
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime?   @updatedAt
+  embeddings Embedding[]
+
+  @@map("memory")
 }
 
 model User {
