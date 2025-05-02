@@ -1,18 +1,12 @@
-import { createEmbeddingQueue } from "~/lib/models/diary/createEmbedding";
+import { createEmbedding } from "~/lib/models/diary/createEmbedding";
+import { createMemory } from "~/lib/models/diary/createMemory";
+import { embedding } from "~/lib/models/embedding";
+import { memory } from "~/lib/models/memory";
 import { prisma } from "~/utils/db";
 
 import type { Diary } from "@prisma/client";
-import type { JobsOptions } from "bullmq";
 
 export type { Diary };
-
-const jobOptions: JobsOptions = {
-  attempts: 3,
-  backoff: {
-    type: "exponential",
-    delay: 1000,
-  },
-};
 
 export const diary = {
   async createDiary(data: { content: string; date: Date }) {
@@ -20,15 +14,13 @@ export const diary = {
       data,
     });
 
-    const promises = [
-      createEmbeddingQueue.addJob(
-        { diaryId: diary.id, content: data.content },
-        jobOptions,
-      ),
-    ];
+    await createEmbedding(diary.id, diary.content);
+    const { memories } = await createMemory(diary.id);
 
-    Promise.all(promises);
-    return diary;
+    return {
+      diary,
+      memories,
+    };
   },
 
   async tempSaveDiary(data: { content: string; date: Date }) {
@@ -47,21 +39,16 @@ export const diary = {
       data,
     });
 
-    await prisma.embedding.deleteMany({
-      where: {
-        diaryId: id,
-      },
-    });
+    await embedding.removeEmbeddingByDiaryId(id);
+    await memory.removeMemoryByDiaryId(id);
 
-    const promises = [
-      createEmbeddingQueue.addJob(
-        { diaryId: diary.id, content: data.content },
-        jobOptions,
-      ),
-    ];
+    await createEmbedding(diary.id, diary.content);
+    const { memories } = await createMemory(diary.id);
 
-    Promise.all(promises);
-    return diary;
+    return {
+      diary,
+      memories,
+    };
   },
 
   async deleteDiary(id: string) {
@@ -74,6 +61,16 @@ export const diary = {
     await prisma.embedding.deleteMany({
       where: {
         diaryId: id,
+      },
+    });
+
+    await prisma.memory.deleteMany({
+      where: {
+        diaries: {
+          some: {
+            id,
+          },
+        },
       },
     });
   },
@@ -89,21 +86,23 @@ export const diary = {
       return null;
     }
 
-    await prisma.embedding.deleteMany({
+    const embeddingCount = await prisma.embedding.count({
       where: {
         diaryId: id,
       },
     });
 
-    const promises = [
-      createEmbeddingQueue.addJob(
-        { diaryId: diary.id, content: diary.content },
-        jobOptions,
-      ),
-    ];
+    await memory.removeMemoryByDiaryId(id);
 
-    Promise.all(promises);
-    return diary;
+    if (embeddingCount === 0) {
+      await createEmbedding(diary.id, diary.content);
+    }
+    const { memories } = await createMemory(diary.id);
+
+    return {
+      diary,
+      memories,
+    };
   },
 
   async getDiaryById(id: string) {
@@ -144,6 +143,7 @@ export const diary = {
         _count: {
           select: {
             embeddings: true,
+            memories: true,
           },
         },
       },

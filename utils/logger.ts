@@ -2,8 +2,6 @@ import { createLogger, format, transports } from "winston";
 
 import "winston-daily-rotate-file";
 
-import { singleton } from "~/utils/singleton";
-
 const transport = new transports.DailyRotateFile({
   filename: "lemontree-%DATE%.log",
   datePattern: "YYYY-MM-DD-HH",
@@ -13,21 +11,19 @@ const transport = new transports.DailyRotateFile({
   dirname: "logs",
 });
 
-export const logger = singleton("logger", () =>
-  createLogger({
-    level: "info",
-    format: format.combine(
-      format.timestamp({
-        format: "YYYY-MM-DD HH:mm:ss",
-      }),
-      format.errors({ stack: true }),
-      format.splat(),
-      format.json(),
-    ),
-    defaultMeta: { service: "lemontree" },
-    transports: [transport],
-  }),
-);
+export const logger = createLogger({
+  level: "info",
+  format: format.combine(
+    format.timestamp({
+      format: "YYYY-MM-DD HH:mm:ss",
+    }),
+    format.errors({ stack: true }),
+    format.splat(),
+    format.json(),
+  ),
+  defaultMeta: { service: "lemontree" },
+  transports: [transport],
+});
 
 //
 // If we're not in production then **ALSO** log to the `console`

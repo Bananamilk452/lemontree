@@ -5,7 +5,6 @@ import { format } from "date-fns";
 import {
   CaseSensitiveIcon,
   EllipsisVerticalIcon,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   MemoryStickIcon,
   PencilIcon,
   Trash2Icon,
@@ -72,12 +71,12 @@ export function DiaryListCard({ diary }: DiaryListCardProps) {
             </dt>
             <dd>임베딩 {diary._count.embeddings}개</dd>
           </dl>
-          {/* <dl className="flex gap-1.5 items-center text-sm">
+          <dl className="flex gap-1.5 items-center text-sm">
             <dt>
               <MemoryStickIcon className="size-5" />
             </dt>
-            <dd>메모리 2개</dd>
-          </dl> */}
+            <dd>메모리 {diary._count.memories}개</dd>
+          </dl>
         </div>
 
         <div className="min-h-12 py-5">
@@ -85,7 +84,7 @@ export function DiaryListCard({ diary }: DiaryListCardProps) {
             <Note variant="warning" title="일기 메모리화가 필요합니다.">
               일기의 메모리화가 필요합니다. 에디터에서 저장 버튼이나{" "}
               <EllipsisVerticalIcon className="inline-block size-4" />을 누르고
-              &quot;일기 메모리화화&quot;을 눌러주세요.
+              &quot;일기 메모리화&quot;을 눌러주세요.
             </Note>
           )}
         </div>
@@ -131,11 +130,10 @@ export function DiaryListCard({ diary }: DiaryListCardProps) {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuGroup>
-                  <DropdownMenuItem
-                    onClick={handleDiaryMemorify}
-                    disabled={diary._count.embeddings > 0}
-                  >
-                    일기 메모리화
+                  <DropdownMenuItem onClick={handleDiaryMemorify}>
+                    {diary._count.embeddings > 0
+                      ? "일기 다시 메모리화"
+                      : "일기 메모리화"}
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
               </DropdownMenuContent>

@@ -9,6 +9,12 @@ export default async function List({
 }) {
   const limit = 10;
   const { page } = await params;
+
+  if (isNaN(Number(page))) {
+    // TODO: 에러 페이지 따로 만들기기
+    return <div>잘못된 페이지입니다.</div>;
+  }
+
   const { diarys, total } = await getDiarys({ limit, page: Number(page) });
 
   return (

@@ -23,13 +23,10 @@ export function DiaryViewer({ diary: initialDiary }: DiaryViewerProps) {
     initialDiary || null,
   );
   const [isLoading, setIsLoading] = useState(false);
-  const [shouldLoadDiary, setShouldLoadDiary] = useState(initialDiary === null);
 
   useEffect(() => {
-    // SSR로 첫 로딩되면 여기에 걸리고
-    if (shouldLoadDiary === false) {
-      // 다음부턴 일기 로딩하게
-      setShouldLoadDiary(true);
+    // SSR로 첫 로딩되면 패스
+    if (initialDiary?.date == date) {
       return;
     }
 
@@ -38,7 +35,7 @@ export function DiaryViewer({ diary: initialDiary }: DiaryViewerProps) {
       setCurrentDiary(d);
       setIsLoading(false);
     });
-  }, [date, shouldLoadDiary]);
+  }, [date, initialDiary]);
 
   function handlePreviousDiary() {
     const newDate = new Date(date);
