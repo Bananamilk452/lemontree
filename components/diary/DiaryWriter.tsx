@@ -151,7 +151,6 @@ export function DiaryWriter(props: DiaryWriterProps) {
             <FormItem>
               <FormControl>
                 <Textarea
-                  {...field}
                   disabled={isLoading}
                   className="shadow-md rounded-xl resize-none h-[500px] p-4 !text-base"
                   placeholder={
@@ -159,6 +158,7 @@ export function DiaryWriter(props: DiaryWriterProps) {
                       ? "일기를 불러오는 중입니다..."
                       : "오늘은 어떤 일이 있었나요? 기분 좋은 일, 감사한 일, 또는 오늘 배운 것을 자유롭게 적어보세요."
                   }
+                  {...field}
                 />
               </FormControl>
               <FormMessage />
