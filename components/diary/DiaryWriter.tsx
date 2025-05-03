@@ -46,7 +46,7 @@ export function DiaryWriter(props: DiaryWriterProps) {
     setIsLoading(false);
 
     if (res.success) {
-      toast.success("일기가 저장되었습니다.");
+      toast.success("일기를 저장하고 메모리화했습니다.");
     } else {
       toast.error("일기 저장에 실패했습니다.");
       console.error(res.error);
@@ -118,7 +118,7 @@ export function DiaryWriter(props: DiaryWriterProps) {
     } else {
       form.setValue("content", "");
     }
-  }, [diary, form]);
+  }, [date, diary, form]);
 
   return (
     <Form {...form}>
