@@ -152,3 +152,9 @@ export async function getDiarys(
 
   return data;
 }
+
+export async function getUnmemorizedOldestDiaryByDate(date: Date) {
+  const data = await diary.getUnmemorizedOldestDiaryByDate(date);
+
+  return data;
+}

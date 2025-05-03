@@ -161,6 +161,25 @@ export const diary = {
       total,
     };
   },
+
+  async getUnmemorizedOldestDiaryByDate(date: Date) {
+    const diarys = await prisma.diary.findMany({
+      where: {
+        date: {
+          lt: date,
+        },
+        embeddings: {
+          none: {},
+        },
+      },
+      orderBy: {
+        date: "asc",
+      },
+      take: 1,
+    });
+
+    return diarys;
+  },
 };
 
 export type DiaryWithCount = Awaited<
