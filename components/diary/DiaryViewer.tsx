@@ -82,7 +82,7 @@ export function DiaryViewer({ diary: initialDiary }: DiaryViewerProps) {
       ) : currentDiary ? (
         <DiaryCard diary={currentDiary} />
       ) : (
-        <DiaryEmpty />
+        <DiaryEmpty date={date} />
       )}
     </div>
   );
