@@ -33,6 +33,7 @@ export function DeleteDiaryModal({
     setIsLoading(true);
     deleteDiary(diary.id)
       .then(() => {
+        toast.success("일기가 삭제되었습니다.");
         setOpen(false);
         setIsLoading(false);
       })
@@ -51,7 +52,8 @@ export function DeleteDiaryModal({
         </DialogHeader>
         <div>
           {format(diary.date, "yyyy년 M월 d일")}의 일기를 삭제하시겠습니까?
-          (임베딩, 메모리도 삭제됩니다.)
+          <br />
+          <strong>(일기, 임베딩, 메모리도 함께 삭제됩니다.)</strong>
         </div>
         <DialogFooter className="flex justify-end gap-2 items-center">
           {isLoading && <Spinner className="mr-2 size-5" />}
@@ -62,6 +64,16 @@ export function DeleteDiaryModal({
             disabled={isLoading}
           >
             삭제
+          </Button>
+          <Button
+            variant="outline"
+            type="button"
+            onClick={() => {
+              setOpen(false);
+            }}
+            disabled={isLoading}
+          >
+            취소
           </Button>
         </DialogFooter>
       </DialogContent>
