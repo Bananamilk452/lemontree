@@ -12,10 +12,11 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useLayoutEffect, useRef, useState } from "react";
-import { toast } from "sonner";
 
-import { processDiary } from "~/app/actions/diary";
+import { getUnmemorizedOldestDiaryByDate } from "~/app/actions/diary";
 import { DeleteDiaryModal } from "~/components/diary/DeleteDiaryModal";
+import { MemoryPastFirstModal } from "~/components/diary/MemoryPastFirstModal";
+import { MemoryResetAlertModal } from "~/components/diary/MemoryResetAlertModal";
 import { Spinner } from "~/components/Spinner";
 import { Button } from "~/components/ui/button";
 import {
@@ -33,30 +34,35 @@ interface DiaryListCardProps {
   diary: DiaryWithCount;
 }
 
+export type DiaryListCardActiveModal =
+  | "memory-past-first"
+  | "memory-reset-alert"
+  | null;
+
 export function DiaryListCard({ diary }: DiaryListCardProps) {
   const router = useRouter();
 
   const [isLoading, setIsLoading] = useState(false);
   const [isDeleteDiaryModalOpen, setIsDeleteDiaryModalOpen] = useState(false);
+  const [activeModal, setActiveModal] =
+    useState<DiaryListCardActiveModal>(null);
+  const [pastDiary, setPastDiary] = useState<Diary | null>(null);
 
   function handleEditButtonClick() {
     router.push(`/new?date=${format(diary.date, "yyyy-MM-dd")}`);
   }
 
-  function handleDiaryMemorify() {
+  async function handleDiaryMemorify() {
     setIsLoading(true);
-    processDiary(diary.id)
-      .then((res) => {
-        toast.success(
-          `일기 메모리화가 완료되었습니다. (메모리 ${res.data?.memories.length}개)`,
-        );
-      })
-      .catch(() => {
-        toast.error("일기 메모리화에 실패했습니다.");
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+    const [pd] = await getUnmemorizedOldestDiaryByDate(diary.date);
+    setIsLoading(false);
+
+    if (pd) {
+      setPastDiary(pd);
+      setActiveModal("memory-past-first");
+    } else {
+      setActiveModal("memory-reset-alert");
+    }
   }
 
   return (
@@ -128,11 +134,7 @@ export function DiaryListCard({ diary }: DiaryListCardProps) {
               <Trash2Icon className="size-5" />
               삭제
             </Button>
-            <DeleteDiaryModal
-              diary={diary}
-              open={isDeleteDiaryModalOpen}
-              setOpen={setIsDeleteDiaryModalOpen}
-            />
+
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm">
@@ -155,6 +157,24 @@ export function DiaryListCard({ diary }: DiaryListCardProps) {
           </div>
         </div>
       </div>
+
+      <DeleteDiaryModal
+        diary={diary}
+        open={isDeleteDiaryModalOpen}
+        setOpen={setIsDeleteDiaryModalOpen}
+      />
+      <MemoryResetAlertModal
+        diary={diary}
+        activeModal={activeModal}
+        setActiveModal={setActiveModal}
+      />
+      {pastDiary && (
+        <MemoryPastFirstModal
+          diary={pastDiary}
+          activeModal={activeModal}
+          setActiveModal={setActiveModal}
+        />
+      )}
     </div>
   );
 }
