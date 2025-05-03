@@ -69,6 +69,7 @@ export function DatePicker({
           mode="single"
           selected={value}
           onSelect={handleOnChange}
+          defaultMonth={value}
           initialFocus
         />
       </PopoverContent>
