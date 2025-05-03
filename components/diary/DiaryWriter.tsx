@@ -40,30 +40,34 @@ export function DiaryWriter(props: DiaryWriterProps) {
     },
   });
 
-  async function onSave(data: z.infer<typeof DiaryWriterFormSchema>) {
+  function onSave(data: z.infer<typeof DiaryWriterFormSchema>) {
     setIsLoading(true);
-    const res = await createDiary(data);
-    setIsLoading(false);
-
-    if (res.success) {
-      toast.success("일기를 저장하고 메모리화했습니다.");
-    } else {
-      toast.error("일기 저장에 실패했습니다.");
-      console.error(res.error);
-    }
+    createDiary(data)
+      .then(() => {
+        toast.success("일기를 저장하고 메모리화했습니다.");
+      })
+      .catch((error) => {
+        toast.error("일기 저장에 실패했습니다.");
+        console.error(error);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   }
 
   async function onTempSave(data: z.infer<typeof DiaryWriterFormSchema>) {
     setIsLoading(true);
-    const res = await createDiary(data, { temp: true });
-    setIsLoading(false);
-
-    if (res.success) {
-      toast.success("임시 저장되었습니다.");
-    } else {
-      toast.error("임시 저장에 실패했습니다.");
-      console.error(res.error);
-    }
+    createDiary(data, { temp: true })
+      .then(() => {
+        toast.success("일기를 임시 저장했습니다.");
+      })
+      .catch((error) => {
+        toast.error("일기 임시 저장에 실패했습니다.");
+        console.error(error);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   }
 
   async function onUpdate(data: z.infer<typeof DiaryWriterFormSchema>) {
@@ -73,15 +77,17 @@ export function DiaryWriter(props: DiaryWriterProps) {
     }
 
     setIsLoading(true);
-    const res = await updateDiary(diary.id, data);
-    setIsLoading(false);
-
-    if (res.success) {
-      toast.success("일기가 수정되었습니다.");
-    } else {
-      toast.error("일기 수정에 실패했습니다.");
-      console.error(res.error);
-    }
+    updateDiary(diary.id, data)
+      .then(() => {
+        toast.success("일기를 수정했습니다.");
+      })
+      .catch((error) => {
+        toast.error("일기 수정에 실패했습니다.");
+        console.error(error);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   }
 
   const [isLoading, setIsLoading] = useState(false);

@@ -28,7 +28,7 @@ export const diary = {
       data,
     });
 
-    return diary;
+    return { diary };
   },
 
   async updateDiary(id: string, data: { content: string; date: Date }) {
@@ -83,7 +83,7 @@ export const diary = {
     });
 
     if (!diary) {
-      return null;
+      throw new Error("Diary not found");
     }
 
     const embeddingCount = await prisma.embedding.count({

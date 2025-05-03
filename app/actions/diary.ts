@@ -16,10 +16,9 @@ export async function createDiary(
   const validatedFields = DiaryWriterFormSchema.safeParse(data);
 
   if (!validatedFields.success) {
-    return {
-      success: false,
-      error: validatedFields.error.flatten().fieldErrors,
-    };
+    throw new Error("Validation failed", {
+      cause: validatedFields.error.flatten().fieldErrors,
+    });
   }
 
   const { date, content } = validatedFields.data;
@@ -37,10 +36,7 @@ export async function createDiary(
     revalidatePath("/new");
     revalidatePath("/list/[page]", "page");
 
-    return {
-      success: true,
-      data,
-    };
+    return data;
   } else {
     const data = await diary.createDiary({
       content,
@@ -49,10 +45,7 @@ export async function createDiary(
     revalidatePath("/home");
     revalidatePath("/new");
     revalidatePath("/list/[page]", "page");
-    return {
-      success: true,
-      data,
-    };
+    return data;
   }
 }
 
@@ -60,10 +53,9 @@ export async function updateDiary(id: string, data: DiaryWriterForm) {
   const validatedFields = DiaryWriterFormSchema.safeParse(data);
 
   if (!validatedFields.success) {
-    return {
-      success: false,
-      error: validatedFields.error.flatten().fieldErrors,
-    };
+    throw new Error("Validation failed", {
+      cause: validatedFields.error.flatten().fieldErrors,
+    });
   }
 
   const { date, content } = validatedFields.data;
@@ -80,10 +72,7 @@ export async function updateDiary(id: string, data: DiaryWriterForm) {
   revalidatePath("/new");
   revalidatePath("/list/[page]", "page");
 
-  return {
-    success: true,
-    result,
-  };
+  return result;
 }
 
 export async function deleteDiary(id: string) {
@@ -93,9 +82,7 @@ export async function deleteDiary(id: string) {
   revalidatePath("/new");
   revalidatePath("/list/[page]", "page");
 
-  return {
-    success: true,
-  };
+  return;
 }
 
 export async function processDiary(id: string) {
@@ -105,10 +92,7 @@ export async function processDiary(id: string) {
   revalidatePath("/new");
   revalidatePath("/list/[page]", "page");
 
-  return {
-    success: true,
-    data,
-  };
+  return data;
 }
 
 export async function getDiaryById(id: string) {
