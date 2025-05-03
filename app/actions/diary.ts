@@ -28,24 +28,32 @@ export async function createDiary(
   const dateWithoutTime = removeTimeFromDate(date);
 
   if (options.temp) {
-    await diary.tempSaveDiary({
+    const data = await diary.tempSaveDiary({
       content,
       date: dateWithoutTime,
     });
+
+    revalidatePath("/home");
+    revalidatePath("/new");
+    revalidatePath("/list/[page]", "page");
+
+    return {
+      success: true,
+      data,
+    };
   } else {
-    await diary.createDiary({
+    const data = await diary.createDiary({
       content,
       date: dateWithoutTime,
     });
+    revalidatePath("/home");
+    revalidatePath("/new");
+    revalidatePath("/list/[page]", "page");
+    return {
+      success: true,
+      data,
+    };
   }
-
-  revalidatePath("/home");
-  revalidatePath("/new");
-  revalidatePath("/list/[page]", "page");
-
-  return {
-    success: true,
-  };
 }
 
 export async function updateDiary(id: string, data: DiaryWriterForm) {
@@ -63,7 +71,7 @@ export async function updateDiary(id: string, data: DiaryWriterForm) {
   // 시간 정보 제거
   const dateWithoutTime = removeTimeFromDate(date);
 
-  await diary.updateDiary(id, {
+  const result = await diary.updateDiary(id, {
     content,
     date: dateWithoutTime,
   });
@@ -74,6 +82,7 @@ export async function updateDiary(id: string, data: DiaryWriterForm) {
 
   return {
     success: true,
+    result,
   };
 }
 
@@ -92,16 +101,13 @@ export async function deleteDiary(id: string) {
 export async function processDiary(id: string) {
   const data = await diary.processDiary(id);
 
-  if (!data) {
-    return null;
-  }
-
   revalidatePath("/home");
   revalidatePath("/new");
   revalidatePath("/list/[page]", "page");
 
   return {
     success: true,
+    data,
   };
 }
 

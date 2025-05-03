@@ -46,7 +46,7 @@ export function DiaryWriter(props: DiaryWriterProps) {
     setIsLoading(false);
 
     if (res.success) {
-      toast.success("일기가 저장되었습니다.");
+      toast.success("일기를 저장하고 메모리화했습니다.");
     } else {
       toast.error("일기 저장에 실패했습니다.");
       console.error(res.error);
@@ -118,7 +118,7 @@ export function DiaryWriter(props: DiaryWriterProps) {
     } else {
       form.setValue("content", "");
     }
-  }, [diary, form]);
+  }, [date, diary, form]);
 
   return (
     <Form {...form}>
@@ -167,6 +167,7 @@ export function DiaryWriter(props: DiaryWriterProps) {
         />
         {diary ? (
           <div className="flex justify-end gap-4">
+            {form.formState.isSubmitting && <Spinner />}
             <Button
               onClick={form.handleSubmit(onUpdate)}
               size="lg"
@@ -175,11 +176,11 @@ export function DiaryWriter(props: DiaryWriterProps) {
             >
               <PencilIcon strokeWidth={1.5} className="size-5" />
               일기 수정
-              {form.formState.isSubmitting && <Spinner />}
             </Button>
           </div>
         ) : (
           <div className="flex justify-end gap-4">
+            {form.formState.isSubmitting && <Spinner />}
             <Button
               onClick={form.handleSubmit(onTempSave)}
               size="lg"
@@ -188,7 +189,6 @@ export function DiaryWriter(props: DiaryWriterProps) {
               disabled={form.formState.isSubmitting || isLoading}
             >
               임시 저장
-              {form.formState.isSubmitting && <Spinner />}
             </Button>
 
             <Button
@@ -199,7 +199,6 @@ export function DiaryWriter(props: DiaryWriterProps) {
             >
               <SaveIcon strokeWidth={1.5} className="size-5" />
               일기 저장
-              {form.formState.isSubmitting && <Spinner />}
             </Button>
           </div>
         )}

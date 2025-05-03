@@ -16,6 +16,7 @@ import { toast } from "sonner";
 
 import { processDiary } from "~/app/actions/diary";
 import { DeleteDiaryModal } from "~/components/diary/DeleteDiaryModal";
+import { Spinner } from "~/components/Spinner";
 import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
@@ -35,6 +36,7 @@ interface DiaryListCardProps {
 export function DiaryListCard({ diary }: DiaryListCardProps) {
   const router = useRouter();
 
+  const [isLoading, setIsLoading] = useState(false);
   const [isDeleteDiaryModalOpen, setIsDeleteDiaryModalOpen] = useState(false);
 
   function handleEditButtonClick() {
@@ -42,12 +44,18 @@ export function DiaryListCard({ diary }: DiaryListCardProps) {
   }
 
   function handleDiaryMemorify() {
+    setIsLoading(true);
     processDiary(diary.id)
-      .then(() => {
-        toast.success("일기를 메모리화 중입니다. 잠시 후 다시 확인해주세요.");
+      .then((res) => {
+        toast.success(
+          `일기 메모리화가 완료되었습니다. (메모리 ${res.data?.memories.length}개)`,
+        );
       })
       .catch(() => {
         toast.error("일기 메모리화에 실패했습니다.");
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   }
 
@@ -98,12 +106,14 @@ export function DiaryListCard({ diary }: DiaryListCardProps) {
             )}
           </p>
 
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
+            {isLoading && <Spinner />}
             <Button
               onClick={handleEditButtonClick}
               className="text-gray-600"
               variant="ghost"
               size="sm"
+              disabled={isLoading}
             >
               <PencilIcon className="size-5" />
               수정
@@ -113,6 +123,7 @@ export function DiaryListCard({ diary }: DiaryListCardProps) {
               className="text-red-600 hover:text-red-800"
               variant="ghost"
               size="sm"
+              disabled={isLoading}
             >
               <Trash2Icon className="size-5" />
               삭제
@@ -130,9 +141,12 @@ export function DiaryListCard({ diary }: DiaryListCardProps) {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuGroup>
-                  <DropdownMenuItem onClick={handleDiaryMemorify}>
+                  <DropdownMenuItem
+                    onClick={handleDiaryMemorify}
+                    disabled={isLoading}
+                  >
                     {diary._count.embeddings > 0
-                      ? "일기 다시 메모리화"
+                      ? "일기 재메모리화"
                       : "일기 메모리화"}
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
