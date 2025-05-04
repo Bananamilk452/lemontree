@@ -13,7 +13,7 @@ const AUTH_PAGES = [
 ];
 
 export async function middleware(request: NextRequest) {
-  const res = await ky.get<Session>(
+  const res = await ky.get<Session | null>(
     `${request.nextUrl.origin}/api/auth/get-session`,
     {
       retry: 0,
@@ -23,10 +23,10 @@ export async function middleware(request: NextRequest) {
     },
   );
 
-  const session = await res.text();
+  const session = await res.json();
 
   if (!session) {
-    // 같은 페이지로 리디렉션되는 경우를 방지지
+    // 같은 페이지로 리디렉션되는 경우를 방지
     if (AUTH_PAGES.some((page) => request.nextUrl.pathname.startsWith(page))) {
       return NextResponse.next();
     }

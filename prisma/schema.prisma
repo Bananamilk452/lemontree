@@ -20,6 +20,8 @@ model Diary {
   keywords   String[]
   embeddings Embedding[]
   memories   Memory[]    @relation(name: "diary_memory")
+  userId     String
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("diary")
 }
@@ -46,6 +48,8 @@ model Memory {
   createdAt  DateTime    @default(now())
   updatedAt  DateTime?   @updatedAt
   embeddings Embedding[]
+  userId     String
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("memory")
 }
@@ -60,6 +64,8 @@ model User {
   updatedAt     DateTime
   sessions      Session[]
   accounts      Account[]
+  diaries       Diary[]
+  memories      Memory[]
 
   @@unique([email])
   @@map("user")

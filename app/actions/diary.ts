@@ -2,7 +2,9 @@
 
 import { removeTimeFromDate } from "~/utils";
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 
+import { auth } from "~/lib/auth";
 import { diary } from "~/lib/models/diary";
 import {
   DiaryWriterForm,
@@ -10,49 +12,47 @@ import {
 } from "~/types/zod/DiaryWriterFormSchema";
 
 export async function createDiary(
+  diaryId: string | undefined,
   data: DiaryWriterForm,
   options: { temp?: boolean } = {},
 ) {
   const validatedFields = DiaryWriterFormSchema.safeParse(data);
 
   if (!validatedFields.success) {
-    return {
-      success: false,
-      error: validatedFields.error.flatten().fieldErrors,
-    };
+    throw new Error("Validation failed", {
+      cause: validatedFields.error.flatten().fieldErrors,
+    });
   }
 
   const { date, content } = validatedFields.data;
 
+  const { user } = (await auth.api.getSession({
+    headers: await headers(),
+  }))!;
+
   // 시간 정보 제거
   const dateWithoutTime = removeTimeFromDate(date);
 
+  const diaryData = {
+    content,
+    date: dateWithoutTime,
+    userId: user.id,
+  };
+
   if (options.temp) {
-    const data = await diary.tempSaveDiary({
-      content,
-      date: dateWithoutTime,
-    });
+    const data = await diary.tempSaveDiary(diaryId, diaryData);
 
     revalidatePath("/home");
     revalidatePath("/new");
     revalidatePath("/list/[page]", "page");
 
-    return {
-      success: true,
-      data,
-    };
+    return data;
   } else {
-    const data = await diary.createDiary({
-      content,
-      date: dateWithoutTime,
-    });
+    const data = await diary.createDiary(diaryId, diaryData);
     revalidatePath("/home");
     revalidatePath("/new");
     revalidatePath("/list/[page]", "page");
-    return {
-      success: true,
-      data,
-    };
+    return data;
   }
 }
 
@@ -60,10 +60,9 @@ export async function updateDiary(id: string, data: DiaryWriterForm) {
   const validatedFields = DiaryWriterFormSchema.safeParse(data);
 
   if (!validatedFields.success) {
-    return {
-      success: false,
-      error: validatedFields.error.flatten().fieldErrors,
-    };
+    throw new Error("Validation failed", {
+      cause: validatedFields.error.flatten().fieldErrors,
+    });
   }
 
   const { date, content } = validatedFields.data;
@@ -80,22 +79,31 @@ export async function updateDiary(id: string, data: DiaryWriterForm) {
   revalidatePath("/new");
   revalidatePath("/list/[page]", "page");
 
-  return {
-    success: true,
-    result,
-  };
+  return result;
 }
 
 export async function deleteDiary(id: string) {
+  const { user } = (await auth.api.getSession({
+    headers: await headers(),
+  }))!;
+
+  const targetDiary = await diary.getDiaryById(id);
+
+  if (!targetDiary) {
+    throw new Error("Diary not found");
+  }
+
+  if (targetDiary.userId !== user.id) {
+    throw new Error("Unauthorized");
+  }
+
   await diary.deleteDiary(id);
 
   revalidatePath("/home");
   revalidatePath("/new");
   revalidatePath("/list/[page]", "page");
 
-  return {
-    success: true,
-  };
+  return;
 }
 
 export async function processDiary(id: string) {
@@ -105,10 +113,7 @@ export async function processDiary(id: string) {
   revalidatePath("/new");
   revalidatePath("/list/[page]", "page");
 
-  return {
-    success: true,
-    data,
-  };
+  return data;
 }
 
 export async function getDiaryById(id: string) {

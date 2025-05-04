@@ -1,4 +1,5 @@
 import { getDiarys } from "~/app/actions/diary";
+import { DiaryEmpty } from "~/components/diary/DiaryEmpty";
 import { Header } from "~/components/Header";
 import DiaryList from "~/components/list/DiaryList";
 
@@ -27,12 +28,16 @@ export default async function List({
       </Header>
 
       <div className="px-6 pb-6">
-        <DiaryList
-          diarys={diarys}
-          limit={limit}
-          page={Number(page)}
-          total={total}
-        />
+        {diarys.length > 0 ? (
+          <DiaryList
+            diarys={diarys}
+            limit={limit}
+            page={Number(page)}
+            total={total}
+          />
+        ) : (
+          <DiaryEmpty />
+        )}
       </div>
     </>
   );

@@ -41,9 +41,9 @@ export function MemoryResetAlertModal({
   function handleReset() {
     setIsLoading(true);
     processDiary(diary.id)
-      .then((res) => {
+      .then(({ memories }) => {
         toast.success(
-          `일기 재메모리화가 완료되었습니다. (메모리 ${res.data?.memories.length}개)`,
+          `일기 재메모리화가 완료되었습니다. (메모리 ${memories.length}개)`,
         );
         handleCloseModal(false);
         setIsLoading(false);
