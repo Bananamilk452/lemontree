@@ -12,7 +12,7 @@ import {
 import { prisma } from "~/utils/db";
 import { logger } from "~/utils/logger";
 
-export async function createMemory(diaryId: string) {
+export async function createMemory(diaryId: string, userId: string) {
   const jobId = crypto.randomUUID();
   logger.info(`[${jobId}] createMemory 작업 시작: diaryId: ${diaryId}`);
 
@@ -65,7 +65,7 @@ export async function createMemory(diaryId: string) {
   logger.info(`[${jobId}] 추론한 메모리: ${JSON.stringify(memories, null, 2)}`);
 
   try {
-    const newMemories = await processNewMemories(diaryId, memories);
+    const newMemories = await processNewMemories(diaryId, userId, memories);
     const updateMemories = await processUpdateMemories(diaryId, memories);
     await processDeleteMemories(memories);
 
@@ -102,6 +102,7 @@ export async function createMemory(diaryId: string) {
 
 async function processNewMemories(
   diaryId: string,
+  userId: string,
   memories: CreateMemorySchema[],
 ) {
   const newMemories = memories.filter((memory) => memory.operation === "NEW");
@@ -115,6 +116,7 @@ async function processNewMemories(
       prisma.memory.create({
         data: {
           content: memory.content!,
+          userId,
           diaries: {
             connect: {
               id: diaryId,

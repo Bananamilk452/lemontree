@@ -2,7 +2,9 @@
 
 import { removeTimeFromDate } from "~/utils";
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 
+import { auth } from "~/lib/auth";
 import { diary } from "~/lib/models/diary";
 import {
   DiaryWriterForm,
@@ -10,6 +12,7 @@ import {
 } from "~/types/zod/DiaryWriterFormSchema";
 
 export async function createDiary(
+  diaryId: string | undefined,
   data: DiaryWriterForm,
   options: { temp?: boolean } = {},
 ) {
@@ -23,14 +26,21 @@ export async function createDiary(
 
   const { date, content } = validatedFields.data;
 
+  const { user } = (await auth.api.getSession({
+    headers: await headers(),
+  }))!;
+
   // 시간 정보 제거
   const dateWithoutTime = removeTimeFromDate(date);
 
+  const diaryData = {
+    content,
+    date: dateWithoutTime,
+    userId: user.id,
+  };
+
   if (options.temp) {
-    const data = await diary.tempSaveDiary({
-      content,
-      date: dateWithoutTime,
-    });
+    const data = await diary.tempSaveDiary(diaryId, diaryData);
 
     revalidatePath("/home");
     revalidatePath("/new");
@@ -38,10 +48,7 @@ export async function createDiary(
 
     return data;
   } else {
-    const data = await diary.createDiary({
-      content,
-      date: dateWithoutTime,
-    });
+    const data = await diary.createDiary(diaryId, diaryData);
     revalidatePath("/home");
     revalidatePath("/new");
     revalidatePath("/list/[page]", "page");
@@ -76,6 +83,20 @@ export async function updateDiary(id: string, data: DiaryWriterForm) {
 }
 
 export async function deleteDiary(id: string) {
+  const { user } = (await auth.api.getSession({
+    headers: await headers(),
+  }))!;
+
+  const targetDiary = await diary.getDiaryById(id);
+
+  if (!targetDiary) {
+    throw new Error("Diary not found");
+  }
+
+  if (targetDiary.userId !== user.id) {
+    throw new Error("Unauthorized");
+  }
+
   await diary.deleteDiary(id);
 
   revalidatePath("/home");
