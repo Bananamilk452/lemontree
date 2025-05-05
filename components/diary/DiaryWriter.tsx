@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { DIARY_MAX_LENGTH } from "~/constants";
 import { utcDateNow } from "~/utils";
 import { CalendarIcon, SaveIcon } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -146,6 +147,9 @@ export function DiaryWriter(props: DiaryWriterProps) {
             </FormItem>
           )}
         />
+        <p className="text-sm text-gray-600">
+          {form.watch("content").length}/{DIARY_MAX_LENGTH}
+        </p>
         <div className="flex justify-end gap-4">
           {form.formState.isSubmitting && (
             <Spinner className="size-5 shrink-0" />
