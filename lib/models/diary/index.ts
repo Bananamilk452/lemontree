@@ -1,6 +1,3 @@
-import { headers } from "next/headers";
-
-import { auth } from "~/lib/auth";
 import { createEmbedding } from "~/lib/models/diary/createEmbedding";
 import { createMemory } from "~/lib/models/diary/createMemory";
 import { embedding } from "~/lib/models/embedding";
@@ -12,21 +9,28 @@ import type { Diary } from "@prisma/client";
 export type { Diary };
 
 export const diary = {
+  async isOwner(diaryId: string, userId: string) {
+    const diary = await prisma.diary.findUnique({
+      where: {
+        id: diaryId,
+        userId,
+      },
+    });
+
+    return !!diary;
+  },
   async createDiary(
     diaryId: string | undefined,
-    data: { content: string; date: Date; userId: string },
+    userId: string,
+    data: { content: string; date: Date },
   ) {
-    const { user } = (await auth.api.getSession({
-      headers: await headers(),
-    }))!;
-
     const diary = await prisma.diary.upsert({
       where: {
         id: diaryId || "00000000-0000-0000-0000-0000-000000000000",
       },
       create: {
         ...data,
-        userId: user.id,
+        userId,
       },
       update: {
         ...data,
@@ -35,12 +39,12 @@ export const diary = {
 
     // UPDATE 시에는 기존의 임베딩과 메모리를 삭제하고 새로 생성
     if (diaryId) {
-      await embedding.removeEmbeddingByDiaryId(diaryId);
-      await memory.removeMemoryByDiaryId(diaryId);
+      await embedding.deleteEmbeddingsByDiaryId(diaryId);
+      await memory.deleteMemoriesByDiaryId(diaryId, userId);
     }
 
     await createEmbedding(diary.id, diary.content);
-    const { memories } = await createMemory(diary.id, user.id);
+    const { memories } = await createMemory(diary.id, userId);
 
     return {
       diary,
@@ -50,7 +54,8 @@ export const diary = {
 
   async tempSaveDiary(
     diaryId: string | undefined,
-    data: { content: string; date: Date; userId: string },
+    userId: string,
+    data: { content: string; date: Date },
   ) {
     const diary = await prisma.diary.upsert({
       where: {
@@ -58,7 +63,7 @@ export const diary = {
       },
       create: {
         ...data,
-        userId: data.userId,
+        userId,
       },
       update: {
         ...data,
@@ -68,16 +73,21 @@ export const diary = {
     return { diary };
   },
 
-  async updateDiary(id: string, data: { content: string; date: Date }) {
+  async updateDiary(
+    diaryId: string,
+    userId: string,
+    data: { content: string; date: Date },
+  ) {
     const diary = await prisma.diary.update({
       where: {
-        id,
+        id: diaryId,
+        userId,
       },
       data,
     });
 
-    await embedding.removeEmbeddingByDiaryId(id);
-    await memory.removeMemoryByDiaryId(id);
+    await embedding.deleteEmbeddingsByDiaryId(diaryId);
+    await memory.deleteMemoriesByDiaryId(diaryId, userId);
 
     await createEmbedding(diary.id, diary.content);
     const { memories } = await createMemory(diary.id, diary.userId);
@@ -88,34 +98,23 @@ export const diary = {
     };
   },
 
-  async deleteDiary(id: string) {
+  async deleteDiary(diaryId: string, userId: string) {
     await prisma.diary.delete({
       where: {
-        id,
+        id: diaryId,
+        userId,
       },
     });
 
-    await prisma.embedding.deleteMany({
-      where: {
-        diaryId: id,
-      },
-    });
-
-    await prisma.memory.deleteMany({
-      where: {
-        diaries: {
-          some: {
-            id,
-          },
-        },
-      },
-    });
+    await embedding.deleteEmbeddingsByDiaryId(diaryId);
+    await memory.deleteMemoriesByDiaryId(diaryId, userId);
   },
 
-  async processDiary(id: string) {
+  async processDiary(diaryId: string, userId: string) {
     const diary = await prisma.diary.findUnique({
       where: {
-        id,
+        id: diaryId,
+        userId,
       },
     });
 
@@ -125,16 +124,17 @@ export const diary = {
 
     const embeddingCount = await prisma.embedding.count({
       where: {
-        diaryId: id,
+        diaryId: diaryId,
       },
     });
 
-    await memory.removeMemoryByDiaryId(id);
+    await memory.deleteMemoriesByDiaryId(diaryId, userId);
 
+    // 임베딩이 없을 경우에만 임베딩 생성 (완전히 새로운 일기일 경우)
     if (embeddingCount === 0) {
       await createEmbedding(diary.id, diary.content);
     }
-    const { memories } = await createMemory(diary.id, diary.userId);
+    const { memories } = await createMemory(diaryId, userId);
 
     return {
       diary,
@@ -142,44 +142,32 @@ export const diary = {
     };
   },
 
-  async getDiaryById(id: string) {
-    const { user } = (await auth.api.getSession({
-      headers: await headers(),
-    }))!;
-
+  async getDiaryById(diaryId: string, userId: string) {
     const diary = await prisma.diary.findUnique({
       where: {
-        id,
-        userId: user.id,
+        id: diaryId,
+        userId,
       },
     });
 
     return diary;
   },
 
-  async getDiaryByDate(date: Date) {
-    const { user } = (await auth.api.getSession({
-      headers: await headers(),
-    }))!;
-
+  async getDiaryByDate(date: Date, userId: string) {
     const diary = await prisma.diary.findFirst({
       where: {
         date,
-        userId: user.id,
+        userId,
       },
     });
 
     return diary;
   },
 
-  async getRecentDiary() {
-    const { user } = (await auth.api.getSession({
-      headers: await headers(),
-    }))!;
-
+  async getRecentDiary(userId: string) {
     const diary = await prisma.diary.findFirst({
       where: {
-        userId: user.id,
+        userId,
       },
       orderBy: {
         date: "desc",
@@ -189,16 +177,12 @@ export const diary = {
     return diary;
   },
 
-  async getDiarys(options: { limit: number; page: number }) {
-    const { user } = (await auth.api.getSession({
-      headers: await headers(),
-    }))!;
-
+  async getDiarys(userId: string, options: { limit: number; page: number }) {
     const { limit, page } = options;
 
     const diarys = await prisma.diary.findMany({
       where: {
-        userId: user.id,
+        userId,
       },
       include: {
         _count: {
@@ -207,6 +191,7 @@ export const diary = {
             memories: true,
           },
         },
+        memories: true,
       },
       orderBy: {
         date: "desc",
@@ -217,7 +202,7 @@ export const diary = {
 
     const total = await prisma.diary.count({
       where: {
-        userId: user.id,
+        userId,
       },
     });
 
@@ -227,14 +212,10 @@ export const diary = {
     };
   },
 
-  async getUnmemorizedOldestDiaryByDate(date: Date) {
-    const { user } = (await auth.api.getSession({
-      headers: await headers(),
-    }))!;
-
+  async getOldestUnmemorizedDiaryByDate(userId: string, date: Date) {
     const diarys = await prisma.diary.findMany({
       where: {
-        userId: user.id,
+        userId,
         date: {
           lt: date,
         },

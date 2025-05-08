@@ -13,7 +13,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useLayoutEffect, useRef, useState } from "react";
 
-import { getUnmemorizedOldestDiaryByDate } from "~/app/actions/diary";
+import { getOldestUnmemorizedDiaryByDate } from "~/app/actions/diary";
 import { DeleteDiaryModal } from "~/components/diary/DeleteDiaryModal";
 import { MemoryPastFirstModal } from "~/components/diary/MemoryPastFirstModal";
 import { MemoryResetAlertModal } from "~/components/diary/MemoryResetAlertModal";
@@ -54,7 +54,7 @@ export function DiaryListCard({ diary }: DiaryListCardProps) {
 
   async function handleDiaryMemorify() {
     setIsLoading(true);
-    const [pd] = await getUnmemorizedOldestDiaryByDate(diary.date);
+    const [pd] = await getOldestUnmemorizedDiaryByDate(diary.date);
     setIsLoading(false);
 
     if (pd) {
