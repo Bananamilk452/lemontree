@@ -30,11 +30,7 @@ export const memory = {
     const memories = await prisma.memory.findMany({
       where: {
         userId,
-        diaries: {
-          some: {
-            id: diaryId,
-          },
-        },
+        diaryId,
       },
       select: { id: true },
     });

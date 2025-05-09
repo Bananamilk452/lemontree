@@ -19,7 +19,7 @@ model Diary {
   summary    String?
   keywords   String[]
   embeddings Embedding[]
-  memories   Memory[]    @relation(name: "diary_memory")
+  memories   Memory[]
   userId     String
   user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -44,12 +44,13 @@ model Embedding {
 model Memory {
   id         String      @id @default(uuid(7))
   content    String
-  diaries    Diary[]     @relation(name: "diary_memory")
   createdAt  DateTime    @default(now())
   updatedAt  DateTime?   @updatedAt
   embeddings Embedding[]
   userId     String
   user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Diary      Diary?      @relation(fields: [diaryId], references: [id])
+  diaryId    String?
 
   @@map("memory")
 }
