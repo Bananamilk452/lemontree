@@ -147,10 +147,12 @@ export function DiaryWriter(props: DiaryWriterProps) {
             </FormItem>
           )}
         />
-        <p className="text-sm text-gray-600">
-          {form.watch("content").length}/{DIARY_MAX_LENGTH}
-        </p>
+
         <div className="flex justify-end gap-4">
+          <p className="text-sm text-gray-600">
+            {form.watch("content").length}/{DIARY_MAX_LENGTH}
+          </p>
+          <div className="grow"></div>
           {form.formState.isSubmitting && (
             <Spinner className="size-5 shrink-0" />
           )}

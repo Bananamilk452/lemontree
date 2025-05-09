@@ -191,7 +191,11 @@ export const diary = {
             memories: true,
           },
         },
-        memories: true,
+        memories: {
+          orderBy: {
+            id: "asc",
+          },
+        },
       },
       orderBy: {
         date: "desc",
