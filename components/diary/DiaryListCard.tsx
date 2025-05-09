@@ -5,18 +5,17 @@ import { format } from "date-fns";
 import {
   CaseSensitiveIcon,
   EllipsisVerticalIcon,
-  MemoryStickIcon,
   PencilIcon,
   Trash2Icon,
-  WaypointsIcon,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useLayoutEffect, useRef, useState } from "react";
 
-import { getUnmemorizedOldestDiaryByDate } from "~/app/actions/diary";
+import { getOldestUnmemorizedDiaryByDate } from "~/app/actions/diary";
 import { DeleteDiaryModal } from "~/components/diary/DeleteDiaryModal";
 import { MemoryPastFirstModal } from "~/components/diary/MemoryPastFirstModal";
 import { MemoryResetAlertModal } from "~/components/diary/MemoryResetAlertModal";
+import { MemoryList } from "~/components/memory/MemoryList";
 import { Spinner } from "~/components/Spinner";
 import { Button } from "~/components/ui/button";
 import {
@@ -54,7 +53,7 @@ export function DiaryListCard({ diary }: DiaryListCardProps) {
 
   async function handleDiaryMemorify() {
     setIsLoading(true);
-    const [pd] = await getUnmemorizedOldestDiaryByDate(diary.date);
+    const [pd] = await getOldestUnmemorizedDiaryByDate(diary.date);
     setIsLoading(false);
 
     if (pd) {
@@ -67,43 +66,63 @@ export function DiaryListCard({ diary }: DiaryListCardProps) {
 
   return (
     <div className="flex flex-col gap-4">
-      <h2 className="font-bold">{format(diary.date, "yyyy년 M월 d일")}</h2>
+      <div className="flex justify-between items-center">
+        <h2 className="font-bold">{format(diary.date, "yyyy년 M월 d일")}</h2>
+        <div className="flex gap-2 items-center">
+          {isLoading && <Spinner />}
+          <Button
+            onClick={handleEditButtonClick}
+            className="text-gray-600"
+            variant="ghost"
+            size="sm"
+            disabled={isLoading}
+          >
+            <PencilIcon className="size-5" />
+            수정
+          </Button>
+          <Button
+            onClick={() => setIsDeleteDiaryModalOpen(true)}
+            className="text-red-600 hover:text-red-800"
+            variant="ghost"
+            size="sm"
+            disabled={isLoading}
+          >
+            <Trash2Icon className="size-5" />
+            삭제
+          </Button>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm">
+                <EllipsisVerticalIcon className="size-5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuGroup>
+                <DropdownMenuItem
+                  onClick={handleDiaryMemorify}
+                  disabled={isLoading}
+                >
+                  {diary._count.embeddings > 0
+                    ? "일기 재메모리화"
+                    : "일기 메모리화"}
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
 
       <DiaryCard diary={diary} />
 
       <div className="flex flex-col gap-1.5">
-        <div className="flex gap-3 text-gray-600">
+        <div className="flex gap-4 items-center text-gray-600">
           <dl className="flex gap-1.5 items-center text-sm">
             <dt>
               <CaseSensitiveIcon className="size-5" />
             </dt>
             <dd>{diary.content.length}자</dd>
           </dl>
-          <dl className="flex gap-1.5 items-center text-sm">
-            <dt>
-              <WaypointsIcon className="size-5" />
-            </dt>
-            <dd>임베딩 {diary._count.embeddings}개</dd>
-          </dl>
-          <dl className="flex gap-1.5 items-center text-sm">
-            <dt>
-              <MemoryStickIcon className="size-5" />
-            </dt>
-            <dd>메모리 {diary._count.memories}개</dd>
-          </dl>
-        </div>
-
-        <div className="min-h-12 py-5">
-          {diary._count.embeddings <= 0 && (
-            <Note variant="warning" title="일기 메모리화가 필요합니다.">
-              일기의 메모리화가 필요합니다. 에디터에서 저장 버튼이나{" "}
-              <EllipsisVerticalIcon className="inline-block size-4" />을 누르고
-              &quot;일기 메모리화&quot;을 눌러주세요.
-            </Note>
-          )}
-        </div>
-
-        <div className="flex justify-between items-center">
           <p className="text-xs text-gray-600">
             마지막 수정:{" "}
             {format(
@@ -111,51 +130,21 @@ export function DiaryListCard({ diary }: DiaryListCardProps) {
               "yyyy년 M월 d일 HH:mm:ss",
             )}
           </p>
-
-          <div className="flex gap-2 items-center">
-            {isLoading && <Spinner />}
-            <Button
-              onClick={handleEditButtonClick}
-              className="text-gray-600"
-              variant="ghost"
-              size="sm"
-              disabled={isLoading}
-            >
-              <PencilIcon className="size-5" />
-              수정
-            </Button>
-            <Button
-              onClick={() => setIsDeleteDiaryModalOpen(true)}
-              className="text-red-600 hover:text-red-800"
-              variant="ghost"
-              size="sm"
-              disabled={isLoading}
-            >
-              <Trash2Icon className="size-5" />
-              삭제
-            </Button>
-
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm">
-                  <EllipsisVerticalIcon className="size-5" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuGroup>
-                  <DropdownMenuItem
-                    onClick={handleDiaryMemorify}
-                    disabled={isLoading}
-                  >
-                    {diary._count.embeddings > 0
-                      ? "일기 재메모리화"
-                      : "일기 메모리화"}
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
         </div>
+
+        <div className="min-h-12 mt-6">
+          {diary._count.embeddings <= 0 ? (
+            <Note variant="warning" title="일기 메모리화가 필요합니다.">
+              일기의 메모리화가 필요합니다. 에디터에서 저장 버튼이나{" "}
+              <EllipsisVerticalIcon className="inline-block size-4" />을 누르고
+              &quot;일기 메모리화&quot;을 눌러주세요.
+            </Note>
+          ) : (
+            <MemoryList memories={diary.memories} />
+          )}
+        </div>
+
+        <div className="flex justify-between items-center"></div>
       </div>
 
       <DeleteDiaryModal
@@ -208,7 +197,7 @@ function DiaryCard({ diary }: { diary: Diary }) {
       {isHide && (
         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent to-white to-95%">
           <div className="size-full p-6 flex justify-center items-end">
-            <Button variant="secondary" onClick={() => setIsHide(false)}>
+            <Button variant="outline" onClick={() => setIsHide(false)}>
               더보기
             </Button>
           </div>

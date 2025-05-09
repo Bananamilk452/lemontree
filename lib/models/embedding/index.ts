@@ -1,7 +1,7 @@
 import { prisma } from "~/utils/db";
 
 export const embedding = {
-  async removeEmbeddingByDiaryId(diaryId: string) {
+  async deleteEmbeddingsByDiaryId(diaryId: string) {
     const embeddings = await prisma.embedding.findMany({
       where: { diaryId },
       select: { id: true, diaryId: true },

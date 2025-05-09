@@ -7,11 +7,10 @@ diary_embeddings AS (
   WHERE "diaryId" = $1
 ),
 memory_embeddings AS (
-  SELECT memory.id AS "memoryId", embedding.vector AS memory_vector, memory.content
+  SELECT memory.id AS "memoryId", embedding.vector AS memory_vector, memory.content, diary.date as date
   FROM memory
   JOIN embedding ON memory.id = embedding."memoryId"
-  JOIN _diary_memory ON memory.id = _diary_memory."B"
-  JOIN diary ON diary.id = _diary_memory."A"
+  JOIN diary ON memory."diaryId" = diary.id
   WHERE $2 > diary.date
 ),
 all_similarities AS (
@@ -19,6 +18,7 @@ all_similarities AS (
     d."diaryId",
     m."memoryId",
     m.content,
+    m.date,
     1 - (d.vector <=> m.memory_vector) AS cosine_similarity
   FROM 
     diary_embeddings d
@@ -34,10 +34,12 @@ max_similarities AS (
   GROUP BY 
     "memoryId"
 )
+
 SELECT
   a."memoryId",
   a.content,
-  a.cosine_similarity
+  a.cosine_similarity,
+  a.date
 FROM 
   all_similarities a
 JOIN 

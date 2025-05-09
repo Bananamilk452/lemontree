@@ -1,0 +1,46 @@
+diff --git a/dist/utils/gemini.cjs b/dist/utils/gemini.cjs
+index 87b974ff8ef06ca4c9c9c818aef0a3d898b4c920..b1e0a733648394584cdeb0f0fd0248463db0604e 100644
+--- a/dist/utils/gemini.cjs
++++ b/dist/utils/gemini.cjs
+@@ -1088,14 +1088,12 @@ function getGeminiAPI(config) {
+             }
+         }
+         // Add thinking configuration if explicitly set
+-        if (typeof parameters.maxReasoningTokens !== "undefined" &&
+-            parameters.maxReasoningTokens !== 0) {
++        if (typeof parameters.maxReasoningTokens !== "undefined") {
+             ret.thinkingConfig = {
+-                thinkingBudget: parameters.maxReasoningTokens,
+-                // TODO: Expose this configuration to the user once google fully supports it
+-                includeThoughts: false,
++              thinkingBudget: parameters.maxReasoningTokens,
++              includeThoughts: parameters.maxReasoningTokens === 0 ? false : true,
+             };
+-        }
++          }
+         // Remove any undefined properties, so we don't send them
+         let attribute;
+         for (attribute in ret) {
+diff --git a/dist/utils/gemini.js b/dist/utils/gemini.js
+index b55e313b67d5d8dc079b68ea0d45a216372ce7bf..50e1ee9fdd398bf305bbadc7f1e3d9c52187a8c3 100644
+--- a/dist/utils/gemini.js
++++ b/dist/utils/gemini.js
+@@ -1083,14 +1083,12 @@ export function getGeminiAPI(config) {
+             }
+         }
+         // Add thinking configuration if explicitly set
+-        if (typeof parameters.maxReasoningTokens !== "undefined" &&
+-            parameters.maxReasoningTokens !== 0) {
++        if (typeof parameters.maxReasoningTokens !== "undefined") {
+             ret.thinkingConfig = {
+-                thinkingBudget: parameters.maxReasoningTokens,
+-                // TODO: Expose this configuration to the user once google fully supports it
+-                includeThoughts: false,
++              thinkingBudget: parameters.maxReasoningTokens,
++              includeThoughts: parameters.maxReasoningTokens === 0 ? false : true,
+             };
+-        }
++          }
+         // Remove any undefined properties, so we don't send them
+         let attribute;
+         for (attribute in ret) {

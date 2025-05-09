@@ -37,7 +37,7 @@ export async function createMemory(diaryId: string, userId: string) {
 
   const model = new ChatVertexAI({
     model: "gemini-2.5-flash-preview-04-17",
-    temperature: 0.9,
+    temperature: 0.2,
     maxReasoningTokens: 0,
   });
 
@@ -53,7 +53,7 @@ export async function createMemory(diaryId: string, userId: string) {
     current_date: format(diary.date, "yyyy-MM-dd"),
     similar_memories: JSON.stringify(
       relatedMemories.map((memory) => ({
-        id: memory.memoryId,
+        date: format(memory.date, "yyyy-MM-dd"),
         content: memory.content,
       })),
       null,
@@ -64,21 +64,17 @@ export async function createMemory(diaryId: string, userId: string) {
   const { memories } = await modelWithStructure.invoke(promptValue);
   logger.info(`[${jobId}] 추론한 메모리: ${JSON.stringify(memories, null, 2)}`);
 
-  try {
-    const newMemories = await processNewMemories(diaryId, userId, memories);
-    const updateMemories = await processUpdateMemories(diaryId, memories);
-    await processDeleteMemories(memories);
+  const newMemories = await addNewMemories(diaryId, userId, memories);
 
-    const result = await createMemoryEmbedding(newMemories, updateMemories);
+  try {
+    const result = await createMemoryEmbedding(newMemories);
 
     logger.info(
       `[${jobId}] createMemory 작업 완료: diaryId: ${diaryId}, vectorCounts: ${result.embeddings.length}`,
     );
     return result;
   } catch (error) {
-    const memoryIds = memories
-      .map((memory) => memory.id)
-      .filter((id): id is string => typeof id === "string");
+    const memoryIds = newMemories.map((memory) => memory.id);
 
     await prisma.memory.deleteMany({
       where: {
@@ -100,28 +96,18 @@ export async function createMemory(diaryId: string, userId: string) {
   }
 }
 
-async function processNewMemories(
+async function addNewMemories(
   diaryId: string,
   userId: string,
   memories: CreateMemorySchema[],
 ) {
-  const newMemories = memories.filter((memory) => memory.operation === "NEW");
-
-  if (newMemories.some((memory) => !memory.content)) {
-    throw new Error("NEW 메모리의 content가 없습니다.");
-  }
-
   const results = await prisma.$transaction(
-    newMemories.map((memory) =>
+    memories.map((memory) =>
       prisma.memory.create({
         data: {
-          content: memory.content!,
+          content: memory,
           userId,
-          diaries: {
-            connect: {
-              id: diaryId,
-            },
-          },
+          diaryId,
         },
       }),
     ),
@@ -130,79 +116,7 @@ async function processNewMemories(
   return results;
 }
 
-async function processUpdateMemories(
-  diaryId: string,
-  memories: CreateMemorySchema[],
-) {
-  const updateMemories = memories.filter(
-    (memory) => memory.operation === "UPDATE",
-  );
-
-  if (updateMemories.some((memory) => !memory.id)) {
-    throw new Error("UPDATE 메모리의 id가 없습니다.");
-  }
-
-  if (updateMemories.some((memory) => !memory.content)) {
-    throw new Error("UPDATE 메모리의 content가 없습니다.");
-  }
-
-  const results = await prisma.$transaction(
-    updateMemories.map((memory) =>
-      prisma.memory.update({
-        where: { id: memory.id },
-        data: {
-          content: memory.content,
-          diaries: {
-            connect: {
-              id: diaryId,
-            },
-          },
-        },
-      }),
-    ),
-  );
-
-  return results;
-}
-
-async function processDeleteMemories(memories: CreateMemorySchema[]) {
-  const deleteMemories = memories.filter(
-    (memory) => memory.operation === "DELETE",
-  );
-
-  if (deleteMemories.some((memory) => !memory.id)) {
-    throw new Error("DELETE 메모리의 id가 없습니다.");
-  }
-
-  const results = await prisma.$transaction(
-    deleteMemories.flatMap((memory) => [
-      prisma.memory.delete({
-        where: { id: memory.id },
-      }),
-      prisma.embedding.deleteMany({
-        where: { memoryId: memory.id },
-      }),
-    ]),
-  );
-
-  return results;
-}
-
-async function createMemoryEmbedding(
-  newMemories: Memory[],
-  updateMemories: Memory[],
-) {
-  // UPDATE의 경우는 embedding을 삭제하고 새로 생성해야 함
-  await prisma.$transaction(
-    updateMemories.map((memory) =>
-      prisma.embedding.deleteMany({
-        where: { memoryId: memory.id },
-      }),
-    ),
-  );
-
-  const memories = [...newMemories, ...updateMemories];
-
+async function createMemoryEmbedding(memories: Memory[]) {
   const embeddings = await prisma.$transaction(
     memories.map((memory) =>
       prisma.embedding.create({
