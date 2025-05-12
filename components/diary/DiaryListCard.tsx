@@ -1,6 +1,5 @@
 "use client";
 
-import { cn } from "~/utils";
 import { format } from "date-fns";
 import {
   CaseSensitiveIcon,
@@ -8,11 +7,13 @@ import {
   PencilIcon,
   Trash2Icon,
 } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useLayoutEffect, useRef, useState } from "react";
+import { useState } from "react";
 
 import { getOldestUnmemorizedDiaryByDate } from "~/app/actions/diary";
 import { DeleteDiaryModal } from "~/components/diary/DeleteDiaryModal";
+import { DiaryPaper } from "~/components/diary/DiaryPaper";
 import { MemoryPastFirstModal } from "~/components/diary/MemoryPastFirstModal";
 import { MemoryResetAlertModal } from "~/components/diary/MemoryResetAlertModal";
 import { MemoryList } from "~/components/memory/MemoryList";
@@ -107,13 +108,16 @@ export function DiaryListCard({ diary }: DiaryListCardProps) {
                     ? "일기 재메모리화"
                     : "일기 메모리화"}
                 </DropdownMenuItem>
+                <DropdownMenuItem asChild={true}>
+                  <Link href={`/diary/${diary.id}`}>일기 상세보기</Link>
+                </DropdownMenuItem>
               </DropdownMenuGroup>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       </div>
 
-      <DiaryCard diary={diary} />
+      <DiaryPaper diary={diary} />
 
       <div className="flex flex-col gap-1.5">
         <div className="flex gap-4 items-center text-gray-600">
@@ -168,56 +172,56 @@ export function DiaryListCard({ diary }: DiaryListCardProps) {
   );
 }
 
-function DiaryCard({ diary }: { diary: Diary }) {
-  const paragraph = useRef<HTMLParagraphElement>(null);
-  const [isHide, setIsHide] = useState(true);
+// function DiaryCard({ diary }: { diary: Diary }) {
+//   const paragraph = useRef<HTMLParagraphElement>(null);
+//   const [isHide, setIsHide] = useState(true);
 
-  const padding = 16;
-  const height = 256 - padding * 2; // h-64 - py-4
+//   const padding = 16;
+//   const height = 256 - padding * 2; // h-64 - py-4
 
-  useLayoutEffect(() => {
-    // 컨테이너 크기보다 일기가 더 길면
-    // isHide가 true
-    if (paragraph.current) {
-      if (paragraph.current.scrollHeight > height) {
-        setIsHide(true);
-      } else {
-        setIsHide(false);
-      }
-    }
-  }, [height]);
+//   useLayoutEffect(() => {
+//     // 컨테이너 크기보다 일기가 더 길면
+//     // isHide가 true
+//     if (paragraph.current) {
+//       if (paragraph.current.scrollHeight > height) {
+//         setIsHide(true);
+//       } else {
+//         setIsHide(false);
+//       }
+//     }
+//   }, [height]);
 
-  return (
-    <article
-      className={cn(
-        "bg-white border border-gray-300 rounded-xl shadow-md relative",
-        isHide ? "max-h-64 overflow-hidden" : "h-auto",
-      )}
-    >
-      {isHide && (
-        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent to-white to-95%">
-          <div className="size-full p-6 flex justify-center items-end">
-            <Button variant="outline" onClick={() => setIsHide(false)}>
-              더보기
-            </Button>
-          </div>
-        </div>
-      )}
+//   return (
+//     <article
+//       className={cn(
+//         "bg-white border border-gray-300 rounded-xl shadow-md relative",
+//         isHide ? "max-h-64 overflow-hidden" : "h-auto",
+//       )}
+//     >
+//       {isHide && (
+//         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent to-white to-95%">
+//           <div className="size-full p-6 flex justify-center items-end">
+//             <Button variant="outline" onClick={() => setIsHide(false)}>
+//               더보기
+//             </Button>
+//           </div>
+//         </div>
+//       )}
 
-      <div className="p-4 h-full">
-        <p
-          ref={paragraph}
-          className="whitespace-pre-wrap break-keep-all h-full"
-          style={{
-            backgroundImage: "linear-gradient(#ccc 1px, transparent 1px)",
-            backgroundSize: "100% 26px",
-            lineHeight: "26px",
-            backgroundPosition: "0 25px",
-          }}
-        >
-          {diary.content}
-        </p>
-      </div>
-    </article>
-  );
-}
+//       <div className="p-4 h-full">
+//         <p
+//           ref={paragraph}
+//           className="whitespace-pre-wrap break-keep-all h-full"
+//           style={{
+//             backgroundImage: "linear-gradient(#ccc 1px, transparent 1px)",
+//             backgroundSize: "100% 26px",
+//             lineHeight: "26px",
+//             backgroundPosition: "0 25px",
+//           }}
+//         >
+//           {diary.content}
+//         </p>
+//       </div>
+//     </article>
+//   );
+// }

@@ -148,6 +148,19 @@ export const diary = {
         id: diaryId,
         userId,
       },
+      include: {
+        _count: {
+          select: {
+            embeddings: true,
+            memories: true,
+          },
+        },
+        memories: {
+          orderBy: {
+            id: "asc",
+          },
+        },
+      },
     });
 
     return diary;
@@ -158,6 +171,19 @@ export const diary = {
       where: {
         date,
         userId,
+      },
+      include: {
+        _count: {
+          select: {
+            embeddings: true,
+            memories: true,
+          },
+        },
+        memories: {
+          orderBy: {
+            id: "asc",
+          },
+        },
       },
     });
 

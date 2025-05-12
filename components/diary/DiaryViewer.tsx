@@ -5,11 +5,10 @@ import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { getDiaryByDate } from "~/app/actions/diary";
-
-import { DatePicker } from "../DatePicker";
-import { Spinner } from "../Spinner";
-import { DiaryCard } from "./DiaryCard";
-import { DiaryEmpty } from "./DiaryEmpty";
+import { DatePicker } from "~/components/DatePicker";
+import { DiaryEmpty } from "~/components/diary/DiaryEmpty";
+import { DiaryPaper } from "~/components/diary/DiaryPaper";
+import { Spinner } from "~/components/Spinner";
 
 import type { Diary } from "~/lib/models/diary";
 
@@ -80,7 +79,7 @@ export function DiaryViewer({ diary: initialDiary }: DiaryViewerProps) {
           <Spinner className="size-6" />
         </div>
       ) : currentDiary ? (
-        <DiaryCard diary={currentDiary} />
+        <DiaryPaper diary={currentDiary} />
       ) : (
         <DiaryEmpty date={date} />
       )}
