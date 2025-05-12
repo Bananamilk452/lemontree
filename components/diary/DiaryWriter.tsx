@@ -148,12 +148,12 @@ export function DiaryWriter(props: DiaryWriterProps) {
           )}
         />
 
-        <div className="flex justify-end gap-4">
-          <p className="text-sm text-gray-600">
+        <div className="flex justify-end items-center gap-4">
+          <p className="text-sm text-gray-600 self-start">
             {form.watch("content").length}/{DIARY_MAX_LENGTH}
           </p>
           <div className="grow"></div>
-          {form.formState.isSubmitting && (
+          {(form.formState.isSubmitting || isLoading) && (
             <Spinner className="size-5 shrink-0" />
           )}
           <Button
