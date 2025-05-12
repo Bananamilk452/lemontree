@@ -5,11 +5,10 @@ import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { getDiaryByDate } from "~/app/actions/diary";
-
-import { DatePicker } from "../DatePicker";
-import { Spinner } from "../Spinner";
-import { DiaryCard } from "./DiaryCard";
-import { DiaryEmpty } from "./DiaryEmpty";
+import { DatePicker } from "~/components/DatePicker";
+import { DiaryEmpty } from "~/components/diary/DiaryEmpty";
+import { DiaryCard } from "~/components/diary/DiaryPaper";
+import { Spinner } from "~/components/Spinner";
 
 import type { Diary } from "~/lib/models/diary";
 

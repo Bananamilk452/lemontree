@@ -11,7 +11,7 @@ export function DiaryCard({ diary, className }: DiaryCardProps) {
   return (
     <article
       className={cn(
-        "bg-white border border-gray-300 rounded-xl shadow-md",
+        "bg-white border border-gray-300 rounded-xl shadow-md max-h-96 overflow-scroll",
         className,
       )}
     >
