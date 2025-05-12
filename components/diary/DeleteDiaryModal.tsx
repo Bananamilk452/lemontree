@@ -2,6 +2,7 @@
 
 import { Diary } from "@prisma/client";
 import { format } from "date-fns";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -27,6 +28,8 @@ export function DeleteDiaryModal({
   open,
   setOpen,
 }: DeleteDiaryModalProps) {
+  const router = useRouter();
+
   const [isLoading, setIsLoading] = useState(false);
 
   function handleDelete() {
@@ -36,6 +39,11 @@ export function DeleteDiaryModal({
         toast.success("일기가 삭제되었습니다.");
         setOpen(false);
         setIsLoading(false);
+
+        // 일기 상세보기에서 삭제 시 목록으로 돌아감
+        if (location.pathname.includes("/diary/")) {
+          router.push("/list/1");
+        }
       })
       .catch((error) => {
         toast.error("일기 삭제에 실패했습니다.");

@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { getDiaryByDate } from "~/app/actions/diary";
 import { DatePicker } from "~/components/DatePicker";
 import { DiaryEmpty } from "~/components/diary/DiaryEmpty";
-import { DiaryCard } from "~/components/diary/DiaryPaper";
+import { DiaryPaper } from "~/components/diary/DiaryPaper";
 import { Spinner } from "~/components/Spinner";
 
 import type { Diary } from "~/lib/models/diary";
@@ -79,7 +79,7 @@ export function DiaryViewer({ diary: initialDiary }: DiaryViewerProps) {
           <Spinner className="size-6" />
         </div>
       ) : currentDiary ? (
-        <DiaryCard diary={currentDiary} />
+        <DiaryPaper diary={currentDiary} />
       ) : (
         <DiaryEmpty date={date} />
       )}

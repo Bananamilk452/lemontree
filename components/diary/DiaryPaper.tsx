@@ -7,7 +7,7 @@ interface DiaryCardProps {
   className?: string;
 }
 
-export function DiaryCard({ diary, className }: DiaryCardProps) {
+export function DiaryPaper({ diary, className }: DiaryCardProps) {
   return (
     <article
       className={cn(

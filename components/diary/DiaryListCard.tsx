@@ -7,12 +7,13 @@ import {
   PencilIcon,
   Trash2Icon,
 } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { getOldestUnmemorizedDiaryByDate } from "~/app/actions/diary";
 import { DeleteDiaryModal } from "~/components/diary/DeleteDiaryModal";
-import { DiaryCard } from "~/components/diary/DiaryPaper";
+import { DiaryPaper } from "~/components/diary/DiaryPaper";
 import { MemoryPastFirstModal } from "~/components/diary/MemoryPastFirstModal";
 import { MemoryResetAlertModal } from "~/components/diary/MemoryResetAlertModal";
 import { MemoryList } from "~/components/memory/MemoryList";
@@ -107,13 +108,16 @@ export function DiaryListCard({ diary }: DiaryListCardProps) {
                     ? "일기 재메모리화"
                     : "일기 메모리화"}
                 </DropdownMenuItem>
+                <DropdownMenuItem asChild={true}>
+                  <Link href={`/diary/${diary.id}`}>일기 상세보기</Link>
+                </DropdownMenuItem>
               </DropdownMenuGroup>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       </div>
 
-      <DiaryCard diary={diary} className="max-h-96" />
+      <DiaryPaper diary={diary} />
 
       <div className="flex flex-col gap-1.5">
         <div className="flex gap-4 items-center text-gray-600">

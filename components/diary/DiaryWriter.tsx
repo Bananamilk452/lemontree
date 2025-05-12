@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { DIARY_MAX_LENGTH } from "~/constants";
 import { utcDateNow } from "~/utils";
 import { CalendarIcon, SaveIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -33,6 +34,8 @@ interface DiaryWriterProps {
 }
 
 export function DiaryWriter(props: DiaryWriterProps) {
+  const router = useRouter();
+
   const form = useForm<DiaryWriterForm>({
     resolver: zodResolver(DiaryWriterFormSchema),
     defaultValues: {
@@ -48,6 +51,7 @@ export function DiaryWriter(props: DiaryWriterProps) {
         toast.success("일기를 저장하고 메모리화했습니다.");
         setDiary(diary);
         form.setValue("content", diary.content);
+        router.push(`/diary/${diary.id}`);
       })
       .catch((error) => {
         toast.error("일기 저장에 실패했습니다.");
@@ -65,6 +69,7 @@ export function DiaryWriter(props: DiaryWriterProps) {
         toast.success("일기를 임시 저장했습니다.");
         setDiary(diary);
         form.setValue("content", diary.content);
+        router.push(`/diary/${diary.id}`);
       })
       .catch((error) => {
         toast.error("일기 임시 저장에 실패했습니다.");
