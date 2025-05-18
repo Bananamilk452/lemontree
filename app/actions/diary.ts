@@ -179,3 +179,31 @@ export async function getOldestUnmemorizedDiaryByDate(date: Date) {
 
   return data;
 }
+
+export async function semanticSearch(
+  searchTerm: string,
+  options: {
+    page: number;
+    limit: number;
+  },
+) {
+  const session = await getValidSession();
+
+  const data = await diary.semanticSearch(session.user.id, searchTerm, options);
+
+  return data;
+}
+
+export async function fullTextSearch(
+  searchTerm: string,
+  options: {
+    page: number;
+    limit: number;
+  },
+) {
+  const session = await getValidSession();
+
+  const data = await diary.fullTextSearch(session.user.id, searchTerm, options);
+
+  return data;
+}

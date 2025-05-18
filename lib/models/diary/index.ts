@@ -1,5 +1,7 @@
 import { createEmbedding } from "~/lib/models/diary/createEmbedding";
 import { createMemory } from "~/lib/models/diary/createMemory";
+import { fullTextSearch as diaryFullTextSearch } from "~/lib/models/diary/fullTextSearch";
+import { semanticSearch as diarySemanticSearch } from "~/lib/models/diary/semanticSearch";
 import { embedding } from "~/lib/models/embedding";
 import { memory } from "~/lib/models/memory";
 import { prisma } from "~/utils/db";
@@ -260,6 +262,28 @@ export const diary = {
     });
 
     return diarys;
+  },
+
+  async semanticSearch(
+    userId: string,
+    searchTerm: string,
+    options: { limit: number; page: number },
+  ) {
+    return diarySemanticSearch(userId, searchTerm, {
+      limit: options.limit,
+      page: (options.page - 1) * options.limit,
+    });
+  },
+
+  async fullTextSearch(
+    userId: string,
+    searchTerm: string,
+    options: { limit: number; page: number },
+  ) {
+    return diaryFullTextSearch(userId, searchTerm, {
+      limit: options.limit,
+      page: (options.page - 1) * options.limit,
+    });
   },
 };
 
