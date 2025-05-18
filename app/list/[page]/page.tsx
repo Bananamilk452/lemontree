@@ -1,3 +1,5 @@
+import { PAGE_SIZE } from "~/constants";
+
 import { getDiarys } from "~/app/actions/diary";
 import { DiaryEmpty } from "~/components/diary/DiaryEmpty";
 import { Header } from "~/components/Header";
@@ -8,7 +10,7 @@ export default async function List({
 }: {
   params: Promise<{ page: string }>;
 }) {
-  const limit = 10;
+  const limit = PAGE_SIZE;
   const { page } = await params;
 
   if (isNaN(Number(page))) {
