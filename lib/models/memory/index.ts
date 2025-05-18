@@ -1,4 +1,6 @@
 import { vectorStore } from "~/lib/langchain";
+import { fullTextSearch as memoryFullTextSearch } from "~/lib/models/memory/fullTextSearch";
+import { semanticSearch as memorySemanticSearch } from "~/lib/models/memory/semanticSearch";
 import { prisma } from "~/utils/db";
 
 export const memory = {
@@ -78,5 +80,26 @@ export const memory = {
         }),
       ]),
     );
+  },
+  async semanticSearch(
+    userId: string,
+    searchTerm: string,
+    options: { limit: number; page: number },
+  ) {
+    return memorySemanticSearch(userId, searchTerm, {
+      limit: options.limit,
+      page: (options.page - 1) * options.limit,
+    });
+  },
+
+  async fullTextSearch(
+    userId: string,
+    searchTerm: string,
+    options: { limit: number; page: number },
+  ) {
+    return memoryFullTextSearch(userId, searchTerm, {
+      limit: options.limit,
+      page: (options.page - 1) * options.limit,
+    });
   },
 };

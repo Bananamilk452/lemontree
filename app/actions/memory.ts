@@ -43,3 +43,39 @@ export async function deleteMemoryById(memoryId: string) {
   revalidatePath("/new");
   revalidatePath("/list/[page]", "page");
 }
+
+export async function semanticSearch(
+  searchTerm: string,
+  options: {
+    limit: number;
+    page: number;
+  },
+) {
+  const session = await getValidSession();
+
+  const searchResult = await memory.semanticSearch(
+    session.user.id,
+    searchTerm,
+    options,
+  );
+
+  return searchResult;
+}
+
+export async function fullTextSearch(
+  searchTerm: string,
+  options: {
+    limit: number;
+    page: number;
+  },
+) {
+  const session = await getValidSession();
+
+  const searchResult = await memory.fullTextSearch(
+    session.user.id,
+    searchTerm,
+    options,
+  );
+
+  return searchResult;
+}

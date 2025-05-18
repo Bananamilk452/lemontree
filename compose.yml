@@ -40,7 +40,9 @@ services:
     command: "valkey-server --save 60 1 --loglevel warning --maxmemory-policy noeviction"
 
   postgres:
-    image: pgvector/pgvector:pg17
+    build:
+      context: .
+      dockerfile: postgres.Dockerfile
     expose:
       - "5432"
     env_file:
