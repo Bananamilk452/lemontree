@@ -15,14 +15,13 @@ model Diary {
   date       DateTime    @default(now())
   createdAt  DateTime    @default(now())
   updatedAt  DateTime?   @updatedAt
-  sentiment  String?
-  summary    String?
-  keywords   String[]
   embeddings Embedding[]
   memories   Memory[]
   userId     String
   user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([userId])
+  @@index([date])
   @@map("diary")
 }
 
@@ -37,6 +36,8 @@ model Embedding {
   createdAt DateTime                    @default(now())
   updatedAt DateTime?                   @updatedAt
 
+  @@index([diaryId])
+  @@index([memoryId])
   @@index([vector], map: "embedding_vector_HNSW")
   @@map("embedding")
 }
@@ -52,6 +53,8 @@ model Memory {
   Diary      Diary?      @relation(fields: [diaryId], references: [id])
   diaryId    String?
 
+  @@index([userId])
+  @@index([diaryId])
   @@map("memory")
 }
 
