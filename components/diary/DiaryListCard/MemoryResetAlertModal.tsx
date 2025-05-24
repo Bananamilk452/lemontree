@@ -6,7 +6,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { processDiary } from "~/app/actions/diary";
-import { DiaryListCardActiveModal } from "~/components/diary/DiaryListCard";
+import { DiaryModalType } from "~/components/diary/DiaryListCard/Provider";
 import { Spinner } from "~/components/Spinner";
 import { Button } from "~/components/ui/button";
 import {
@@ -19,10 +19,8 @@ import {
 
 interface MemoryResetAlertModalProps {
   diary: Diary;
-  activeModal: DiaryListCardActiveModal;
-  setActiveModal: (
-    modal: "memory-past-first" | "memory-reset-alert" | null,
-  ) => void;
+  activeModal: DiaryModalType;
+  setActiveModal: (modal: DiaryModalType) => void;
 }
 
 export function MemoryResetAlertModal({
