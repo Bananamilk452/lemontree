@@ -1,21 +1,8 @@
 "use server";
 
-import { removeTimeFromDate } from "~/utils";
-import { revalidatePath } from "next/cache";
-
-import { diary } from "~/lib/models/diary";
-import {
-  DiaryWriterForm,
-  DiaryWriterFormSchema,
-} from "~/types/zod/DiaryWriterFormSchema";
+import { DiaryService } from "~/lib/services";
+import { DiaryWriterForm } from "~/types/zod/DiaryWriterFormSchema";
 import { getValidSession } from "~/utils/action";
-
-async function checkDiaryOwner(diaryId: string, userId: string) {
-  const d = await diary.isOwner(diaryId, userId);
-  if (!d) {
-    throw new Error("이 일기에 대한 권한이 없습니다");
-  }
-}
 
 export async function createDiary(
   diaryId: string | undefined,
@@ -23,161 +10,67 @@ export async function createDiary(
   options: { temp?: boolean } = {},
 ) {
   const session = await getValidSession();
-  if (diaryId) {
-    await checkDiaryOwner(diaryId, session.user.id);
-  }
+  const diaryService = new DiaryService({ userId: session.user.id });
 
-  const validatedFields = DiaryWriterFormSchema.safeParse(data);
-
-  if (!validatedFields.success) {
-    throw new Error("Validation failed", {
-      cause: validatedFields.error.flatten().fieldErrors,
-    });
-  }
-
-  const { date, content } = validatedFields.data;
-
-  // 시간 정보 제거
-  const dateWithoutTime = removeTimeFromDate(date);
-
-  const diaryData = {
-    content,
-    date: dateWithoutTime,
-  };
-
-  if (options.temp) {
-    const data = await diary.tempSaveDiary(diaryId, session.user.id, diaryData);
-
-    revalidatePath("/home");
-    revalidatePath("/new");
-    revalidatePath("/list/[page]", "page");
-
-    return data;
-  } else {
-    const data = await diary.createDiary(diaryId, session.user.id, diaryData);
-    revalidatePath("/home");
-    revalidatePath("/new");
-    revalidatePath("/list/[page]", "page");
-    return data;
-  }
+  return await diaryService.createDiary(diaryId, data, options);
 }
 
 export async function updateDiary(diaryId: string, data: DiaryWriterForm) {
   const session = await getValidSession();
-  if (diaryId) {
-    await checkDiaryOwner(diaryId, session.user.id);
-  }
+  const diaryService = new DiaryService({ userId: session.user.id });
 
-  const validatedFields = DiaryWriterFormSchema.safeParse(data);
-
-  if (!validatedFields.success) {
-    throw new Error("Validation failed", {
-      cause: validatedFields.error.flatten().fieldErrors,
-    });
-  }
-
-  const { date, content } = validatedFields.data;
-
-  // 시간 정보 제거
-  const dateWithoutTime = removeTimeFromDate(date);
-
-  const result = await diary.updateDiary(diaryId, session.user.id, {
-    content,
-    date: dateWithoutTime,
-  });
-
-  revalidatePath("/home");
-  revalidatePath("/new");
-  revalidatePath("/list/[page]", "page");
-
-  return result;
+  return await diaryService.updateDiary(diaryId, data);
 }
 
 export async function deleteDiary(diaryId: string) {
   const session = await getValidSession();
-  await checkDiaryOwner(diaryId, session.user.id);
+  const diaryService = new DiaryService({ userId: session.user.id });
 
-  await diary.deleteDiary(diaryId, session.user.id);
-
-  revalidatePath("/home");
-  revalidatePath("/new");
-  revalidatePath("/list/[page]", "page");
-
-  return;
+  return await diaryService.deleteDiary(diaryId);
 }
 
 export async function processDiary(diaryId: string) {
   const session = await getValidSession();
-  await checkDiaryOwner(diaryId, session.user.id);
+  const diaryService = new DiaryService({ userId: session.user.id });
 
-  const data = await diary.processDiary(diaryId, session.user.id);
-
-  revalidatePath("/home");
-  revalidatePath("/new");
-  revalidatePath("/list/[page]", "page");
-
-  return data;
+  return await diaryService.processDiary(diaryId);
 }
 
 export async function getDiaryById(diaryId: string) {
   const session = await getValidSession();
+  const diaryService = new DiaryService({ userId: session.user.id });
 
-  const data = await diary.getDiaryById(diaryId, session.user.id);
-
-  if (!data) {
-    return null;
-  }
-
-  return data;
+  return await diaryService.getDiaryById(diaryId);
 }
 
 export async function getDiaryByDate(date: Date) {
   const session = await getValidSession();
+  const diaryService = new DiaryService({ userId: session.user.id });
 
-  const data = await diary.getDiaryByDate(date, session.user.id);
-
-  if (!data) {
-    return null;
-  }
-
-  return data;
+  return await diaryService.getDiaryByDate(date);
 }
 
 export async function getRecentDiary() {
   const session = await getValidSession();
+  const diaryService = new DiaryService({ userId: session.user.id });
 
-  const data = await diary.getRecentDiary(session.user.id);
-
-  if (!data) {
-    return null;
-  }
-
-  return data;
+  return await diaryService.getRecentDiary();
 }
 
 export async function getDiarys(
-  options: Parameters<typeof diary.getDiarys>[1],
+  options: Parameters<typeof DiaryService.prototype.getDiarys>[0],
 ) {
   const session = await getValidSession();
+  const diaryService = new DiaryService({ userId: session.user.id });
 
-  const data = await diary.getDiarys(session.user.id, options);
-
-  if (!data) {
-    return { diarys: [], total: 0 };
-  }
-
-  return data;
+  return await diaryService.getDiarys(options);
 }
 
 export async function getOldestUnmemorizedDiaryByDate(date: Date) {
   const session = await getValidSession();
+  const diaryService = new DiaryService({ userId: session.user.id });
 
-  const data = await diary.getOldestUnmemorizedDiaryByDate(
-    session.user.id,
-    date,
-  );
-
-  return data;
+  return await diaryService.getOldestUnmemorizedDiaryByDate(date);
 }
 
 export async function semanticSearch(
@@ -188,10 +81,9 @@ export async function semanticSearch(
   },
 ) {
   const session = await getValidSession();
+  const diaryService = new DiaryService({ userId: session.user.id });
 
-  const data = await diary.semanticSearch(session.user.id, searchTerm, options);
-
-  return data;
+  return await diaryService.semanticSearch(searchTerm, options);
 }
 
 export async function fullTextSearch(
@@ -202,8 +94,7 @@ export async function fullTextSearch(
   },
 ) {
   const session = await getValidSession();
+  const diaryService = new DiaryService({ userId: session.user.id });
 
-  const data = await diary.fullTextSearch(session.user.id, searchTerm, options);
-
-  return data;
+  return await diaryService.fullTextSearch(searchTerm, options);
 }

@@ -1,47 +1,20 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
-
-import { memory } from "~/lib/models/memory";
+import { MemoryService } from "~/lib/services";
 import { getValidSession } from "~/utils/action";
-
-async function checkMemoryOwner(memoryId: string, userId: string) {
-  const m = await memory.isOwner(memoryId, userId);
-  if (!m) {
-    throw new Error("이 메모리에 대한 권한이 없습니다.");
-  }
-}
 
 export async function updateMemoryById(memoryId: string, content: string) {
   const session = await getValidSession();
-  await checkMemoryOwner(memoryId, session.user.id);
+  const memoryService = new MemoryService({ userId: session.user.id });
 
-  const updatedMemory = await memory.updateMemoryById(
-    memoryId,
-    session.user.id,
-    content,
-  );
-
-  if (!updatedMemory) {
-    throw new Error("메모리 업데이트에 실패했습니다.");
-  }
-
-  revalidatePath("/home");
-  revalidatePath("/new");
-  revalidatePath("/list/[page]", "page");
-
-  return updatedMemory;
+  return await memoryService.updateMemoryById(memoryId, content);
 }
 
 export async function deleteMemoryById(memoryId: string) {
   const session = await getValidSession();
-  await checkMemoryOwner(memoryId, session.user.id);
+  const memoryService = new MemoryService({ userId: session.user.id });
 
-  await memory.deleteMemoryById(memoryId, session.user.id);
-
-  revalidatePath("/home");
-  revalidatePath("/new");
-  revalidatePath("/list/[page]", "page");
+  return await memoryService.deleteMemoryById(memoryId);
 }
 
 export async function semanticSearch(
@@ -52,14 +25,9 @@ export async function semanticSearch(
   },
 ) {
   const session = await getValidSession();
+  const memoryService = new MemoryService({ userId: session.user.id });
 
-  const searchResult = await memory.semanticSearch(
-    session.user.id,
-    searchTerm,
-    options,
-  );
-
-  return searchResult;
+  return await memoryService.semanticSearch(searchTerm, options);
 }
 
 export async function fullTextSearch(
@@ -70,12 +38,7 @@ export async function fullTextSearch(
   },
 ) {
   const session = await getValidSession();
+  const memoryService = new MemoryService({ userId: session.user.id });
 
-  const searchResult = await memory.fullTextSearch(
-    session.user.id,
-    searchTerm,
-    options,
-  );
-
-  return searchResult;
+  return await memoryService.fullTextSearch(searchTerm, options);
 }
