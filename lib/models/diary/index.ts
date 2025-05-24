@@ -5,6 +5,7 @@ import { semanticSearch as diarySemanticSearch } from "~/lib/models/diary/semant
 import { embedding } from "~/lib/models/embedding";
 import { memory } from "~/lib/models/memory";
 import { prisma } from "~/utils/db";
+import { NotFoundError } from "~/utils/error";
 
 import type { Diary } from "@prisma/client";
 
@@ -121,7 +122,7 @@ export const diary = {
     });
 
     if (!diary) {
-      throw new Error("Diary not found");
+      throw new NotFoundError("일기를 찾을 수 없습니다.");
     }
 
     const embeddingCount = await prisma.embedding.count({

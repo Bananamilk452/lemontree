@@ -10,12 +10,10 @@ import {
   createMemorySchema,
 } from "~/lib/prompts";
 import { prisma } from "~/utils/db";
+import { ApplicationError, NotFoundError } from "~/utils/error";
 import { logger } from "~/utils/logger";
 
 export async function createMemory(diaryId: string, userId: string) {
-  const jobId = crypto.randomUUID();
-  logger.info(`[${jobId}] createMemory 작업 시작: diaryId: ${diaryId}`);
-
   const diary = await prisma.diary.findUnique({
     where: { id: diaryId },
     include: {
@@ -28,11 +26,11 @@ export async function createMemory(diaryId: string, userId: string) {
   });
 
   if (!diary) {
-    throw new Error(`다이어리 없음: ${diaryId}`);
+    throw new NotFoundError("일기를 찾을 수 없습니다.");
   }
 
   if (diary._count.embeddings <= 0) {
-    throw new Error(`임베딩 없음: ${diaryId}`);
+    throw new NotFoundError("임베딩을 찾을 수 없습니다.");
   }
 
   const model = new ChatVertexAI({
@@ -45,7 +43,7 @@ export async function createMemory(diaryId: string, userId: string) {
 
   const relatedMemories = await getRelatedMemories(diary.id);
   logger.info(
-    `[${jobId}] 관련 메모리: ${JSON.stringify(relatedMemories, null, 2)}`,
+    `[${diary.id}] 관련 메모리: ${JSON.stringify(relatedMemories, null, 2)}`,
   );
 
   const promptValue = await createMemoryPromptTemplate.invoke({
@@ -62,7 +60,9 @@ export async function createMemory(diaryId: string, userId: string) {
   });
 
   const { memories } = await modelWithStructure.invoke(promptValue);
-  logger.info(`[${jobId}] 추론한 메모리: ${JSON.stringify(memories, null, 2)}`);
+  logger.info(
+    `[${diary.id}] 추론한 메모리: ${JSON.stringify(memories, null, 2)}`,
+  );
 
   const newMemories = await addNewMemories(diaryId, userId, memories);
 
@@ -70,7 +70,7 @@ export async function createMemory(diaryId: string, userId: string) {
     const result = await createMemoryEmbedding(newMemories);
 
     logger.info(
-      `[${jobId}] createMemory 작업 완료: diaryId: ${diaryId}, vectorCounts: ${result.embeddings.length}`,
+      `[${diary.id}] createMemory 작업 완료: diaryId: ${diaryId}, vectorCounts: ${result.embeddings.length}`,
     );
     return result;
   } catch (error) {
@@ -83,10 +83,10 @@ export async function createMemory(diaryId: string, userId: string) {
     });
 
     logger.error(
-      `[${jobId}] createMemory 작업 중 에러로 메모리 생성이 롤백됨. 에러: ${error}`,
+      `[${diary.id}] createMemory 작업 중 에러로 메모리 생성이 롤백됨. 에러: ${error}`,
     );
-    throw new Error(
-      `createMemory 작업 중 에러로 메모리 생성이 롤백됨. 에러: ${error}`,
+    throw new ApplicationError(
+      "createMemory 작업 중 에러로 메모리 생성이 롤백됨",
     );
   }
 }

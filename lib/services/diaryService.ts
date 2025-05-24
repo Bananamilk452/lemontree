@@ -6,6 +6,7 @@ import {
   DiaryWriterForm,
   DiaryWriterFormSchema,
 } from "~/types/zod/DiaryWriterFormSchema";
+import { PermissionError, ValidationError } from "~/utils/error";
 
 interface DiaryServiceDeps {
   userId: string;
@@ -21,7 +22,7 @@ export class DiaryService {
   private async checkOwnership(diaryId: string): Promise<void> {
     const isOwner = await diary.isOwner(diaryId, this.userId);
     if (!isOwner) {
-      throw new Error("이 일기에 대한 권한이 없습니다");
+      throw new PermissionError();
     }
   }
 
@@ -29,9 +30,7 @@ export class DiaryService {
     const validatedFields = DiaryWriterFormSchema.safeParse(data);
 
     if (!validatedFields.success) {
-      throw new Error("Validation failed", {
-        cause: validatedFields.error.flatten().fieldErrors,
-      });
+      throw new ValidationError();
     }
 
     return validatedFields.data;

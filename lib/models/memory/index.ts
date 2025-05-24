@@ -2,6 +2,8 @@ import { vectorStore } from "~/lib/langchain";
 import { fullTextSearch as memoryFullTextSearch } from "~/lib/models/memory/fullTextSearch";
 import { semanticSearch as memorySemanticSearch } from "~/lib/models/memory/semanticSearch";
 import { prisma } from "~/utils/db";
+import { ApplicationError, NotFoundError } from "~/utils/error";
+import { logger } from "~/utils/logger";
 
 export const memory = {
   async isOwner(memoryId: string, userId: string) {
@@ -17,7 +19,7 @@ export const memory = {
     });
 
     if (!memory) {
-      throw new Error("메모리를 찾을 수 없습니다.");
+      throw new NotFoundError("메모리를 찾을 수 없습니다.");
     }
 
     const [updatedMemory, , embedding] = await prisma.$transaction([
@@ -46,8 +48,9 @@ export const memory = {
         where: { memoryId },
       });
 
-      throw new Error(
-        `updateMemoryById 작업 중 에러로 임베딩 생성이 롤백됨. 에러: ${error}`,
+      logger.error(error);
+      throw new ApplicationError(
+        "메모리 업데이트 중 오류가 발생했습니다. 다시 시도해주세요.",
       );
     }
   },

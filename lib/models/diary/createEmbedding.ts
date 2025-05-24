@@ -2,12 +2,10 @@ import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 
 import { vectorStore } from "~/lib/langchain";
 import { prisma } from "~/utils/db";
+import { ApplicationError } from "~/utils/error";
 import { logger } from "~/utils/logger";
 
 export async function createEmbedding(diaryId: string, content: string) {
-  const jobId = crypto.randomUUID();
-  logger.info(`[${jobId}] createEmbedding 작업 시작: diaryId: ${diaryId}`);
-
   const separators = ["\n\n", "\n", ".", "!", "?", ",", " ", ""];
 
   const splitter = new RecursiveCharacterTextSplitter({
@@ -29,7 +27,7 @@ export async function createEmbedding(diaryId: string, content: string) {
     await vectorStore.addModels(vectors);
 
     logger.info(
-      `[${jobId}] createEmbedding 작업 완료: diaryId: ${diaryId}, vectorCounts: ${vectors.length}`,
+      `[${diaryId}] createEmbedding 작업 완료: diaryId: ${diaryId}, vectorCounts: ${vectors.length}`,
     );
     return {
       content,
@@ -44,10 +42,10 @@ export async function createEmbedding(diaryId: string, content: string) {
     });
 
     logger.error(
-      `[${jobId}] createEmbedding 작업 중 에러로 임베딩 생성이 롤백됨. 에러: ${vectorError}`,
+      `[${diaryId}] createEmbedding 작업 중 에러로 임베딩 생성이 롤백됨. 에러: ${vectorError}`,
     );
-    throw new Error(
-      `createEmbedding 작업 중 에러로 임베딩 생성이 롤백됨. 에러: ${vectorError}`,
+    throw new ApplicationError(
+      "createEmbedding 작업 중 에러로 임베딩 생성이 롤백됨.",
     );
   }
 }
