@@ -1,0 +1,169 @@
+import { removeTimeFromDate } from "~/utils";
+import { revalidatePath } from "next/cache";
+
+import { diary } from "~/lib/models/diary";
+import {
+  DiaryWriterForm,
+  DiaryWriterFormSchema,
+} from "~/types/zod/DiaryWriterFormSchema";
+
+interface DiaryServiceDeps {
+  userId: string;
+}
+
+export class DiaryService {
+  private userId: string;
+
+  constructor({ userId }: DiaryServiceDeps) {
+    this.userId = userId;
+  }
+
+  private async checkOwnership(diaryId: string): Promise<void> {
+    const isOwner = await diary.isOwner(diaryId, this.userId);
+    if (!isOwner) {
+      throw new Error("이 일기에 대한 권한이 없습니다");
+    }
+  }
+
+  private validateDiaryData(data: DiaryWriterForm) {
+    const validatedFields = DiaryWriterFormSchema.safeParse(data);
+
+    if (!validatedFields.success) {
+      throw new Error("Validation failed", {
+        cause: validatedFields.error.flatten().fieldErrors,
+      });
+    }
+
+    return validatedFields.data;
+  }
+
+  private revalidatePages() {
+    revalidatePath("/home");
+    revalidatePath("/new");
+    revalidatePath("/list/[page]", "page");
+  }
+
+  async createDiary(
+    diaryId: string | undefined,
+    data: DiaryWriterForm,
+    options: { temp?: boolean } = {},
+  ) {
+    if (diaryId) {
+      await this.checkOwnership(diaryId);
+    }
+
+    const validatedData = this.validateDiaryData(data);
+    const { date, content } = validatedData;
+
+    // 시간 정보 제거
+    const dateWithoutTime = removeTimeFromDate(date);
+
+    const diaryData = {
+      content,
+      date: dateWithoutTime,
+    };
+
+    let result;
+    if (options.temp) {
+      result = await diary.tempSaveDiary(diaryId, this.userId, diaryData);
+    } else {
+      result = await diary.createDiary(diaryId, this.userId, diaryData);
+    }
+
+    this.revalidatePages();
+    return result;
+  }
+
+  async updateDiary(diaryId: string, data: DiaryWriterForm) {
+    await this.checkOwnership(diaryId);
+
+    const validatedData = this.validateDiaryData(data);
+    const { date, content } = validatedData;
+
+    // 시간 정보 제거
+    const dateWithoutTime = removeTimeFromDate(date);
+
+    const result = await diary.updateDiary(diaryId, this.userId, {
+      content,
+      date: dateWithoutTime,
+    });
+
+    this.revalidatePages();
+    return result;
+  }
+
+  async deleteDiary(diaryId: string) {
+    await this.checkOwnership(diaryId);
+
+    await diary.deleteDiary(diaryId, this.userId);
+
+    this.revalidatePages();
+  }
+
+  async processDiary(diaryId: string) {
+    await this.checkOwnership(diaryId);
+
+    const result = await diary.processDiary(diaryId, this.userId);
+
+    this.revalidatePages();
+    return result;
+  }
+
+  async getDiaryById(diaryId: string) {
+    const diaryData = await diary.getDiaryById(diaryId, this.userId);
+
+    if (!diaryData) {
+      return null;
+    }
+
+    return diaryData;
+  }
+
+  async getDiaryByDate(date: Date) {
+    const diaryData = await diary.getDiaryByDate(date, this.userId);
+
+    if (!diaryData) {
+      return null;
+    }
+
+    return diaryData;
+  }
+
+  async getRecentDiary() {
+    const diaryData = await diary.getRecentDiary(this.userId);
+
+    if (!diaryData) {
+      return null;
+    }
+
+    return diaryData;
+  }
+
+  async getDiarys(options: { limit: number; page: number }) {
+    const data = await diary.getDiarys(this.userId, options);
+
+    if (!data) {
+      return { diarys: [], total: 0 };
+    }
+
+    return data;
+  }
+
+  async getOldestUnmemorizedDiaryByDate(date: Date) {
+    return await diary.getOldestUnmemorizedDiaryByDate(this.userId, date);
+  }
+
+  async semanticSearch(
+    searchTerm: string,
+    options: { limit: number; page: number },
+  ) {
+    return await diary.semanticSearch(this.userId, searchTerm, options);
+  }
+
+  async fullTextSearch(
+    searchTerm: string,
+    options: { limit: number; page: number },
+  ) {
+    return await diary.fullTextSearch(this.userId, searchTerm, options);
+  }
+}
