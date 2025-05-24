@@ -7,8 +7,8 @@ export async function semanticSearch(
   userId: string,
   searchTerm: string,
   options: {
-    limit: number;
-    page: number;
+    take: number;
+    skip: number;
   },
 ) {
   const searchTermVector = await embeddings.embedQuery(searchTerm);
@@ -17,8 +17,8 @@ export async function semanticSearch(
     diarySemanticSearch(
       userId,
       JSON.stringify(searchTermVector),
-      options.limit,
-      options.page,
+      options.take,
+      options.skip,
     ),
   );
 

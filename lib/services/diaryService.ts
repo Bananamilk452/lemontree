@@ -140,7 +140,11 @@ export class DiaryService {
   }
 
   async getDiarys(options: { limit: number; page: number }) {
-    const data = await diary.getDiarys(this.userId, options);
+    const { limit, page } = options;
+    const take = limit;
+    const skip = (page - 1) * limit;
+
+    const data = await diary.getDiarys(this.userId, { take, skip });
 
     if (!data) {
       return { diarys: [], total: 0 };
@@ -157,13 +161,21 @@ export class DiaryService {
     searchTerm: string,
     options: { limit: number; page: number },
   ) {
-    return await diary.semanticSearch(this.userId, searchTerm, options);
+    const { limit, page } = options;
+    const take = limit;
+    const skip = (page - 1) * limit;
+
+    return await diary.semanticSearch(this.userId, searchTerm, { take, skip });
   }
 
   async fullTextSearch(
     searchTerm: string,
     options: { limit: number; page: number },
   ) {
-    return await diary.fullTextSearch(this.userId, searchTerm, options);
+    const { limit, page } = options;
+    const take = limit;
+    const skip = (page - 1) * limit;
+
+    return await diary.fullTextSearch(this.userId, searchTerm, { take, skip });
   }
 }

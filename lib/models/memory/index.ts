@@ -69,22 +69,16 @@ export const memory = {
   async semanticSearch(
     userId: string,
     searchTerm: string,
-    options: { limit: number; page: number },
+    options: { take: number; skip: number },
   ) {
-    return memorySemanticSearch(userId, searchTerm, {
-      limit: options.limit,
-      page: (options.page - 1) * options.limit,
-    });
+    return memorySemanticSearch(userId, searchTerm, options);
   },
 
   async fullTextSearch(
     userId: string,
     searchTerm: string,
-    options: { limit: number; page: number },
+    options: { take: number; skip: number },
   ) {
-    return memoryFullTextSearch(userId, searchTerm, {
-      limit: options.limit,
-      page: (options.page - 1) * options.limit,
-    });
+    return memoryFullTextSearch(userId, searchTerm, options);
   },
 };

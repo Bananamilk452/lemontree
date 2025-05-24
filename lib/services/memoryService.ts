@@ -55,13 +55,21 @@ export class MemoryService {
     searchTerm: string,
     options: { limit: number; page: number },
   ) {
-    return await memory.semanticSearch(this.userId, searchTerm, options);
+    const { limit, page } = options;
+    const take = limit;
+    const skip = (page - 1) * limit;
+
+    return await memory.semanticSearch(this.userId, searchTerm, { take, skip });
   }
 
   async fullTextSearch(
     searchTerm: string,
     options: { limit: number; page: number },
   ) {
-    return await memory.fullTextSearch(this.userId, searchTerm, options);
+    const { limit, page } = options;
+    const take = limit;
+    const skip = (page - 1) * limit;
+
+    return await memory.fullTextSearch(this.userId, searchTerm, { take, skip });
   }
 }

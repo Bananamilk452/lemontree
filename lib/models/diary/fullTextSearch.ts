@@ -6,12 +6,12 @@ export async function fullTextSearch(
   userId: string,
   searchTerm: string,
   options: {
-    limit: number;
-    page: number;
+    take: number;
+    skip: number;
   },
 ) {
   const searchResult = await prisma.$queryRawTyped(
-    diaryFullTextSearch(userId, searchTerm, options.limit, options.page),
+    diaryFullTextSearch(userId, searchTerm, options.take, options.skip),
   );
 
   return searchResult;
