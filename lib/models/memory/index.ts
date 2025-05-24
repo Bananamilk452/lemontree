@@ -55,11 +55,9 @@ export const memory = {
     }
   },
   async deleteMemoryById(memoryId: string, userId: string) {
-    await prisma.$transaction([
-      prisma.memory.delete({
-        where: { id: memoryId, userId },
-      }),
-    ]);
+    await prisma.memory.delete({
+      where: { id: memoryId, userId },
+    });
   },
   async deleteMemoriesByDiaryId(diaryId: string, userId: string) {
     await prisma.memory.deleteMany({

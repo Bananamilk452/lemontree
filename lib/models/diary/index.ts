@@ -2,7 +2,6 @@ import { createEmbedding } from "~/lib/models/diary/createEmbedding";
 import { createMemory } from "~/lib/models/diary/createMemory";
 import { fullTextSearch as diaryFullTextSearch } from "~/lib/models/diary/fullTextSearch";
 import { semanticSearch as diarySemanticSearch } from "~/lib/models/diary/semanticSearch";
-import { embedding } from "~/lib/models/embedding";
 import { memory } from "~/lib/models/memory";
 import { prisma } from "~/utils/db";
 import { NotFoundError } from "~/utils/error";
@@ -21,6 +20,16 @@ export const diary = {
     });
 
     return !!diary;
+  },
+  async deleteMemoriesAndEmbeddings(diaryId: string, userId: string) {
+    return prisma.$transaction([
+      prisma.embedding.deleteMany({
+        where: { diaryId },
+      }),
+      prisma.memory.deleteMany({
+        where: { diaryId, userId },
+      }),
+    ]);
   },
   async createDiary(
     diaryId: string | undefined,
@@ -42,8 +51,7 @@ export const diary = {
 
     // UPDATE 시에는 기존의 임베딩과 메모리를 삭제하고 새로 생성
     if (diaryId) {
-      await embedding.deleteEmbeddingsByDiaryId(diaryId);
-      await memory.deleteMemoriesByDiaryId(diaryId, userId);
+      this.deleteMemoriesAndEmbeddings(diaryId, userId);
     }
 
     await createEmbedding(diary.id, diary.content);
@@ -89,8 +97,7 @@ export const diary = {
       data,
     });
 
-    await embedding.deleteEmbeddingsByDiaryId(diaryId);
-    await memory.deleteMemoriesByDiaryId(diaryId, userId);
+    this.deleteMemoriesAndEmbeddings(diaryId, userId);
 
     await createEmbedding(diary.id, diary.content);
     const { memories } = await createMemory(diary.id, diary.userId);
@@ -108,9 +115,6 @@ export const diary = {
         userId,
       },
     });
-
-    await embedding.deleteEmbeddingsByDiaryId(diaryId);
-    await memory.deleteMemoriesByDiaryId(diaryId, userId);
   },
 
   async processDiary(diaryId: string, userId: string) {
