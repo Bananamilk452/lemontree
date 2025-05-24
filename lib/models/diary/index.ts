@@ -205,8 +205,8 @@ export const diary = {
     return diary;
   },
 
-  async getDiarys(userId: string, options: { limit: number; page: number }) {
-    const { limit, page } = options;
+  async getDiarys(userId: string, options: { take: number; skip: number }) {
+    const { take, skip } = options;
 
     const diarys = await prisma.diary.findMany({
       where: {
@@ -228,8 +228,8 @@ export const diary = {
       orderBy: {
         date: "desc",
       },
-      take: limit,
-      skip: (page - 1) * limit,
+      take,
+      skip,
     });
 
     const total = await prisma.diary.count({
@@ -267,23 +267,17 @@ export const diary = {
   async semanticSearch(
     userId: string,
     searchTerm: string,
-    options: { limit: number; page: number },
+    options: { take: number; skip: number },
   ) {
-    return diarySemanticSearch(userId, searchTerm, {
-      limit: options.limit,
-      page: (options.page - 1) * options.limit,
-    });
+    return diarySemanticSearch(userId, searchTerm, options);
   },
 
   async fullTextSearch(
     userId: string,
     searchTerm: string,
-    options: { limit: number; page: number },
+    options: { take: number; skip: number },
   ) {
-    return diaryFullTextSearch(userId, searchTerm, {
-      limit: options.limit,
-      page: (options.page - 1) * options.limit,
-    });
+    return diaryFullTextSearch(userId, searchTerm, options);
   },
 };
 
