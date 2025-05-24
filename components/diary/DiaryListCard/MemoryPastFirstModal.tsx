@@ -3,7 +3,7 @@
 import { Diary } from "@prisma/client";
 import { format } from "date-fns";
 
-import { DiaryListCardActiveModal } from "~/components/diary/DiaryListCard";
+import { DiaryModalType } from "~/components/diary/DiaryListCard/Provider";
 import { Button } from "~/components/ui/button";
 import {
   Dialog,
@@ -15,10 +15,8 @@ import {
 
 interface MemoryPastFirstModalProps {
   diary: Diary;
-  activeModal: DiaryListCardActiveModal;
-  setActiveModal: (
-    modal: "memory-past-first" | "memory-reset-alert" | null,
-  ) => void;
+  activeModal: DiaryModalType;
+  setActiveModal: (modal: DiaryModalType) => void;
 }
 
 export function MemoryPastFirstModal({
