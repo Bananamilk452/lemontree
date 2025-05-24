@@ -56,30 +56,15 @@ export const memory = {
       prisma.memory.delete({
         where: { id: memoryId, userId },
       }),
-      prisma.embedding.deleteMany({
-        where: { memoryId },
-      }),
     ]);
   },
   async deleteMemoriesByDiaryId(diaryId: string, userId: string) {
-    const memories = await prisma.memory.findMany({
+    await prisma.memory.deleteMany({
       where: {
         userId,
         diaryId,
       },
-      select: { id: true },
     });
-
-    await prisma.$transaction(
-      memories.flatMap((memory) => [
-        prisma.memory.deleteMany({
-          where: { id: memory.id, userId },
-        }),
-        prisma.embedding.deleteMany({
-          where: { memoryId: memory.id, diaryId },
-        }),
-      ]),
-    );
   },
   async semanticSearch(
     userId: string,

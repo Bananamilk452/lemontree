@@ -30,9 +30,9 @@ model Embedding {
   vector    Unsupported("vector(768)")?
   content   String
   diaryId   String?
-  diary     Diary?                      @relation(fields: [diaryId], references: [id])
+  diary     Diary?                      @relation(fields: [diaryId], references: [id], onDelete: Cascade)
   memoryId  String?
-  memory    Memory?                     @relation(fields: [memoryId], references: [id])
+  memory    Memory?                     @relation(fields: [memoryId], references: [id], onDelete: Cascade)
   createdAt DateTime                    @default(now())
   updatedAt DateTime?                   @updatedAt
 
@@ -50,7 +50,7 @@ model Memory {
   embeddings Embedding[]
   userId     String
   user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  Diary      Diary?      @relation(fields: [diaryId], references: [id])
+  diary      Diary?      @relation(fields: [diaryId], references: [id], onDelete: Cascade)
   diaryId    String?
 
   @@index([userId])
