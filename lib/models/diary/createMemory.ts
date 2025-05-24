@@ -82,11 +82,6 @@ export async function createMemory(diaryId: string, userId: string) {
       },
     });
 
-    await prisma.embedding.deleteMany({
-      where: {
-        memoryId: { in: memoryIds },
-      },
-    });
     logger.error(
       `[${jobId}] createMemory 작업 중 에러로 메모리 생성이 롤백됨. 에러: ${error}`,
     );
