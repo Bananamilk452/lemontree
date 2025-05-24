@@ -31,6 +31,8 @@ export function DiaryModalProvider({ children }: { children: ReactNode }) {
     setActiveModal(type);
     if (data?.pastDiary) {
       setPastDiary(data.pastDiary);
+    } else {
+      setPastDiary(null);
     }
   };
 

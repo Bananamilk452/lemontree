@@ -12,15 +12,14 @@ interface DiaryListCardModalsProps {
 }
 
 export function DiaryListCardModals({ diary }: DiaryListCardModalsProps) {
-  const { activeModal, pastDiary, setActiveModal, closeModal } =
-    useDiaryModal();
+  const { activeModal, pastDiary, setActiveModal } = useDiaryModal();
 
   return (
     <>
       <DeleteDiaryModal
         diary={diary}
-        open={activeModal === "delete"}
-        setOpen={closeModal}
+        activeModal={activeModal}
+        setActiveModal={setActiveModal}
       />
       <MemoryResetAlertModal
         diary={diary}

@@ -7,6 +7,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { deleteDiary } from "~/app/actions/diary";
+import { DiaryModalType } from "~/components/diary/DiaryListCard/Provider";
 import { Spinner } from "~/components/Spinner";
 import { Button } from "~/components/ui/button";
 import {
@@ -19,25 +20,31 @@ import {
 
 interface DeleteDiaryModalProps {
   diary: Diary;
-  open: boolean;
-  setOpen: (open: boolean) => void;
+  activeModal: DiaryModalType;
+  setActiveModal: (modal: DiaryModalType) => void;
 }
 
 export function DeleteDiaryModal({
   diary,
-  open,
-  setOpen,
+  activeModal,
+  setActiveModal,
 }: DeleteDiaryModalProps) {
   const router = useRouter();
 
   const [isLoading, setIsLoading] = useState(false);
+
+  function handleCloseModal(open: boolean) {
+    if (!open) {
+      setActiveModal(null);
+    }
+  }
 
   function handleDelete() {
     setIsLoading(true);
     deleteDiary(diary.id)
       .then(() => {
         toast.success("일기가 삭제되었습니다.");
-        setOpen(false);
+        setActiveModal(null);
         setIsLoading(false);
 
         // 일기 상세보기에서 삭제 시 목록으로 돌아감
@@ -53,7 +60,7 @@ export function DeleteDiaryModal({
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={activeModal === "delete"} onOpenChange={handleCloseModal}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>일기 삭제</DialogTitle>
@@ -77,7 +84,7 @@ export function DeleteDiaryModal({
             variant="outline"
             type="button"
             onClick={() => {
-              setOpen(false);
+              handleCloseModal(false);
             }}
             disabled={isLoading}
           >

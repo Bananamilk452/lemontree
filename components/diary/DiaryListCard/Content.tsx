@@ -39,8 +39,6 @@ export function DiaryListCardContent({ diary }: { diary: DiaryWithCount }) {
             <MemoryList memories={diary.memories} />
           )}
         </div>
-
-        <div className="flex justify-between items-center"></div>
       </div>
     </>
   );
