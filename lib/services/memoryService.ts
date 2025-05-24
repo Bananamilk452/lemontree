@@ -1,6 +1,7 @@
 import { revalidatePath } from "next/cache";
 
 import { memory } from "~/lib/models/memory";
+import { PermissionError } from "~/utils/error";
 
 interface MemoryServiceDeps {
   userId: string;
@@ -16,7 +17,7 @@ export class MemoryService {
   private async checkOwnership(memoryId: string): Promise<void> {
     const isOwner = await memory.isOwner(memoryId, this.userId);
     if (!isOwner) {
-      throw new Error("이 메모리에 대한 권한이 없습니다.");
+      throw new PermissionError();
     }
   }
 
@@ -34,10 +35,6 @@ export class MemoryService {
       this.userId,
       content,
     );
-
-    if (!updatedMemory) {
-      throw new Error("메모리 업데이트에 실패했습니다.");
-    }
 
     this.revalidatePages();
     return updatedMemory;

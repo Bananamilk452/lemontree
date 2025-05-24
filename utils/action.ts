@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import "server-only";
 
 import { auth } from "~/lib/auth";
+import { PermissionError } from "~/utils/error";
 
 export async function getValidSession() {
   const session = await auth.api.getSession({
@@ -10,7 +11,7 @@ export async function getValidSession() {
   });
 
   if (!session || !session.user) {
-    throw new Error("세션이 존재하지 않습니다.");
+    throw new PermissionError("로그인이 필요합니다.");
   }
 
   return session;
