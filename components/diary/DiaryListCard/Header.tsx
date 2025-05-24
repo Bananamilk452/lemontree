@@ -24,11 +24,6 @@ interface DiaryListCardProps {
   diary: DiaryWithCount;
 }
 
-export type DiaryListCardActiveModal =
-  | "memory-past-first"
-  | "memory-reset-alert"
-  | null;
-
 export function DiaryListCardHeader({ diary }: DiaryListCardProps) {
   const router = useRouter();
 
