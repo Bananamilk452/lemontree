@@ -51,7 +51,7 @@ export const diary = {
 
     // UPDATE 시에는 기존의 임베딩과 메모리를 삭제하고 새로 생성
     if (diaryId) {
-      this.deleteMemoriesAndEmbeddings(diaryId, userId);
+      await this.deleteMemoriesAndEmbeddings(diaryId, userId);
     }
 
     await createEmbedding(diary.id, diary.content);
@@ -97,7 +97,7 @@ export const diary = {
       data,
     });
 
-    this.deleteMemoriesAndEmbeddings(diaryId, userId);
+    await this.deleteMemoriesAndEmbeddings(diaryId, userId);
 
     await createEmbedding(diary.id, diary.content);
     const { memories } = await createMemory(diary.id, diary.userId);
