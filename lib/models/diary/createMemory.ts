@@ -4,11 +4,7 @@ import { getRelatedMemories as getRelatedMemoriesQuery } from "@prisma/client/sq
 import { format } from "date-fns";
 
 import { vectorStore } from "~/lib/langchain";
-import {
-  createMemoryPromptTemplate,
-  CreateMemorySchema,
-  createMemorySchema,
-} from "~/lib/prompts";
+import { createMemoryPromptTemplate, CreateMemorySchema } from "~/lib/prompts";
 import { prisma } from "~/utils/db";
 import { ApplicationError, NotFoundError } from "~/utils/error";
 import { logger } from "~/utils/logger";
@@ -39,8 +35,6 @@ export async function createMemory(diaryId: string, userId: string) {
     maxReasoningTokens: 0,
   });
 
-  const modelWithStructure = model.withStructuredOutput(createMemorySchema);
-
   const relatedMemories = await getRelatedMemories(diary.id);
   logger.info(
     `[${diary.id}] 관련 메모리: ${JSON.stringify(relatedMemories, null, 2)}`,
@@ -59,7 +53,12 @@ export async function createMemory(diaryId: string, userId: string) {
     ),
   });
 
-  const { memories } = await modelWithStructure.invoke(promptValue);
+  let rawMemories = (await model.invoke(promptValue)).text;
+  rawMemories = rawMemories.replace("```json", "");
+  rawMemories = rawMemories.replace("```", "");
+
+  const { memories } = JSON.parse(rawMemories) as { memories: string[] };
+
   logger.info(
     `[${diary.id}] 추론한 메모리: ${JSON.stringify(memories, null, 2)}`,
   );
