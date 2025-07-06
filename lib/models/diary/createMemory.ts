@@ -34,7 +34,7 @@ export async function createMemory(diaryId: string, userId: string) {
   }
 
   const model = new ChatVertexAI({
-    model: "gemini-2.5-flash-preview-04-17",
+    model: "gemini-2.5-flash",
     temperature: 0.2,
     maxReasoningTokens: 0,
   });
