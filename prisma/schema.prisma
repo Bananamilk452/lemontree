@@ -27,7 +27,7 @@ model Diary {
 
 model Embedding {
   id        String                      @id @default(uuid(7))
-  vector    Unsupported("vector(768)")?
+  vector    Unsupported("vector(3072)")?
   content   String
   diaryId   String?
   diary     Diary?                      @relation(fields: [diaryId], references: [id], onDelete: Cascade)
