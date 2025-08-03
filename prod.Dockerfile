@@ -10,6 +10,7 @@ RUN pnpm install --frozen-lockfile
 
 COPY . .
 
+RUN pnpm run migrate
 RUN pnpm run build
 
-CMD ["pnpm", "migrateandstart"]
+CMD ["pnpm", "start"]
