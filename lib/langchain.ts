@@ -5,7 +5,7 @@ import { Embedding, Prisma } from "@prisma/client";
 import { prisma } from "~/utils/db";
 
 export const embeddings = new VertexAIEmbeddings({
-  model: "text-multilingual-embedding-002",
+  model: "gemini-embedding-001",
 });
 
 export const vectorStore = PrismaVectorStore.withModel<Embedding>(
