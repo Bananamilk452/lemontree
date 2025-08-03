@@ -10,7 +10,8 @@
     "format": "prettier --write --cache .",
     "prisma": "prisma",
     "prepare": "husky",
-    "migrateandstart": "pnpm prisma migrate deploy && pnpm prisma generate --sql && pnpm start"
+    "migrate": "pnpm prisma migrate deploy && pnpm prisma generate --sql",
+    "migrateandstart": "pnpm migrate && pnpm start"
   },
   "dependencies": {
     "@hookform/resolvers": "^4.1.3",

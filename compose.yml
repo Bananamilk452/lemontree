@@ -6,8 +6,6 @@ services:
     expose:
       - "3000"
     depends_on:
-      valkey:
-        condition: service_healthy
       postgres:
         condition: service_healthy
     restart: unless-stopped
@@ -34,5 +32,4 @@ services:
     restart: unless-stopped
 
 volumes:
-  redis_data:
   pg_data:
