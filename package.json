@@ -9,7 +9,6 @@
     "lint": "next lint",
     "format": "prettier --write --cache .",
     "prisma": "prisma",
-    "prepare": "husky",
     "migrate": "pnpm prisma migrate deploy && pnpm prisma generate --sql",
     "migrateandstart": "pnpm migrate && pnpm start"
   },
