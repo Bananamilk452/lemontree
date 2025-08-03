@@ -1,10 +1,10 @@
 import { ChatVertexAI } from "@langchain/google-vertexai";
-import { Memory } from "@prisma/client";
-import { getRelatedMemories as getRelatedMemoriesQuery } from "@prisma/client/sql";
 import { format } from "date-fns";
 
 import { vectorStore } from "~/lib/langchain";
 import { createMemoryPromptTemplate, CreateMemorySchema } from "~/lib/prompts";
+import { Memory } from "~/prisma/generated/client";
+import { getRelatedMemories as getRelatedMemoriesQuery } from "~/prisma/generated/client/sql";
 import { prisma } from "~/utils/db";
 import { ApplicationError, NotFoundError } from "~/utils/error";
 import { logger } from "~/utils/logger";

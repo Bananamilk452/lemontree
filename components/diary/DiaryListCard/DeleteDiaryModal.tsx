@@ -1,6 +1,5 @@
 "use client";
 
-import { Diary } from "@prisma/client";
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -17,6 +16,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "~/components/ui/dialog";
+import { Diary } from "~/prisma/generated/client";
 
 interface DeleteDiaryModalProps {
   diary: Diary;

@@ -1,6 +1,5 @@
 "use client";
 
-import { Diary } from "@prisma/client";
 import { format } from "date-fns";
 
 import { DiaryModalType } from "~/components/diary/DiaryListCard/Provider";
@@ -12,6 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "~/components/ui/dialog";
+import { Diary } from "~/prisma/generated/client";
 
 interface MemoryPastFirstModalProps {
   diary: Diary;

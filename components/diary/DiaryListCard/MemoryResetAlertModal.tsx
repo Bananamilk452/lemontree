@@ -1,6 +1,5 @@
 "use client";
 
-import { Diary } from "@prisma/client";
 import { format } from "date-fns";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -16,6 +15,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "~/components/ui/dialog";
+import { Diary } from "~/prisma/generated/client";
 
 interface MemoryResetAlertModalProps {
   diary: Diary;

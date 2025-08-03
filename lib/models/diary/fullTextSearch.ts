@@ -1,5 +1,4 @@
-import { diaryFullTextSearch } from "@prisma/client/sql";
-
+import { diaryFullTextSearch } from "~/prisma/generated/client/sql";
 import { prisma } from "~/utils/db";
 
 export async function fullTextSearch(

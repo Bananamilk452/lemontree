@@ -1,7 +1,7 @@
 import { PrismaVectorStore } from "@langchain/community/vectorstores/prisma";
 import { VertexAIEmbeddings } from "@langchain/google-vertexai";
-import { Embedding, Prisma } from "@prisma/client";
 
+import { Embedding, Prisma } from "~/prisma/generated/client";
 import { prisma } from "~/utils/db";
 
 export const embeddings = new VertexAIEmbeddings({
