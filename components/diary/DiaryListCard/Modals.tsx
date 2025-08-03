@@ -1,11 +1,10 @@
 "use client";
 
-import { Diary } from "@prisma/client";
-
 import { DeleteDiaryModal } from "~/components/diary/DiaryListCard/DeleteDiaryModal";
 import { MemoryPastFirstModal } from "~/components/diary/DiaryListCard/MemoryPastFirstModal";
 import { MemoryResetAlertModal } from "~/components/diary/DiaryListCard/MemoryResetAlertModal";
 import { useDiaryModal } from "~/components/diary/DiaryListCard/Provider";
+import { Diary } from "~/prisma/generated/client";
 
 interface DiaryListCardModalsProps {
   diary: Diary;

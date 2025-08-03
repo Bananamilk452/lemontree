@@ -11,7 +11,7 @@ RUN pnpm install --frozen-lockfile
 
 COPY . .
 
-RUN pnpm prisma generate --sql
+RUN pnpm prisma generate
 RUN pnpm run build
 
 # Production stage

@@ -1,6 +1,5 @@
 "use client";
 
-import { Memory as MemoryType } from "@prisma/client";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -14,6 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "~/components/ui/dialog";
+import { Memory as MemoryType } from "~/prisma/generated/client";
 
 interface DeleteMemoryModalProps {
   memory: MemoryType;

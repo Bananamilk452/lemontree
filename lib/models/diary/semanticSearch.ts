@@ -1,6 +1,5 @@
-import { diarySemanticSearch } from "@prisma/client/sql";
-
 import { embeddings } from "~/lib/langchain";
+import { diarySemanticSearch } from "~/prisma/generated/client/sql";
 import { prisma } from "~/utils/db";
 
 export async function semanticSearch(

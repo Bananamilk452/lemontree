@@ -1,5 +1,4 @@
-import { memoryFullTextSearch } from "@prisma/client/sql";
-
+import { memoryFullTextSearch } from "~/prisma/generated/client/sql";
 import { prisma } from "~/utils/db";
 
 export async function fullTextSearch(

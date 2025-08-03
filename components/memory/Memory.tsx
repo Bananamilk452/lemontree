@@ -6,7 +6,7 @@ import { useState } from "react";
 import { DeleteMemoryModal } from "~/components/memory/DeleteMemoryModal";
 import { EditMemoryModal } from "~/components/memory/EditMemoryModal";
 
-import type { Memory } from "@prisma/client";
+import type { Memory } from "~/prisma/generated/client";
 
 interface MemoryProps {
   memory: Memory;

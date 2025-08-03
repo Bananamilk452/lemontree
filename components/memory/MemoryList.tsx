@@ -9,7 +9,7 @@ import {
   AccordionTrigger,
 } from "~/components/ui/accordion";
 
-import type { Memory as MemoryType } from "@prisma/client";
+import type { Memory as MemoryType } from "~/prisma/generated/client";
 
 interface MemoryListProps {
   memories: MemoryType[];

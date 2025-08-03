@@ -6,7 +6,7 @@ import { memory } from "~/lib/models/memory";
 import { prisma } from "~/utils/db";
 import { NotFoundError } from "~/utils/error";
 
-import type { Diary } from "@prisma/client";
+import type { Diary } from "~/prisma/generated/client";
 
 export type { Diary };
 

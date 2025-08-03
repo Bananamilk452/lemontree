@@ -1,5 +1,7 @@
 generator client {
   provider        = "prisma-client-js"
+  output   = "generated/client"
+  moduleFormat    = "esm"
   previewFeatures = ["postgresqlExtensions", "typedSql"]
 }
 
