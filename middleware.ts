@@ -14,7 +14,7 @@ const AUTH_PAGES = [
 
 export async function middleware(request: NextRequest) {
   const res = await ky.get<Session | null>(
-    `${request.nextUrl.origin}/api/auth/get-session`,
+    "http://localhost:3000/api/auth/get-session",
     {
       retry: 0,
       headers: {
