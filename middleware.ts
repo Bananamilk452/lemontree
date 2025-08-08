@@ -1,9 +1,7 @@
-import ky from "ky";
+import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
-import type { auth } from "~/lib/auth";
-
-type Session = typeof auth.$Infer.Session;
+import { auth } from "~/lib/auth";
 
 const AUTH_PAGES = [
   "/sign-in",
@@ -13,17 +11,9 @@ const AUTH_PAGES = [
 ];
 
 export async function middleware(request: NextRequest) {
-  const res = await ky.get<Session | null>(
-    "http://localhost:3000/api/auth/get-session",
-    {
-      retry: 0,
-      headers: {
-        cookie: request.headers.get("cookie") || "", // Forward the cookies from the request
-      },
-    },
-  );
-
-  const session = await res.json();
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
   if (!session) {
     // 같은 페이지로 리디렉션되는 경우를 방지
@@ -48,6 +38,7 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
+  runtime: "nodejs",
   matcher: [
     /*
      * Match all request paths except for the ones starting with:
