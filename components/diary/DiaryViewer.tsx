@@ -13,7 +13,7 @@ import { Spinner } from "~/components/Spinner";
 import type { Diary } from "~/lib/models/diary";
 
 interface DiaryViewerProps {
-  diary: Diary | null;
+  diary?: Diary | null;
 }
 
 export function DiaryViewer({ diary: initialDiary }: DiaryViewerProps) {
