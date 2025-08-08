@@ -4,7 +4,6 @@ import {
   ChevronUpIcon,
   HomeIcon,
   LogOutIcon,
-  MenuIcon,
   PencilLineIcon,
   TableOfContentsIcon,
   UserIcon,
@@ -27,7 +26,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  useSidebar,
 } from "~/components/ui/sidebar";
 import { authClient, Session } from "~/lib/auth-client";
 
@@ -37,7 +35,6 @@ interface AppSidebarClientProps {
 
 export function AppSidebarClient({ initialSession }: AppSidebarClientProps) {
   const { data } = authClient.useSession();
-  const { toggleSidebar } = useSidebar();
   const router = useRouter();
 
   const session = initialSession || data;
@@ -60,12 +57,6 @@ export function AppSidebarClient({ initialSession }: AppSidebarClientProps) {
             <SidebarMenu>
               <SidebarMenuItem>
                 <div className="flex items-center gap-4">
-                  <button
-                    className="hover:bg-sidebar-accent cursor-pointer rounded-md p-2 -ml-2"
-                    onClick={toggleSidebar}
-                  >
-                    <MenuIcon className="size-5" />
-                  </button>
                   <h1 className="flex items-center gap-1 text-xl font-bold">
                     🍋 레몬트리
                   </h1>
