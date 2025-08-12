@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -34,6 +34,7 @@ const formSchema = z.object({
 });
 
 export default function SignIn() {
+  const [isPending, startTransition] = useTransition();
   const [note, setNote] = useState<{
     content: string;
     variant: ComponentVariant<typeof Note>;
@@ -64,7 +65,9 @@ export default function SignIn() {
       },
       {
         onSuccess: () => {
-          router.replace("/home");
+          startTransition(() => {
+            router.replace("/home");
+          });
         },
       },
     );
@@ -140,9 +143,9 @@ export default function SignIn() {
             <Button
               type="submit"
               size="lg"
-              disabled={form.formState.isSubmitting}
+              disabled={form.formState.isSubmitting || isPending}
             >
-              {form.formState.isSubmitting && <Spinner />}
+              {(form.formState.isSubmitting || isPending) && <Spinner />}
               로그인
             </Button>
           </form>
