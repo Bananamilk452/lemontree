@@ -47,9 +47,9 @@ export function DiaryListCardHeader({ diary }: DiaryListCardProps) {
   }
 
   return (
-    <div className="flex justify-between items-center">
+    <div className="flex items-center justify-between">
       <h2 className="font-bold">{format(diary.date, "yyyy년 M월 d일")}</h2>
-      <div className="flex gap-2 items-center">
+      <div className="flex items-center gap-2">
         {isLoading && <Spinner />}
         <Button
           onClick={handleEditButtonClick}
@@ -59,7 +59,7 @@ export function DiaryListCardHeader({ diary }: DiaryListCardProps) {
           disabled={isLoading}
         >
           <PencilIcon className="size-5" />
-          수정
+          <span className="hidden sm:inline">수정</span>
         </Button>
         <Button
           onClick={() => openModal("delete")}
@@ -69,7 +69,7 @@ export function DiaryListCardHeader({ diary }: DiaryListCardProps) {
           disabled={isLoading}
         >
           <Trash2Icon className="size-5" />
-          삭제
+          <span className="hidden sm:inline">삭제</span>
         </Button>
 
         <DropdownMenu>
