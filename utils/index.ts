@@ -47,3 +47,26 @@ export function removeTimeFromDate(date: Date) {
     Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()),
   );
 }
+
+export function parseMemoryDate(content: string) {
+  const regex = /(\d{4}-\d{2}-\d{2})/g;
+  const splited = content.split(regex);
+
+  const segments = splited.map((seg) => {
+    const match = regex.exec(seg);
+
+    if (match) {
+      return {
+        type: "date",
+        content: match[0],
+      };
+    } else {
+      return {
+        type: "text",
+        content: seg,
+      };
+    }
+  });
+
+  return segments;
+}
