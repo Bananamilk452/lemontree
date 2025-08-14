@@ -1,6 +1,7 @@
 import { getDiaryById } from "~/app/actions/diary";
 import { DiaryListCard } from "~/components/diary/DiaryListCard";
 import { Header } from "~/components/Header";
+import { MainContainer } from "~/components/ui/container";
 
 export default async function DiaryId({
   params,
@@ -21,9 +22,9 @@ export default async function DiaryId({
         <h1 className="text-2xl font-bold">일기 보기</h1>
       </Header>
 
-      <div className="px-6 pb-6">
+      <MainContainer>
         <DiaryListCard diary={diary} />
-      </div>
+      </MainContainer>
     </>
   );
 }

@@ -1,9 +1,9 @@
-import { PAGE_SIZE } from "~/constants";
-
 import { getDiarys } from "~/app/actions/diary";
 import { DiaryEmpty } from "~/components/diary/DiaryEmpty";
 import { Header } from "~/components/Header";
 import DiaryList from "~/components/list/DiaryList";
+import { MainContainer } from "~/components/ui/container";
+import { PAGE_SIZE } from "~/constants";
 
 export default async function List({
   params,
@@ -25,11 +25,11 @@ export default async function List({
       <Header>
         <h1 className="text-2xl font-bold">
           일기 목록
-          <span className="text-base ml-2">(총 {total}개)</span>
+          <span className="ml-2 text-base">(총 {total}개)</span>
         </h1>
       </Header>
 
-      <div className="px-6 pb-6">
+      <MainContainer>
         {diarys.length > 0 ? (
           <DiaryList
             diarys={diarys}
@@ -40,7 +40,7 @@ export default async function List({
         ) : (
           <DiaryEmpty />
         )}
-      </div>
+      </MainContainer>
     </>
   );
 }
