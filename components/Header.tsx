@@ -8,14 +8,17 @@ export function Header({ children }: { children: React.ReactNode }) {
   const { toggleSidebar } = useSidebar();
 
   return (
-    <div className="flex items-center gap-4 p-6 h-21">
-      <button
-        className="md:hidden hover:bg-sidebar-accent -ml-2 cursor-pointer rounded-md p-2"
-        onClick={toggleSidebar}
-      >
-        <MenuIcon className="size-5" />
-      </button>
-      {children}
-    </div>
+    <>
+      <div className="fixed top-0 left-64 z-50 flex w-full items-center gap-4 bg-white p-6 shadow-md">
+        <button
+          className="hover:bg-sidebar-accent -ml-2 cursor-pointer rounded-md p-2 md:hidden"
+          onClick={toggleSidebar}
+        >
+          <MenuIcon className="size-5" />
+        </button>
+        {children}
+      </div>
+      <div className="h-21"></div>
+    </>
   );
 }

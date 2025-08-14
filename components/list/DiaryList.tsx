@@ -8,6 +8,7 @@ import { AppPagination } from "~/components/AppPagination";
 import { DiaryListCard } from "~/components/diary/DiaryListCard";
 import { Spinner } from "~/components/Spinner";
 import { PaginationLink } from "~/components/ui/pagination";
+import { PAGENATION_SIZE } from "~/constants";
 
 import type { DiaryWithCount } from "~/lib/models/diary";
 
@@ -56,7 +57,7 @@ export default function DiaryList(props: DiaryListProps) {
   return (
     <>
       {isLoading ? (
-        <div className="w-full flex justify-center">
+        <div className="flex w-full justify-center">
           <Spinner className="size-5" />
         </div>
       ) : (
@@ -75,12 +76,13 @@ export default function DiaryList(props: DiaryListProps) {
       <AppPagination
         total={total}
         page={page}
+        size={PAGENATION_SIZE}
         limit={props.limit}
         onPageChange={(newPage) => {
           setPage(newPage);
         }}
         render={(number) => {
-          const href = `/list/${number}`;
+          const href = `/diary/list/${number}`;
           const isActive = number === page;
 
           return (

@@ -24,7 +24,21 @@ export class MemoryService {
   private revalidatePages() {
     revalidatePath("/home");
     revalidatePath("/new");
-    revalidatePath("/list/[page]", "page");
+    revalidatePath("/diary/list/[page]", "page");
+  }
+
+  async getMemories(options: { limit: number; page: number }) {
+    const { limit, page } = options;
+    const take = limit;
+    const skip = (page - 1) * limit;
+
+    const data = await memory.getMemories(this.userId, { take, skip });
+
+    if (!data) {
+      return { memories: [], total: 0 };
+    }
+
+    return data;
   }
 
   async updateMemoryById(memoryId: string, content: string) {

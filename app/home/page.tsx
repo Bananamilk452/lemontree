@@ -1,5 +1,6 @@
 import { DiaryViewer } from "~/components/diary/DiaryViewer";
 import { Header } from "~/components/Header";
+import { MainContainer } from "~/components/ui/container";
 
 export default function Home() {
   return (
@@ -8,9 +9,9 @@ export default function Home() {
         <h1 className="text-2xl font-bold">홈</h1>
       </Header>
 
-      <div className="flex flex-col gap-4 px-6 pb-6">
+      <MainContainer className="flex flex-col gap-4">
         <DiaryViewer />
-      </div>
+      </MainContainer>
     </>
   );
 }
