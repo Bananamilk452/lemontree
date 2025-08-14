@@ -205,7 +205,7 @@ function DiaryWriterDatePicker({
                 }}
               />
             </FormControl>
-            의 일기에요!
+            <span className="hidden sm:inline">의 일기에요!</span>
             <FormMessage />
           </FormItem>
         )}
