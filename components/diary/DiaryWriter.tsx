@@ -1,13 +1,17 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { DIARY_MAX_LENGTH } from "~/constants";
-import { utcDateNow } from "~/utils";
-import { format } from "date-fns";
-import { CalendarIcon, SaveIcon } from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { addDays, format } from "date-fns";
+import {
+  CalendarIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  SaveIcon,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useEffect } from "react";
+import { useForm, UseFormReturn } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -23,12 +27,14 @@ import {
   FormMessage,
 } from "~/components/ui/form";
 import { Textarea } from "~/components/ui/textarea";
+import { DIARY_MAX_LENGTH } from "~/constants";
 import {
   DiaryWriterForm,
   DiaryWriterFormSchema,
 } from "~/types/zod/DiaryWriterFormSchema";
+import { utcDateNow } from "~/utils";
 
-import type { Diary } from "~/lib/models/diary";
+type InferredDiaryWriterForm = z.infer<typeof DiaryWriterFormSchema>;
 
 interface DiaryWriterProps {
   initialDate?: Date;
@@ -36,6 +42,7 @@ interface DiaryWriterProps {
 
 export function DiaryWriter(props: DiaryWriterProps) {
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const form = useForm<DiaryWriterForm>({
     resolver: zodResolver(DiaryWriterFormSchema),
@@ -45,94 +52,93 @@ export function DiaryWriter(props: DiaryWriterProps) {
     },
   });
 
-  function onSave(data: z.infer<typeof DiaryWriterFormSchema>) {
-    setIsLoading(true);
-    createDiary(diary?.id, data)
-      .then(({ diary }) => {
-        toast.success("일기를 저장하고 메모리화했습니다.");
-        setDiary(diary);
-        form.setValue("content", diary.content);
-        router.push(`/diary/${diary.id}`);
-      })
-      .catch((error) => {
-        toast.error("일기 저장에 실패했습니다.");
-        console.error(error);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }
-
-  async function onTempSave(data: z.infer<typeof DiaryWriterFormSchema>) {
-    setIsLoading(true);
-    createDiary(diary?.id, data, { temp: true })
-      .then(({ diary }) => {
-        toast.success("일기를 임시 저장했습니다.");
-        setDiary(diary);
-        form.setValue("content", diary.content);
-        router.push(`/diary/${diary.id}`);
-      })
-      .catch((error) => {
-        toast.error("일기 임시 저장에 실패했습니다.");
-        console.error(error);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }
-
-  const [isLoading, setIsLoading] = useState(false);
-  const [diary, setDiary] = useState<Diary | null>(null);
   const date = form.watch("date");
+
+  const {
+    data: diary,
+    status: diaryStatus,
+    error,
+  } = useQuery({
+    queryKey: ["diary", date],
+    queryFn: () => getDiaryByDate(date),
+    enabled: !!date,
+  });
 
   useEffect(() => {
     if (date) {
       router.replace(`/new?date=${format(date, "yyyy-MM-dd")}`);
-      setIsLoading(true);
-      getDiaryByDate(date)
-        .then((diary) => {
-          if (diary) {
-            setDiary(diary);
-            form.setValue("content", diary.content);
-          } else {
-            setDiary(null);
-            form.setValue("content", "");
-          }
-        })
-        .catch((error) => {
-          console.error("Error fetching diary:", error);
-          toast.error("일기를 불러오는 중 오류가 발생했습니다.");
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
     }
-  }, [date, form, router]);
+  }, [date, router]);
+
+  useEffect(() => {
+    form.setValue("content", diary?.content || "");
+  }, [diary, form]);
+
+  useEffect(() => {
+    if (error) {
+      toast.error("일기를 불러오는 중 오류가 발생했습니다.");
+    }
+  }, [error]);
+
+  const { mutate: saveDiary, status: saveDiaryStatus } = useMutation({
+    mutationFn: ({
+      diaryId,
+      data,
+    }: {
+      diaryId?: string;
+      data: InferredDiaryWriterForm;
+    }) => createDiary(diaryId, data),
+    onSuccess: ({ diary }) => {
+      toast.success("일기를 저장하고 메모리화했습니다.");
+      queryClient.setQueryData(["diary", diary.date], diary);
+      form.setValue("content", diary.content);
+      router.push(`/diary/${diary.id}`);
+    },
+    onError: (error) => {
+      toast.error("일기 저장에 실패했습니다.");
+      console.error(error);
+    },
+  });
+
+  const { mutate: tempSaveDiary, status: tempSaveDiaryStatus } = useMutation({
+    mutationFn: ({
+      diaryId,
+      data,
+    }: {
+      diaryId?: string;
+      data: InferredDiaryWriterForm;
+    }) => createDiary(diaryId, data, { temp: true }),
+    onSuccess: ({ diary }) => {
+      toast.success("일기를 임시 저장했습니다.");
+      queryClient.setQueryData(["diary", diary.date], diary);
+      form.setValue("content", diary.content);
+      router.push(`/diary/${diary.id}`);
+    },
+    onError: (error) => {
+      toast.error("일기 임시 저장에 실패했습니다.");
+      console.error(error);
+    },
+  });
+
+  const isLoading =
+    diaryStatus === "pending" ||
+    form.formState.isSubmitting ||
+    saveDiaryStatus === "pending" ||
+    tempSaveDiaryStatus === "pending";
+
+  function onSave(data: InferredDiaryWriterForm) {
+    saveDiary({ diaryId: diary?.id, data });
+  }
+
+  function onTempSave(data: InferredDiaryWriterForm) {
+    tempSaveDiary({ diaryId: diary?.id, data });
+  }
 
   return (
     <Form {...form}>
       <form className="flex flex-col gap-4">
-        <div className="rounded-lg border px-4 py-3 shadow-md">
-          <FormField
-            control={form.control}
-            name="date"
-            render={({ field }) => (
-              <FormItem className="flex items-center gap-2 text-sm">
-                <CalendarIcon className="text-primary size-5" />
-                <FormControl>
-                  <DatePicker
-                    value={field.value}
-                    onChange={(date) => {
-                      field.onChange(date);
-                    }}
-                  />
-                </FormControl>
-                의 일기에요!
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+        <DiaryWriterDatePicker form={form} />
+
         <FormField
           control={form.control}
           name="content"
@@ -155,35 +161,121 @@ export function DiaryWriter(props: DiaryWriterProps) {
           )}
         />
 
-        <div className="flex items-center justify-end gap-4">
-          <p className="self-start text-sm text-gray-600">
-            {form.watch("content").length}/{DIARY_MAX_LENGTH}
-          </p>
-          <div className="grow"></div>
-          {(form.formState.isSubmitting || isLoading) && (
-            <Spinner className="size-5 shrink-0" />
-          )}
-          <Button
-            onClick={form.handleSubmit(onTempSave)}
-            size="lg"
-            className="flex gap-2"
-            variant="secondary"
-            disabled={form.formState.isSubmitting || isLoading}
-          >
-            임시 저장
-          </Button>
-
-          <Button
-            onClick={form.handleSubmit(onSave)}
-            size="lg"
-            className="flex gap-2"
-            disabled={form.formState.isSubmitting || isLoading}
-          >
-            <SaveIcon strokeWidth={1.5} className="size-5" />
-            일기 저장
-          </Button>
-        </div>
+        <DiaryWriterFooter
+          form={form}
+          isLoading={isLoading}
+          onTempSave={onTempSave}
+          onSave={onSave}
+        />
       </form>
     </Form>
+  );
+}
+
+function DiaryWriterDatePicker({
+  form,
+}: {
+  form: UseFormReturn<InferredDiaryWriterForm>;
+}) {
+  function handleDateChange(direction: number) {
+    const date = new Date(form.getValues("date"));
+
+    if (direction === 1) {
+      addDays(date, 1);
+      form.setValue("date", addDays(date, 1));
+    } else {
+      addDays(date, -1);
+      form.setValue("date", addDays(date, -1));
+    }
+  }
+
+  return (
+    <div className="flex items-center rounded-lg border px-4 py-3 shadow-md">
+      <FormField
+        control={form.control}
+        name="date"
+        render={({ field }) => (
+          <FormItem className="flex items-center gap-2 text-sm">
+            <CalendarIcon className="text-primary size-5" />
+            <FormControl>
+              <DatePicker
+                value={field.value}
+                onChange={(date) => {
+                  field.onChange(date);
+                }}
+              />
+            </FormControl>
+            의 일기에요!
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <div className="flex-grow"></div>
+
+      <div className="flex items-center gap-2">
+        <button
+          className="hover:cursor-pointer"
+          onClick={(e) => {
+            e.preventDefault();
+            handleDateChange(-1);
+          }}
+        >
+          <ChevronLeftIcon />
+        </button>
+        <button
+          className="hover:cursor-pointer"
+          onClick={(e) => {
+            e.preventDefault();
+            handleDateChange(1);
+          }}
+        >
+          <ChevronRightIcon />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function DiaryWriterFooter({
+  form,
+  isLoading,
+  onTempSave,
+  onSave,
+}: {
+  form: UseFormReturn<InferredDiaryWriterForm>;
+  isLoading: boolean;
+  onTempSave: (data: InferredDiaryWriterForm) => void;
+  onSave: (data: InferredDiaryWriterForm) => void;
+}) {
+  return (
+    <div className="flex items-center justify-end gap-4">
+      <p className="self-start text-sm text-gray-600">
+        {form.watch("content").length}/{DIARY_MAX_LENGTH}
+      </p>
+      <div className="grow"></div>
+      {(form.formState.isSubmitting || isLoading) && (
+        <Spinner className="size-5 shrink-0" />
+      )}
+      <Button
+        onClick={form.handleSubmit(onTempSave)}
+        size="lg"
+        className="flex gap-2"
+        variant="secondary"
+        disabled={form.formState.isSubmitting || isLoading}
+      >
+        임시 저장
+      </Button>
+
+      <Button
+        onClick={form.handleSubmit(onSave)}
+        size="lg"
+        className="flex gap-2"
+        disabled={form.formState.isSubmitting || isLoading}
+      >
+        <SaveIcon strokeWidth={1.5} className="size-5" />
+        일기 저장
+      </Button>
+    </div>
   );
 }
