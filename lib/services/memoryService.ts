@@ -24,7 +24,7 @@ export class MemoryService {
   private revalidatePages() {
     revalidatePath("/home");
     revalidatePath("/new");
-    revalidatePath("/list/[page]", "page");
+    revalidatePath("/diary/list/[page]", "page");
   }
 
   async updateMemoryById(memoryId: string, content: string) {

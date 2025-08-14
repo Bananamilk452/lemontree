@@ -56,7 +56,7 @@ export default function DiaryList(props: DiaryListProps) {
   return (
     <>
       {isLoading ? (
-        <div className="w-full flex justify-center">
+        <div className="flex w-full justify-center">
           <Spinner className="size-5" />
         </div>
       ) : (
@@ -80,7 +80,7 @@ export default function DiaryList(props: DiaryListProps) {
           setPage(newPage);
         }}
         render={(number) => {
-          const href = `/list/${number}`;
+          const href = `/diary/list/${number}`;
           const isActive = number === page;
 
           return (

@@ -85,7 +85,7 @@ export function AppSidebarClient({ initialSession }: AppSidebarClientProps) {
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton size="lg" asChild>
-                    <Link href="/list/1">
+                    <Link href="/diary/list/1">
                       <TableOfContentsIcon />
                       <span>일기 목록</span>
                     </Link>

@@ -49,7 +49,7 @@ export function DeleteDiaryModal({
 
         // 일기 상세보기에서 삭제 시 목록으로 돌아감
         if (location.pathname.includes("/diary/")) {
-          router.push("/list/1");
+          router.push("/diary/list/1");
         }
       })
       .catch((error) => {
@@ -70,7 +70,7 @@ export function DeleteDiaryModal({
           <br />
           <strong>(일기, 임베딩, 메모리도 함께 삭제됩니다.)</strong>
         </div>
-        <DialogFooter className="flex justify-end gap-2 items-center">
+        <DialogFooter className="flex items-center justify-end gap-2">
           {isLoading && <Spinner className="mr-2 size-5" />}
           <Button
             variant="destructive"

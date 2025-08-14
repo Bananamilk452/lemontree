@@ -1,4 +1,3 @@
-import { removeTimeFromDate } from "~/utils";
 import { revalidatePath } from "next/cache";
 
 import { diary } from "~/lib/models/diary";
@@ -6,6 +5,7 @@ import {
   DiaryWriterForm,
   DiaryWriterFormSchema,
 } from "~/types/zod/DiaryWriterFormSchema";
+import { removeTimeFromDate } from "~/utils";
 import { PermissionError, ValidationError } from "~/utils/error";
 
 interface DiaryServiceDeps {
@@ -39,7 +39,7 @@ export class DiaryService {
   private revalidatePages() {
     revalidatePath("/home");
     revalidatePath("/new");
-    revalidatePath("/list/[page]", "page");
+    revalidatePath("/diary/list/[page]", "page");
   }
 
   async createDiary(
