@@ -8,6 +8,7 @@ import { AppPagination } from "~/components/AppPagination";
 import { DiaryListCard } from "~/components/diary/DiaryListCard";
 import { Spinner } from "~/components/Spinner";
 import { PaginationLink } from "~/components/ui/pagination";
+import { PAGENATION_SIZE } from "~/constants";
 
 import type { DiaryWithCount } from "~/lib/models/diary";
 
@@ -75,6 +76,7 @@ export default function DiaryList(props: DiaryListProps) {
       <AppPagination
         total={total}
         page={page}
+        size={PAGENATION_SIZE}
         limit={props.limit}
         onPageChange={(newPage) => {
           setPage(newPage);
