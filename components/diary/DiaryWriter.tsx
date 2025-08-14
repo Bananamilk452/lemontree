@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DIARY_MAX_LENGTH } from "~/constants";
 import { utcDateNow } from "~/utils";
+import { format } from "date-fns";
 import { CalendarIcon, SaveIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -86,6 +87,7 @@ export function DiaryWriter(props: DiaryWriterProps) {
 
   useEffect(() => {
     if (date) {
+      router.replace(`/new?date=${format(date, "yyyy-MM-dd")}`);
       setIsLoading(true);
       getDiaryByDate(date)
         .then((diary) => {
@@ -105,18 +107,18 @@ export function DiaryWriter(props: DiaryWriterProps) {
           setIsLoading(false);
         });
     }
-  }, [date, form]);
+  }, [date, form, router]);
 
   return (
     <Form {...form}>
       <form className="flex flex-col gap-4">
-        <div className="border px-4 py-3 shadow-md rounded-lg">
+        <div className="rounded-lg border px-4 py-3 shadow-md">
           <FormField
             control={form.control}
             name="date"
             render={({ field }) => (
               <FormItem className="flex items-center gap-2 text-sm">
-                <CalendarIcon className="size-5 text-primary" />
+                <CalendarIcon className="text-primary size-5" />
                 <FormControl>
                   <DatePicker
                     value={field.value}
@@ -139,7 +141,7 @@ export function DiaryWriter(props: DiaryWriterProps) {
               <FormControl>
                 <Textarea
                   disabled={isLoading}
-                  className="shadow-md rounded-xl resize-none h-[500px] p-4 !text-base"
+                  className="h-[500px] resize-none rounded-xl p-4 !text-base shadow-md"
                   placeholder={
                     isLoading
                       ? "일기를 불러오는 중입니다..."
@@ -153,8 +155,8 @@ export function DiaryWriter(props: DiaryWriterProps) {
           )}
         />
 
-        <div className="flex justify-end items-center gap-4">
-          <p className="text-sm text-gray-600 self-start">
+        <div className="flex items-center justify-end gap-4">
+          <p className="self-start text-sm text-gray-600">
             {form.watch("content").length}/{DIARY_MAX_LENGTH}
           </p>
           <div className="grow"></div>
