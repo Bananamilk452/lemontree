@@ -4,6 +4,8 @@ import {
   ChevronUpIcon,
   HomeIcon,
   LogOutIcon,
+  MemoryStickIcon,
+  NotebookIcon,
   PencilLineIcon,
   TableOfContentsIcon,
   UserIcon,
@@ -22,6 +24,7 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
+  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -75,6 +78,14 @@ export function AppSidebarClient({ initialSession }: AppSidebarClientProps) {
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroup>
+            <SidebarGroup>
+              <SidebarGroupLabel>
+                <NotebookIcon className="mr-1.5" />
+                일기
+              </SidebarGroupLabel>
+              <SidebarMenu>
                 <SidebarMenuItem>
                   <SidebarMenuButton size="lg" asChild>
                     <Link href="/new">
@@ -93,7 +104,22 @@ export function AppSidebarClient({ initialSession }: AppSidebarClientProps) {
                 </SidebarMenuItem>
               </SidebarMenu>
             </SidebarGroup>
-            <SidebarGroup />
+            <SidebarGroup>
+              <SidebarGroupLabel>
+                <MemoryStickIcon className="mr-1.5" />
+                메모리
+              </SidebarGroupLabel>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton size="lg" asChild>
+                    <Link href="/memory/list/1">
+                      <TableOfContentsIcon />
+                      <span>메모리 목록</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroup>
           </SidebarContent>
           <SidebarFooter>
             <SidebarMenu>
