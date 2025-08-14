@@ -13,6 +13,40 @@ export const memory = {
 
     return !!memory;
   },
+  async getMemories(userId: string, options: { take: number; skip: number }) {
+    const { take, skip } = options;
+
+    const memories = await prisma.memory.findMany({
+      where: {
+        userId,
+      },
+      include: {
+        diary: {
+          select: {
+            date: true,
+          },
+        },
+      },
+      orderBy: {
+        diary: {
+          date: "desc",
+        },
+      },
+      take,
+      skip,
+    });
+
+    const total = await prisma.memory.count({
+      where: {
+        userId,
+      },
+    });
+
+    return {
+      memories,
+      total,
+    };
+  },
   async updateMemoryById(memoryId: string, userId: string, content: string) {
     const memory = await prisma.memory.findFirst({
       where: { id: memoryId, userId },
