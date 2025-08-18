@@ -250,13 +250,15 @@ function DiaryWriterFooter({
 }) {
   return (
     <div className="flex items-center justify-end gap-4">
-      <p className="self-start text-sm text-gray-600">
-        {form.watch("content").length}/{DIARY_MAX_LENGTH}
-      </p>
-      <div className="grow"></div>
+      {!(form.formState.isSubmitting || isLoading) && (
+        <p className="self-start text-sm text-gray-600">
+          {form.watch("content").length}/{DIARY_MAX_LENGTH}
+        </p>
+      )}
       {(form.formState.isSubmitting || isLoading) && (
         <Spinner className="size-5 shrink-0" />
       )}
+      <div className="grow"></div>
       <Button
         onClick={form.handleSubmit(onTempSave)}
         size="lg"

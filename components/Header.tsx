@@ -9,7 +9,7 @@ export function Header({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      <div className="fixed top-0 left-64 z-50 flex w-full items-center gap-4 bg-white p-6 shadow-md">
+      <div className="fixed top-0 left-0 z-50 flex w-full items-center gap-4 bg-white p-6 shadow-md md:left-64">
         <button
           className="hover:bg-sidebar-accent -ml-2 cursor-pointer rounded-md p-2 md:hidden"
           onClick={toggleSidebar}
