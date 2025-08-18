@@ -42,7 +42,7 @@ export function AppPagination(props: AppPaginationProps) {
 
   return (
     <Pagination>
-      <PaginationContent>
+      <PaginationContent className="flex-wrap justify-center">
         {pageNumbers.map((number) => (
           <PaginationItem key={number} onClick={() => handlePageChange(number)}>
             {props.render(number)}

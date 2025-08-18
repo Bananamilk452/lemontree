@@ -49,29 +49,29 @@ export function ListPage(props: { page: number }) {
         ) : (
           <p>메모리가 없습니다.</p>
         )}
+
+        <hr className="my-6" />
+
+        <AppPagination
+          total={total}
+          page={page}
+          size={PAGENATION_SIZE}
+          limit={limit}
+          onPageChange={(newPage) => {
+            setPage(newPage);
+          }}
+          render={(number) => {
+            const href = `/memory/list/${number}`;
+            const isActive = number === page;
+
+            return (
+              <PaginationLink href={href} isActive={isActive}>
+                {number}
+              </PaginationLink>
+            );
+          }}
+        />
       </MainContainer>
-
-      <hr className="my-6" />
-
-      <AppPagination
-        total={total}
-        page={page}
-        size={PAGENATION_SIZE}
-        limit={limit}
-        onPageChange={(newPage) => {
-          setPage(newPage);
-        }}
-        render={(number) => {
-          const href = `/memory/list/${number}`;
-          const isActive = number === page;
-
-          return (
-            <PaginationLink href={href} isActive={isActive}>
-              {number}
-            </PaginationLink>
-          );
-        }}
-      />
     </>
   );
 }
