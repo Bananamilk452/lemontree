@@ -6,4 +6,5 @@ exports.diaryFullTextSearch = require("./diaryFullTextSearch.js").diaryFullTextS
 exports.diarySemanticSearch = require("./diarySemanticSearch.js").diarySemanticSearch
 exports.getRelatedMemories = require("./getRelatedMemories.js").getRelatedMemories
 exports.memoryFullTextSearch = require("./memoryFullTextSearch.js").memoryFullTextSearch
-exports.memorySemanticSearch = require("./memorySemanticSearch.js").memorySemanticSearch
+exports.memorySemanticSearchByAccuracy = require("./memorySemanticSearchByAccuracy.js").memorySemanticSearchByAccuracy
+exports.memorySemanticSearchByDate = require("./memorySemanticSearchByDate.js").memorySemanticSearchByDate
