@@ -64,13 +64,21 @@ export class MemoryService {
 
   async semanticSearch(
     searchTerm: string,
-    options: { limit: number; page: number },
+    options: {
+      limit: number;
+      page: number;
+      sort: "accuracy" | "latest" | "oldest";
+    },
   ) {
-    const { limit, page } = options;
+    const { limit, page, sort } = options;
     const take = limit;
     const skip = (page - 1) * limit;
 
-    return await memory.semanticSearch(this.userId, searchTerm, { take, skip });
+    return await memory.semanticSearch(this.userId, searchTerm, {
+      take,
+      skip,
+      sort,
+    });
   }
 
   async fullTextSearch(
