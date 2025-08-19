@@ -17,6 +17,8 @@ export namespace memorySemanticSearch {
     updatedAt: Date | null
     userId: string
     diaryId: string | null
+    date: Date
     score: number | null
+    total: bigint | null
   }
 }

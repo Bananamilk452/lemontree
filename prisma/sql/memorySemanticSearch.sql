@@ -5,8 +5,9 @@
 
 WITH
 user_memories AS (
-	SELECT * from memory
-	WHERE "userId" = $1
+	SELECT memory.*, diary.date from memory
+  JOIN diary ON diary.id = memory."diaryId"
+	WHERE memory."userId" = $1
 ),
 memory_embeddings AS (
 	SELECT * from embedding
@@ -31,20 +32,25 @@ max_similarities AS (
     all_similarities
   GROUP BY 
     "memoryId"
+),
+ordered_results AS (
+  SELECT
+    a.id,
+    a.content,
+    a."createdAt",
+    a."updatedAt",
+    a."userId",
+    a."diaryId",
+    a.date,
+    a.cosine_similarity AS score,
+    COUNT(*) OVER() as total
+  FROM
+    all_similarities a
+  JOIN
+    max_similarities m ON a."memoryId" = m."memoryId" AND a.cosine_similarity = m.max_cosine_similarity
+  ORDER BY
+    a.cosine_similarity DESC
 )
-
-SELECT
-  a.id,
-  a.content,
-  a."createdAt",
-  a."updatedAt",
-  a."userId",
-  a."diaryId",
-  a.cosine_similarity AS score
-FROM 
-  all_similarities a
-JOIN 
-  max_similarities m ON a."memoryId" = m."memoryId" AND a.cosine_similarity = m.max_cosine_similarity
-ORDER BY 
-  a.cosine_similarity DESC
+SELECT *
+FROM ordered_results
 LIMIT $3 OFFSET $4;
