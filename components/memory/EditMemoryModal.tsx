@@ -34,12 +34,14 @@ interface EditMemoryModalProps {
   memory: MemoryType;
   open: boolean;
   setOpen: (open: boolean) => void;
+  onSuccess?: (memory: MemoryType) => void;
 }
 
 export function EditMemoryModal({
   memory,
   open,
   setOpen,
+  onSuccess,
 }: EditMemoryModalProps) {
   const form = useForm<EditMemoryModalForm>({
     resolver: zodResolver(EditMemoryModalFormSchema),
@@ -53,7 +55,8 @@ export function EditMemoryModal({
   function onSubmit(data: z.infer<typeof EditMemoryModalFormSchema>) {
     setIsLoading(true);
     updateMemoryById(memory.id, data.content)
-      .then(() => {
+      .then((updatedMemory) => {
+        onSuccess?.(updatedMemory);
         toast.success("메모리가 수정되었습니다.");
         setOpen(false);
         setIsLoading(false);
@@ -81,7 +84,7 @@ export function EditMemoryModal({
                   <FormControl>
                     <Textarea
                       disabled={isLoading}
-                      className="shadow-md rounded-xl resize-none w-full h-[200px] p-4 !text-base"
+                      className="h-[200px] w-full resize-none rounded-xl p-4 !text-base shadow-md"
                       placeholder="메모리의 내용을 작성하세요."
                       {...field}
                     />
@@ -93,7 +96,7 @@ export function EditMemoryModal({
           </form>
         </Form>
 
-        <DialogFooter className="flex justify-end gap-2 items-center">
+        <DialogFooter className="flex items-center justify-end gap-2">
           {isLoading && <Spinner className="mr-2 size-5" />}
           <Button
             type="submit"

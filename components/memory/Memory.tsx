@@ -1,12 +1,12 @@
 "use client";
 
-import { parseMemoryDate } from "~/utils";
 import { PencilIcon, Trash2Icon } from "lucide-react";
 import { useState } from "react";
 
 import { DiaryViewModal } from "~/components/diary/DiaryViewModal";
 import { DeleteMemoryModal } from "~/components/memory/DeleteMemoryModal";
 import { EditMemoryModal } from "~/components/memory/EditMemoryModal";
+import { parseMemoryDate } from "~/utils";
 
 import type { Memory } from "~/prisma/generated/client";
 
@@ -14,9 +14,10 @@ interface MemoryProps {
   memory: Memory;
 }
 
-export function Memory({ memory }: MemoryProps) {
+export function Memory(props: MemoryProps) {
   const [isDeleteMemoryModalOpen, setIsDeleteMemoryModalOpen] = useState(false);
   const [isEditMemoryModalOpen, setIsEditMemoryModalOpen] = useState(false);
+  const [memory, setMemory] = useState(props.memory);
 
   const segments = parseMemoryDate(memory.content);
   const contents = [];
@@ -59,6 +60,9 @@ export function Memory({ memory }: MemoryProps) {
         memory={memory}
         open={isEditMemoryModalOpen}
         setOpen={setIsEditMemoryModalOpen}
+        onSuccess={(updatedMemory) => {
+          setMemory(updatedMemory);
+        }}
       />
     </div>
   );
