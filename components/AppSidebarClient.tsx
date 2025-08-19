@@ -7,6 +7,7 @@ import {
   MemoryStickIcon,
   NotebookIcon,
   PencilLineIcon,
+  SearchIcon,
   TableOfContentsIcon,
   UserIcon,
 } from "lucide-react";
@@ -115,6 +116,14 @@ export function AppSidebarClient({ initialSession }: AppSidebarClientProps) {
                     <Link href="/memory/list/1">
                       <TableOfContentsIcon />
                       <span>메모리 목록</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton size="lg" asChild>
+                    <Link href="/memory/search">
+                      <SearchIcon />
+                      <span>메모리 검색</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
