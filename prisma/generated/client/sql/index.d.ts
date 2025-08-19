@@ -4,6 +4,10 @@ export * from "./diarySemanticSearch"
 
 export * from "./getRelatedMemories"
 
-export * from "./memoryFullTextSearch"
+export * from "./memoryFullTextSearchByAccuracy"
 
-export * from "./memorySemanticSearch"
+export * from "./memoryFullTextSearchByDate"
+
+export * from "./memorySemanticSearchByAccuracy"
+
+export * from "./memorySemanticSearchByDate"

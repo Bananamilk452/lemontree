@@ -101,19 +101,6 @@ export const memory = {
       },
     });
   },
-  async semanticSearch(
-    userId: string,
-    searchTerm: string,
-    options: { take: number; skip: number },
-  ) {
-    return memorySemanticSearch(userId, searchTerm, options);
-  },
-
-  async fullTextSearch(
-    userId: string,
-    searchTerm: string,
-    options: { take: number; skip: number },
-  ) {
-    return memoryFullTextSearch(userId, searchTerm, options);
-  },
+  semanticSearch: memorySemanticSearch,
+  fullTextSearch: memoryFullTextSearch,
 };

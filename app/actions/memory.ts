@@ -1,5 +1,6 @@
 "use server";
 
+import { AVAILABLE_SORTS } from "~/constants";
 import { MemoryService } from "~/lib/services";
 import { getValidSession } from "~/utils/action";
 
@@ -31,12 +32,24 @@ export async function semanticSearch(
   options: {
     limit: number;
     page: number;
+    sort: string;
   },
 ) {
   const session = await getValidSession();
   const memoryService = new MemoryService({ userId: session.user.id });
 
-  return await memoryService.semanticSearch(searchTerm, options);
+  if (!AVAILABLE_SORTS.includes(options.sort)) {
+    throw new Error(`Invalid sort option: ${options.sort}`);
+  }
+
+  return await memoryService.semanticSearch(
+    searchTerm,
+    options as {
+      limit: number;
+      page: number;
+      sort: "accuracy" | "latest" | "oldest";
+    },
+  );
 }
 
 export async function fullTextSearch(
@@ -44,10 +57,22 @@ export async function fullTextSearch(
   options: {
     limit: number;
     page: number;
+    sort: string;
   },
 ) {
   const session = await getValidSession();
   const memoryService = new MemoryService({ userId: session.user.id });
 
-  return await memoryService.fullTextSearch(searchTerm, options);
+  if (!AVAILABLE_SORTS.includes(options.sort)) {
+    throw new Error(`Invalid sort option: ${options.sort}`);
+  }
+
+  return await memoryService.fullTextSearch(
+    searchTerm,
+    options as {
+      limit: number;
+      page: number;
+      sort: "accuracy" | "latest" | "oldest";
+    },
+  );
 }

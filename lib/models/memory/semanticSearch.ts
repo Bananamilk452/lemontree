@@ -1,5 +1,8 @@
 import { embeddings } from "~/lib/langchain";
-import { memorySemanticSearch } from "~/prisma/generated/client/sql";
+import {
+  memorySemanticSearchByAccuracy,
+  memorySemanticSearchByDate,
+} from "~/prisma/generated/client/sql";
 import { prisma } from "~/utils/db";
 
 export async function semanticSearch(
@@ -8,18 +11,60 @@ export async function semanticSearch(
   options: {
     take: number;
     skip: number;
+    sort?: "accuracy" | "latest" | "oldest";
   },
 ) {
-  const searchTermVector = await embeddings.embedQuery(searchTerm);
-
-  const searchResult = await prisma.$queryRawTyped(
-    memorySemanticSearch(
-      userId,
-      JSON.stringify(searchTermVector),
-      options.take,
-      options.skip,
-    ),
+  const searchTermVector = JSON.stringify(
+    await embeddings.embedQuery(searchTerm),
   );
 
-  return searchResult;
+  const sort = options.sort || "accuracy";
+
+  if (sort === "accuracy") {
+    const result = await prisma.$queryRawTyped(
+      memorySemanticSearchByAccuracy(
+        userId,
+        searchTermVector,
+        options.take,
+        options.skip,
+      ),
+    );
+
+    return {
+      memories: result,
+      total: Number(result[0].total),
+    };
+  } else if (sort === "latest") {
+    const result = await prisma.$queryRawTyped(
+      memorySemanticSearchByDate(
+        userId,
+        searchTermVector,
+        options.take,
+        options.skip,
+        "DESC",
+      ),
+    );
+
+    return {
+      memories: result,
+      total: Number(result[0].total),
+    };
+  } else if (sort === "oldest") {
+    const result = await prisma.$queryRawTyped(
+      memorySemanticSearchByDate(
+        userId,
+        searchTermVector,
+        options.take,
+        options.skip,
+        "ASC",
+      ),
+    );
+
+    return {
+      memories: result,
+      total: Number(result[0].total),
+    };
+  } else {
+    throw new Error(`Unknown sort option: ${sort}`);
+  }
 }
