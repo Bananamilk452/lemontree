@@ -83,12 +83,20 @@ export class MemoryService {
 
   async fullTextSearch(
     searchTerm: string,
-    options: { limit: number; page: number },
+    options: {
+      limit: number;
+      page: number;
+      sort: "accuracy" | "latest" | "oldest";
+    },
   ) {
-    const { limit, page } = options;
+    const { limit, page, sort } = options;
     const take = limit;
     const skip = (page - 1) * limit;
 
-    return await memory.fullTextSearch(this.userId, searchTerm, { take, skip });
+    return await memory.fullTextSearch(this.userId, searchTerm, {
+      take,
+      skip,
+      sort,
+    });
   }
 }
