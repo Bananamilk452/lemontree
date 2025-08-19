@@ -6,9 +6,9 @@ import * as $runtime from "../runtime/library"
  * @param take
  * @param skip
  */
-export const memoryFullTextSearch: (userId: string, searchTerm: string, take: number, skip: number) => $runtime.TypedSql<memoryFullTextSearch.Parameters, memoryFullTextSearch.Result>
+export const memoryFullTextSearchByAccuracy: (userId: string, searchTerm: string, take: number, skip: number) => $runtime.TypedSql<memoryFullTextSearchByAccuracy.Parameters, memoryFullTextSearchByAccuracy.Result>
 
-export namespace memoryFullTextSearch {
+export namespace memoryFullTextSearchByAccuracy {
   export type Parameters = [userId: string, searchTerm: string, take: number, skip: number]
   export type Result = {
     id: string
@@ -17,6 +17,8 @@ export namespace memoryFullTextSearch {
     updatedAt: Date | null
     userId: string
     diaryId: string | null
+    date: Date
     score: number | null
+    total: bigint | null
   }
 }
