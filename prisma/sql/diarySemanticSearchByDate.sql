@@ -6,11 +6,32 @@
 
 WITH
 user_diaries AS (
-	SELECT * from diary
+	SELECT
+  *,
+  (
+    SELECT JSON_AGG(
+      JSON_BUILD_OBJECT(
+          'id', m.id,
+          'content', m.content,
+          'createdAt', m."createdAt",
+          'updatedAt', m."updatedAt",
+          'userId', m."userId",
+          'diaryId', m."diaryId"
+      )
+    )
+    FROM memory m 
+    WHERE m."diaryId" = d.id
+  ) AS memories,
+  (
+    SELECT COUNT(*)
+    FROM embedding e
+    WHERE e."diaryId" = d.id
+  ) AS "embeddingCount"
+  FROM diary d
 	WHERE "userId" = $1
 ),
 diary_embeddings AS (
-	SELECT * from embedding
+	SELECT * FROM embedding
 	WHERE "diaryId" IN (SELECT id FROM user_diaries)
 ),
 all_similarities AS (
@@ -42,7 +63,9 @@ ordered_results AS (
     a."updatedAt",
     a."userId",
     a.cosine_similarity AS score,
-    COUNT(*) OVER() as total
+    COUNT(*) OVER() as total,
+    a.memories,
+    a."embeddingCount"
   FROM 
     all_similarities a
   JOIN 

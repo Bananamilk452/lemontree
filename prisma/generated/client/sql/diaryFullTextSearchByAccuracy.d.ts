@@ -19,5 +19,7 @@ export namespace diaryFullTextSearchByAccuracy {
     userId: string
     score: number | null
     total: bigint | null
+    memories: $runtime.JsonValue | null
+    embeddingCount: bigint | null
   }
 }
