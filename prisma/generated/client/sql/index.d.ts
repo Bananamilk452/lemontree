@@ -1,6 +1,10 @@
-export * from "./diaryFullTextSearch"
+export * from "./diaryFullTextSearchByAccuracy"
 
-export * from "./diarySemanticSearch"
+export * from "./diaryFullTextSearchByDate"
+
+export * from "./diarySemanticSearchByAccuracy"
+
+export * from "./diarySemanticSearchByDate"
 
 export * from "./getRelatedMemories"
 

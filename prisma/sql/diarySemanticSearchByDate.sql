@@ -2,6 +2,7 @@
 -- @param {String} $2:vector
 -- @param {Int} $3:take
 -- @param {Int} $4:skip
+-- @param {String} $5:direction
 
 WITH
 user_diaries AS (
@@ -31,20 +32,25 @@ max_similarities AS (
     all_similarities
   GROUP BY 
     "diaryId"
+),
+ordered_results AS (
+  SELECT
+    a.id,
+    a.content,
+    a.date,
+    a."createdAt",
+    a."updatedAt",
+    a."userId",
+    a.cosine_similarity AS score,
+    COUNT(*) OVER() as total
+  FROM 
+    all_similarities a
+  JOIN 
+    max_similarities m ON a."diaryId" = m."diaryId" AND a.cosine_similarity = m.max_cosine_similarity
+  ORDER BY
+    CASE WHEN $5 = 'DESC' THEN a.date END DESC,
+    CASE WHEN $5 = 'ASC' THEN a.date END ASC
 )
-
-SELECT
-  a.id,
-  a.content,
-  a.date,
-  a."createdAt",
-  a."updatedAt",
-  a."userId",
-  a.cosine_similarity AS score
-FROM 
-  all_similarities a
-JOIN 
-  max_similarities m ON a."diaryId" = m."diaryId" AND a.cosine_similarity = m.max_cosine_similarity
-ORDER BY 
-  a.cosine_similarity DESC
+SELECT *
+FROM ordered_results
 LIMIT $3 OFFSET $4;

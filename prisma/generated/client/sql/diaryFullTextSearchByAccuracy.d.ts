@@ -6,9 +6,9 @@ import * as $runtime from "../runtime/library"
  * @param take
  * @param skip
  */
-export const diaryFullTextSearch: (userId: string, searchTerm: string, take: number, skip: number) => $runtime.TypedSql<diaryFullTextSearch.Parameters, diaryFullTextSearch.Result>
+export const diaryFullTextSearchByAccuracy: (userId: string, searchTerm: string, take: number, skip: number) => $runtime.TypedSql<diaryFullTextSearchByAccuracy.Parameters, diaryFullTextSearchByAccuracy.Result>
 
-export namespace diaryFullTextSearch {
+export namespace diaryFullTextSearchByAccuracy {
   export type Parameters = [userId: string, searchTerm: string, take: number, skip: number]
   export type Result = {
     id: string
@@ -18,5 +18,6 @@ export namespace diaryFullTextSearch {
     updatedAt: Date | null
     userId: string
     score: number | null
+    total: bigint | null
   }
 }
