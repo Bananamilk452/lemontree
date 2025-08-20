@@ -6,9 +6,9 @@ import * as $runtime from "../runtime/library"
  * @param take
  * @param skip
  */
-export const diarySemanticSearch: (userId: string, vector: string, take: number, skip: number) => $runtime.TypedSql<diarySemanticSearch.Parameters, diarySemanticSearch.Result>
+export const diarySemanticSearchByAccuracy: (userId: string, vector: string, take: number, skip: number) => $runtime.TypedSql<diarySemanticSearchByAccuracy.Parameters, diarySemanticSearchByAccuracy.Result>
 
-export namespace diarySemanticSearch {
+export namespace diarySemanticSearchByAccuracy {
   export type Parameters = [userId: string, vector: string, take: number, skip: number]
   export type Result = {
     id: string
@@ -18,5 +18,8 @@ export namespace diarySemanticSearch {
     updatedAt: Date | null
     userId: string
     score: number | null
+    total: bigint | null
+    memories: $runtime.JsonValue | null
+    embeddingCount: bigint | null
   }
 }

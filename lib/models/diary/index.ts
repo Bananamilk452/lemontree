@@ -269,23 +269,15 @@ export const diary = {
     return diarys;
   },
 
-  async semanticSearch(
-    userId: string,
-    searchTerm: string,
-    options: { take: number; skip: number },
-  ) {
-    return diarySemanticSearch(userId, searchTerm, options);
-  },
+  semanticSearch: diarySemanticSearch,
 
-  async fullTextSearch(
-    userId: string,
-    searchTerm: string,
-    options: { take: number; skip: number },
-  ) {
-    return diaryFullTextSearch(userId, searchTerm, options);
-  },
+  fullTextSearch: diaryFullTextSearch,
 };
 
 export type DiaryWithCount = Awaited<
   ReturnType<typeof diary.getDiarys>
 >["diarys"][0];
+
+export type DiaryWithScore =
+  | Awaited<ReturnType<typeof diary.semanticSearch>>["diaries"][0]
+  | Awaited<ReturnType<typeof diary.fullTextSearch>>["diaries"][0];

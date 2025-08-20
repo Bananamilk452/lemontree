@@ -103,6 +103,14 @@ export function AppSidebarClient({ initialSession }: AppSidebarClientProps) {
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton size="lg" asChild>
+                    <Link href="/diary/search">
+                      <SearchIcon />
+                      <span>일기 검색</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
               </SidebarMenu>
             </SidebarGroup>
             <SidebarGroup>

@@ -35,9 +35,9 @@ interface SearchBarProps {
 export function SearchBar(props: SearchBarProps) {
   const [searchInput, setSearchInput] = useState(props.searchInput || "");
   const [semanticSearchEnabled, setSemanticSearchEnabled] = useState<boolean>(
-    props.semanticSearchEnabled || true,
+    props.semanticSearchEnabled ?? true,
   );
-  const [sortOrder, setSortOrder] = useState(props.sortOrder || "accuracy");
+  const [sortOrder, setSortOrder] = useState(props.sortOrder ?? "accuracy");
 
   return (
     <div className="flex flex-col gap-2">

@@ -5,10 +5,10 @@ import { DiaryListCardHeader } from "~/components/diary/DiaryListCard/Header";
 import { DiaryListCardModals } from "~/components/diary/DiaryListCard/Modals";
 import { DiaryModalProvider } from "~/components/diary/DiaryListCard/Provider";
 import { DiaryPaper } from "~/components/diary/DiaryPaper";
-import { DiaryWithCount } from "~/lib/models/diary";
+import { DiaryWithCount, DiaryWithScore } from "~/lib/models/diary";
 
 interface DiaryListCardProps {
-  diary: DiaryWithCount;
+  diary: DiaryWithCount | DiaryWithScore;
 }
 
 export function DiaryListCard({ diary }: DiaryListCardProps) {

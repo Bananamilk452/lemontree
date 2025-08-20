@@ -1,6 +1,14 @@
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
+import { Memory } from "~/prisma/generated/client";
+import {
+  diaryFullTextSearchByAccuracy,
+  diaryFullTextSearchByDate,
+  diarySemanticSearchByAccuracy,
+  diarySemanticSearchByDate,
+} from "~/prisma/generated/client/sql";
+
 import type { ClassValue } from "clsx";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -71,3 +79,19 @@ export function parseMemoryDate(content: string) {
 
   return segments;
 }
+
+export const reformDiary = (
+  diary:
+    | diaryFullTextSearchByAccuracy.Result[]
+    | diaryFullTextSearchByDate.Result[]
+    | diarySemanticSearchByAccuracy.Result[]
+    | diarySemanticSearchByDate.Result[],
+) =>
+  diary.map((d) => ({
+    ...d,
+    total: Number(d.total),
+    memories: d.memories as unknown as Memory[],
+    _count: {
+      embeddings: Number(d.embeddingCount),
+    },
+  }));
