@@ -17,7 +17,7 @@ export default async function Search({
   return (
     <>
       <Header>
-        <h1 className="text-2xl font-bold">메모리 검색</h1>
+        <h1 className="text-2xl font-bold">일기 검색</h1>
       </Header>
 
       <MainContainer>
