@@ -6,14 +6,18 @@ import { CaseSensitiveIcon, EllipsisVerticalIcon } from "lucide-react";
 import { MemoryList } from "~/components/memory/MemoryList";
 import { Note } from "~/components/ui/note";
 
-import type { DiaryWithCount } from "~/lib/models/diary";
+import type { DiaryWithCount, DiaryWithScore } from "~/lib/models/diary";
 
-export function DiaryListCardContent({ diary }: { diary: DiaryWithCount }) {
+export function DiaryListCardContent({
+  diary,
+}: {
+  diary: DiaryWithCount | DiaryWithScore;
+}) {
   return (
     <>
       <div className="flex flex-col gap-1.5">
-        <div className="flex gap-4 items-center text-gray-600">
-          <dl className="flex gap-1.5 items-center text-sm">
+        <div className="flex items-center gap-4 text-gray-600">
+          <dl className="flex items-center gap-1.5 text-sm">
             <dt>
               <CaseSensitiveIcon className="size-5" />
             </dt>
@@ -28,7 +32,7 @@ export function DiaryListCardContent({ diary }: { diary: DiaryWithCount }) {
           </p>
         </div>
 
-        <div className="min-h-12 mt-6">
+        <div className="mt-6 min-h-12">
           {diary._count.embeddings <= 0 ? (
             <Note variant="warning" title="일기 메모리화가 필요합니다.">
               일기의 메모리화가 필요합니다. 에디터에서 저장 버튼이나{" "}

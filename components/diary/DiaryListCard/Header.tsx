@@ -18,10 +18,10 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 
-import type { DiaryWithCount } from "~/lib/models/diary";
+import type { DiaryWithCount, DiaryWithScore } from "~/lib/models/diary";
 
 interface DiaryListCardProps {
-  diary: DiaryWithCount;
+  diary: DiaryWithCount | DiaryWithScore;
 }
 
 export function DiaryListCardHeader({ diary }: DiaryListCardProps) {
@@ -48,7 +48,16 @@ export function DiaryListCardHeader({ diary }: DiaryListCardProps) {
 
   return (
     <div className="flex items-center justify-between">
-      <h2 className="font-bold">{format(diary.date, "yyyy년 M월 d일")}</h2>
+      <h2 className="font-bold">
+        {format(diary.date, "yyyy년 M월 d일")}
+        <span className="text-sm font-normal text-gray-400">
+          {"score" in diary &&
+            diary.score &&
+            (diary.isSemantic
+              ? ` 유사도 ${(diary.score * 100).toFixed(2)}%`
+              : ` 검색어 포함 ${diary.score * 10}회`)}
+        </span>
+      </h2>
       <div className="flex items-center gap-2">
         {isLoading && <Spinner />}
         <Button
