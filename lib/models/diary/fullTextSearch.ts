@@ -1,4 +1,7 @@
-import { diaryFullTextSearch } from "~/prisma/generated/client/sql";
+import {
+  diaryFullTextSearchByAccuracy,
+  diaryFullTextSearchByDate,
+} from "~/prisma/generated/client/sql";
 import { prisma } from "~/utils/db";
 
 export async function fullTextSearch(
@@ -7,11 +10,54 @@ export async function fullTextSearch(
   options: {
     take: number;
     skip: number;
+    sort?: "accuracy" | "latest" | "oldest";
   },
 ) {
-  const searchResult = await prisma.$queryRawTyped(
-    diaryFullTextSearch(userId, searchTerm, options.take, options.skip),
-  );
+  const sort = options.sort || "accuracy";
 
-  return searchResult;
+  if (sort === "accuracy") {
+    const result = await prisma.$queryRawTyped(
+      diaryFullTextSearchByAccuracy(
+        userId,
+        searchTerm,
+        options.take,
+        options.skip,
+      ),
+    );
+
+    return {
+      diaries: result,
+      total: Number(result[0].total),
+    };
+  } else if (sort === "latest") {
+    const result = await prisma.$queryRawTyped(
+      diaryFullTextSearchByDate(
+        userId,
+        searchTerm,
+        options.take,
+        options.skip,
+        "DESC",
+      ),
+    );
+
+    return {
+      diaries: result,
+      total: Number(result[0].total),
+    };
+  } else if (sort === "oldest") {
+    const result = await prisma.$queryRawTyped(
+      diaryFullTextSearchByDate(
+        userId,
+        searchTerm,
+        options.take,
+        options.skip,
+        "ASC",
+      ),
+    );
+
+    return {
+      diaries: result,
+      total: Number(result[0].total),
+    };
+  }
 }

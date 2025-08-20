@@ -1,5 +1,6 @@
 "use server";
 
+import { AVAILABLE_SORTS } from "~/constants";
 import { DiaryService } from "~/lib/services";
 import { DiaryWriterForm } from "~/types/zod/DiaryWriterFormSchema";
 import { getValidSession } from "~/utils/action";
@@ -78,12 +79,24 @@ export async function semanticSearch(
   options: {
     page: number;
     limit: number;
+    sort: string;
   },
 ) {
   const session = await getValidSession();
   const diaryService = new DiaryService({ userId: session.user.id });
 
-  return await diaryService.semanticSearch(searchTerm, options);
+  if (!AVAILABLE_SORTS.includes(options.sort)) {
+    throw new Error(`Invalid sort option: ${options.sort}`);
+  }
+
+  return await diaryService.semanticSearch(
+    searchTerm,
+    options as {
+      limit: number;
+      page: number;
+      sort: "accuracy" | "latest" | "oldest";
+    },
+  );
 }
 
 export async function fullTextSearch(
@@ -91,10 +104,22 @@ export async function fullTextSearch(
   options: {
     page: number;
     limit: number;
+    sort: string;
   },
 ) {
   const session = await getValidSession();
   const diaryService = new DiaryService({ userId: session.user.id });
 
-  return await diaryService.fullTextSearch(searchTerm, options);
+  if (!AVAILABLE_SORTS.includes(options.sort)) {
+    throw new Error(`Invalid sort option: ${options.sort}`);
+  }
+
+  return await diaryService.fullTextSearch(
+    searchTerm,
+    options as {
+      limit: number;
+      page: number;
+      sort: "accuracy" | "latest" | "oldest";
+    },
+  );
 }

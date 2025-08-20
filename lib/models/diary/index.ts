@@ -269,21 +269,9 @@ export const diary = {
     return diarys;
   },
 
-  async semanticSearch(
-    userId: string,
-    searchTerm: string,
-    options: { take: number; skip: number },
-  ) {
-    return diarySemanticSearch(userId, searchTerm, options);
-  },
+  semanticSearch: diarySemanticSearch,
 
-  async fullTextSearch(
-    userId: string,
-    searchTerm: string,
-    options: { take: number; skip: number },
-  ) {
-    return diaryFullTextSearch(userId, searchTerm, options);
-  },
+  fullTextSearch: diaryFullTextSearch,
 };
 
 export type DiaryWithCount = Awaited<
