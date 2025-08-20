@@ -2,6 +2,7 @@ import {
   diaryFullTextSearchByAccuracy,
   diaryFullTextSearchByDate,
 } from "~/prisma/generated/client/sql";
+import { reformDiary } from "~/utils";
 import { prisma } from "~/utils/db";
 
 export async function fullTextSearch(
@@ -26,7 +27,7 @@ export async function fullTextSearch(
     );
 
     return {
-      diaries: result,
+      diaries: reformDiary(result).map((x) => ({ ...x, isSemantic: false })),
       total: Number(result[0].total),
     };
   } else if (sort === "latest") {
@@ -41,7 +42,7 @@ export async function fullTextSearch(
     );
 
     return {
-      diaries: result,
+      diaries: reformDiary(result).map((x) => ({ ...x, isSemantic: false })),
       total: Number(result[0].total),
     };
   } else if (sort === "oldest") {
@@ -56,8 +57,10 @@ export async function fullTextSearch(
     );
 
     return {
-      diaries: result,
+      diaries: reformDiary(result).map((x) => ({ ...x, isSemantic: false })),
       total: Number(result[0].total),
     };
+  } else {
+    throw new Error(`Unknown sort option: ${options.sort}`);
   }
 }

@@ -3,6 +3,7 @@ import {
   diarySemanticSearchByAccuracy,
   diarySemanticSearchByDate,
 } from "~/prisma/generated/client/sql";
+import { reformDiary } from "~/utils";
 import { prisma } from "~/utils/db";
 
 export async function semanticSearch(
@@ -31,7 +32,7 @@ export async function semanticSearch(
     );
 
     return {
-      diaries: result,
+      diaries: reformDiary(result).map((x) => ({ ...x, isSemantic: true })),
       total: Number(result[0].total),
     };
   } else if (sort === "latest") {
@@ -46,7 +47,7 @@ export async function semanticSearch(
     );
 
     return {
-      diaries: result,
+      diaries: reformDiary(result).map((x) => ({ ...x, isSemantic: true })),
       total: Number(result[0].total),
     };
   } else if (sort === "oldest") {
@@ -61,8 +62,10 @@ export async function semanticSearch(
     );
 
     return {
-      diaries: result,
+      diaries: reformDiary(result).map((x) => ({ ...x, isSemantic: true })),
       total: Number(result[0].total),
     };
+  } else {
+    throw new Error(`Unknown sort option: ${options.sort}`);
   }
 }

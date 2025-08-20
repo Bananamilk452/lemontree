@@ -277,3 +277,7 @@ export const diary = {
 export type DiaryWithCount = Awaited<
   ReturnType<typeof diary.getDiarys>
 >["diarys"][0];
+
+export type DiaryWithScore =
+  | Awaited<ReturnType<typeof diary.semanticSearch>>["diaries"][0]
+  | Awaited<ReturnType<typeof diary.fullTextSearch>>["diaries"][0];
