@@ -48,14 +48,14 @@ export function DiaryListCardHeader({ diary }: DiaryListCardProps) {
 
   return (
     <div className="flex items-center justify-between">
-      <h2 className="font-bold">
+      <h2 className="flex flex-col justify-start font-bold sm:block">
         {format(diary.date, "yyyy년 M월 d일")}
-        <span className="text-sm font-normal text-gray-400">
+        <span className="text-sm font-normal text-gray-400 sm:ml-2">
           {"score" in diary &&
             diary.score &&
             (diary.isSemantic
-              ? ` 유사도 ${(diary.score * 100).toFixed(2)}%`
-              : ` 검색어 포함 ${diary.score * 10}회`)}
+              ? `유사도 ${(diary.score * 100).toFixed(2)}%`
+              : `검색어 포함 ${diary.score * 10}회`)}
         </span>
       </h2>
       <div className="flex items-center gap-2">
