@@ -18,6 +18,7 @@ export namespace diaryFullTextSearchByDate {
     createdAt: Date
     updatedAt: Date | null
     userId: string
+    sentiment: number | null
     score: number | null
     total: bigint | null
     memories: $runtime.JsonValue | null
