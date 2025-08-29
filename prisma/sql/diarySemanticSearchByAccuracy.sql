@@ -64,6 +64,7 @@ ordered_results AS (
     a.cosine_similarity AS score,
     COUNT(*) OVER() as total,
     a.memories,
+    a.sentiment,
     a."embeddingCount"
   FROM 
     all_similarities a
