@@ -193,4 +193,21 @@ export class DiaryService {
       sort,
     });
   }
+
+  async updateSentiment(diaryId: string, sentiment: number) {
+    await this.checkOwnership(diaryId);
+
+    const result = await diary.updateSentiment(this.userId, diaryId, sentiment);
+
+    this.revalidatePages();
+    return result;
+  }
+
+  async getSentiment(options: { limit: number; page: number }) {
+    const { limit, page } = options;
+    const take = limit;
+    const skip = (page - 1) * limit;
+
+    return await diary.getSentiment(this.userId, { take, skip });
+  }
 }

@@ -21,6 +21,7 @@ export namespace diarySemanticSearchByDate {
     score: number | null
     total: bigint | null
     memories: $runtime.JsonValue | null
+    sentiment: number | null
     embeddingCount: bigint | null
   }
 }

@@ -1,6 +1,6 @@
 generator client {
   provider        = "prisma-client-js"
-  output   = "generated/client"
+  output          = "generated/client"
   moduleFormat    = "esm"
   previewFeatures = ["postgresqlExtensions", "typedSql"]
 }
@@ -21,6 +21,7 @@ model Diary {
   memories   Memory[]
   userId     String
   user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sentiment  Int?
 
   @@index([userId])
   @@index([date])
@@ -28,15 +29,15 @@ model Diary {
 }
 
 model Embedding {
-  id        String                      @id @default(uuid(7))
+  id        String                       @id @default(uuid(7))
   vector    Unsupported("vector(3072)")?
   content   String
   diaryId   String?
-  diary     Diary?                      @relation(fields: [diaryId], references: [id], onDelete: Cascade)
+  diary     Diary?                       @relation(fields: [diaryId], references: [id], onDelete: Cascade)
   memoryId  String?
-  memory    Memory?                     @relation(fields: [memoryId], references: [id], onDelete: Cascade)
-  createdAt DateTime                    @default(now())
-  updatedAt DateTime?                   @updatedAt
+  memory    Memory?                      @relation(fields: [memoryId], references: [id], onDelete: Cascade)
+  createdAt DateTime                     @default(now())
+  updatedAt DateTime?                    @updatedAt
 
   @@index([diaryId])
   @@index([memoryId])

@@ -272,6 +272,40 @@ export const diary = {
   semanticSearch: diarySemanticSearch,
 
   fullTextSearch: diaryFullTextSearch,
+
+  async updateSentiment(userId: string, diaryId: string, sentiment: number) {
+    const diary = await prisma.diary.update({
+      where: {
+        id: diaryId,
+        userId,
+      },
+      data: {
+        sentiment,
+      },
+    });
+
+    return diary;
+  },
+
+  async getSentiment(userId: string, options: { take: number; skip: number }) {
+    const sentiments = await prisma.diary.findMany({
+      where: {
+        userId,
+      },
+      orderBy: {
+        date: "desc",
+      },
+      select: {
+        id: true,
+        date: true,
+        sentiment: true,
+      },
+      take: options.take,
+      skip: options.skip,
+    });
+
+    return sentiments;
+  },
 };
 
 export type DiaryWithCount = Awaited<

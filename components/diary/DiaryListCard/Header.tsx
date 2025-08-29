@@ -1,13 +1,18 @@
 "use client";
 
+import { useMutation } from "@tanstack/react-query";
 import { format } from "date-fns";
-import { EllipsisVerticalIcon, PencilIcon, Trash2Icon } from "lucide-react";
+import { EllipsisVerticalIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { getOldestUnmemorizedDiaryByDate } from "~/app/actions/diary";
+import {
+  getOldestUnmemorizedDiaryByDate,
+  updateSentiment,
+} from "~/app/actions/diary";
 import { useDiaryModal } from "~/components/diary/DiaryListCard/Provider";
+import { SentimentSelect } from "~/components/diary/SentimentSelect";
 import { Spinner } from "~/components/Spinner";
 import { Button } from "~/components/ui/button";
 import {
@@ -27,24 +32,44 @@ interface DiaryListCardProps {
 export function DiaryListCardHeader({ diary }: DiaryListCardProps) {
   const router = useRouter();
 
-  const [isLoading, setIsLoading] = useState(false);
   const { openModal } = useDiaryModal();
 
   function handleEditButtonClick() {
     router.push(`/new?date=${format(diary.date, "yyyy-MM-dd")}`);
   }
 
-  async function handleDiaryMemorify() {
-    setIsLoading(true);
-    const [pd] = await getOldestUnmemorizedDiaryByDate(diary.date);
-    setIsLoading(false);
+  // 원래는 mutation이 아니라 useQuery를 쓰는게 맞지만 useMutation 쓰는게 더 편해서 이렇게 함
+  const {
+    mutate: openDiaryMemorifyModal,
+    status: openDiaryMemorifyModalStatus,
+  } = useMutation({
+    mutationFn: async () => {
+      const [pd] = await getOldestUnmemorizedDiaryByDate(diary.date);
+      return pd;
+    },
+    onSuccess: (pd) => {
+      if (pd) {
+        openModal("memory-past-first", { pastDiary: pd });
+      } else {
+        openModal("memory-reset-alert");
+      }
+    },
+  });
 
-    if (pd) {
-      openModal("memory-past-first", { pastDiary: pd });
-    } else {
-      openModal("memory-reset-alert");
-    }
+  const [sentiment, setSentiment] = useState<number | null>(diary.sentiment);
+  const { mutate: updateDiarySentiment, status: updateDiarySentimentStatus } =
+    useMutation({
+      mutationFn: async (score: number) => updateSentiment(diary.id, score),
+    });
+  function handleSentimentChange(value: string) {
+    const score = Number(value);
+    setSentiment(score);
+    updateDiarySentiment(score);
   }
+
+  const isLoading =
+    openDiaryMemorifyModalStatus === "pending" ||
+    updateDiarySentimentStatus === "pending";
 
   return (
     <div className="flex items-center justify-between">
@@ -60,43 +85,42 @@ export function DiaryListCardHeader({ diary }: DiaryListCardProps) {
       </h2>
       <div className="flex items-center gap-2">
         {isLoading && <Spinner />}
-        <Button
-          onClick={handleEditButtonClick}
-          className="text-gray-600"
-          variant="ghost"
-          size="sm"
-          disabled={isLoading}
-        >
-          <PencilIcon className="size-5" />
-          <span className="hidden sm:inline">수정</span>
-        </Button>
-        <Button
-          onClick={() => openModal("delete")}
-          className="text-red-600 hover:text-red-800"
-          variant="ghost"
-          size="sm"
-          disabled={isLoading}
-        >
-          <Trash2Icon className="size-5" />
-          <span className="hidden sm:inline">삭제</span>
-        </Button>
+
+        <SentimentSelect
+          onValueChange={handleSentimentChange}
+          defaultValue={sentiment ? String(sentiment) : undefined}
+        />
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm">
+            <Button variant="ghost" size="sm" className="size-8">
               <EllipsisVerticalIcon className="size-5" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuGroup>
               <DropdownMenuItem
-                onClick={handleDiaryMemorify}
+                onClick={handleEditButtonClick}
+                disabled={isLoading}
+              >
+                일기 수정
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => openModal("delete")}
+                disabled={isLoading}
+              >
+                일기 삭제
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => openDiaryMemorifyModal}
                 disabled={isLoading}
               >
                 {diary._count.embeddings > 0
                   ? "일기 재메모리화"
                   : "일기 메모리화"}
               </DropdownMenuItem>
+            </DropdownMenuGroup>
+            <DropdownMenuGroup>
               <DropdownMenuItem asChild={true}>
                 <Link href={`/diary/${diary.id}`}>일기 상세보기</Link>
               </DropdownMenuItem>
