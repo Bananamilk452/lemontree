@@ -34,6 +34,8 @@ import {
 } from "~/types/zod/DiaryWriterFormSchema";
 import { utcDateNow } from "~/utils";
 
+import { SentimentSelect } from "./SentimentSelect";
+
 type InferredDiaryWriterForm = z.infer<typeof DiaryWriterFormSchema>;
 
 interface DiaryWriterProps {
@@ -214,6 +216,19 @@ function DiaryWriterDatePicker({
       <div className="flex-grow"></div>
 
       <div className="flex items-center gap-2">
+        <FormField
+          control={form.control}
+          name="sentiment"
+          render={({ field }) => (
+            <FormItem>
+              <SentimentSelect
+                onValueChange={(value) => field.onChange(Number(value))}
+                defaultValue={field.value ? String(field.value) : undefined}
+              />
+            </FormItem>
+          )}
+        />
+
         <button
           className="hover:cursor-pointer"
           onClick={(e) => {
