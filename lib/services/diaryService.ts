@@ -202,4 +202,12 @@ export class DiaryService {
     this.revalidatePages();
     return result;
   }
+
+  async getSentiment(options: { limit: number; page: number }) {
+    const { limit, page } = options;
+    const take = limit;
+    const skip = (page - 1) * limit;
+
+    return await diary.getSentiment(this.userId, { take, skip });
+  }
 }

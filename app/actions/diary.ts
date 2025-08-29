@@ -130,3 +130,13 @@ export async function updateSentiment(diaryId: string, sentiment: number) {
 
   return await diaryService.updateSentiment(diaryId, sentiment);
 }
+
+export async function getSentimentByDate(options: {
+  limit: number;
+  page: number;
+}) {
+  const session = await getValidSession();
+  const diaryService = new DiaryService({ userId: session.user.id });
+
+  return await diaryService.getSentiment(options);
+}
