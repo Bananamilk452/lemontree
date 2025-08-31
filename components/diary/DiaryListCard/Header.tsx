@@ -112,7 +112,7 @@ export function DiaryListCardHeader({ diary }: DiaryListCardProps) {
                 일기 삭제
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={() => openDiaryMemorifyModal}
+                onClick={() => openDiaryMemorifyModal()}
                 disabled={isLoading}
               >
                 {diary._count.embeddings > 0
