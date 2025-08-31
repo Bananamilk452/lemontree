@@ -73,7 +73,16 @@ export function DiaryWriter(props: DiaryWriterProps) {
   }, [date, router]);
 
   useEffect(() => {
-    form.setValue("content", diary?.content || "");
+    if (diary) {
+      form.setValue("content", diary.content);
+      if (diary.sentiment) {
+        console.log(diary);
+        form.setValue("sentiment", diary.sentiment);
+      }
+    } else {
+      form.resetField("content");
+      form.resetField("sentiment");
+    }
   }, [diary, form]);
 
   useEffect(() => {
@@ -183,10 +192,8 @@ function DiaryWriterDatePicker({
     const date = new Date(form.getValues("date"));
 
     if (direction === 1) {
-      addDays(date, 1);
       form.setValue("date", addDays(date, 1));
     } else {
-      addDays(date, -1);
       form.setValue("date", addDays(date, -1));
     }
   }
@@ -221,9 +228,11 @@ function DiaryWriterDatePicker({
           name="sentiment"
           render={({ field }) => (
             <FormItem>
+              <FormMessage />
               <SentimentSelect
                 onValueChange={(value) => field.onChange(Number(value))}
-                defaultValue={field.value ? String(field.value) : undefined}
+                value={field.value?.toString()}
+                defaultValue={field.value?.toString()}
               />
             </FormItem>
           )}
