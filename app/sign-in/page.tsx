@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -24,6 +24,7 @@ import { Input } from "~/components/ui/input";
 import { Note } from "~/components/ui/note";
 import { authClient } from "~/lib/auth-client";
 import { AUTH_MESSAGES } from "~/lib/messages";
+import { safeRedirect } from "~/utils";
 
 import type { AuthMessageKeys } from "~/lib/messages";
 import type { ComponentVariant } from "~/utils";
@@ -34,6 +35,8 @@ const formSchema = z.object({
 });
 
 export default function SignIn() {
+  const searchParams = useSearchParams();
+
   const [isPending, startTransition] = useTransition();
   const [note, setNote] = useState<{
     content: string;
@@ -66,7 +69,8 @@ export default function SignIn() {
       {
         onSuccess: () => {
           startTransition(() => {
-            router.replace("/home");
+            const redirectTo = searchParams.get("redirectTo");
+            router.replace(safeRedirect(redirectTo));
           });
         },
       },
