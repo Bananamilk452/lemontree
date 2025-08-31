@@ -52,13 +52,12 @@ export class DiaryService {
     }
 
     const validatedData = this.validateDiaryData(data);
-    const { date, content } = validatedData;
 
     // 시간 정보 제거
-    const dateWithoutTime = removeTimeFromDate(date);
+    const dateWithoutTime = removeTimeFromDate(validatedData.date);
 
     const diaryData = {
-      content,
+      ...validatedData,
       date: dateWithoutTime,
     };
 
