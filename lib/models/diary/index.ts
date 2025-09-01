@@ -306,6 +306,14 @@ export const diary = {
 
     return sentiments;
   },
+
+  async deleteAllDiaries(userId: string) {
+    await prisma.diary.deleteMany({
+      where: {
+        userId,
+      },
+    });
+  },
 };
 
 export type DiaryWithCount = Awaited<

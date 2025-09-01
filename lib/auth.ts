@@ -1,5 +1,6 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
+import { admin } from "better-auth/plugins";
 
 import { prisma } from "~/utils/db";
 import { sendEmail } from "~/utils/sendEmail";
@@ -8,6 +9,7 @@ export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
+  plugins: [admin()],
   advanced: {
     ipAddress: {
       ipAddressHeaders: ["cf-connecting-ip"],

@@ -209,4 +209,8 @@ export class DiaryService {
 
     return await diary.getSentiment(this.userId, { take, skip });
   }
+
+  async deleteAllDiaries() {
+    await diary.deleteAllDiaries(this.userId);
+  }
 }
