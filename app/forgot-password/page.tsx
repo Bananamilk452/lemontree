@@ -1,7 +1,6 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ComponentVariant } from "~/utils";
 import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -27,6 +26,7 @@ import { Input } from "~/components/ui/input";
 import { Note } from "~/components/ui/note";
 import { authClient } from "~/lib/auth-client";
 import { AUTH_MESSAGES, zodErrorMap } from "~/lib/messages";
+import { ComponentVariant } from "~/utils";
 
 import type { AuthMessageKeys } from "~/lib/messages";
 
@@ -124,9 +124,9 @@ export default function ForgotPassword() {
         </Form>
 
         <div className="flex flex-wrap justify-between gap-4 text-sm text-gray-600">
-          <Link href="/sign-up" className="hover:underline">
+          {/* <Link href="/sign-up" className="hover:underline">
             회원가입
-          </Link>
+          </Link> */}
           <Link href="/sign-in" className="hover:underline">
             로그인
           </Link>

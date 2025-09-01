@@ -1,8 +1,8 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ComponentVariant } from "~/utils";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -23,6 +23,7 @@ import { Input } from "~/components/ui/input";
 import { Note } from "~/components/ui/note";
 import { authClient } from "~/lib/auth-client";
 import { AUTH_MESSAGES, zodErrorMap } from "~/lib/messages";
+import { ComponentVariant } from "~/utils";
 
 import type { AuthMessageKeys } from "~/lib/messages";
 
@@ -41,6 +42,9 @@ const formSchema = z
 z.setErrorMap(zodErrorMap);
 
 export default function SignUp() {
+  // 회원가입 비활성화
+  notFound();
+
   const [note, setNote] = useState<{
     content: string;
     variant: ComponentVariant<typeof Note>;
