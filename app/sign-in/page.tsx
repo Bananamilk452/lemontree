@@ -167,9 +167,9 @@ function SignIn() {
           <Link href="/forgot-password" className="hover:underline">
             비밀번호 찾기
           </Link>
-          <Link href="/sign-up" className="hover:underline">
+          {/* <Link href="/sign-up" className="hover:underline">
             회원가입
-          </Link>
+          </Link> */}
         </div>
       </AuthBox>
 
