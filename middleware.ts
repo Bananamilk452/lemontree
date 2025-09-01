@@ -36,6 +36,13 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/home", request.url));
   }
 
+  // 대시보드 페이지를 어드민이 아닌 유저가 들어갈 때
+  else if (session && request.nextUrl.pathname.startsWith("/dashboard")) {
+    if (session.user.role !== "admin") {
+      return NextResponse.redirect(new URL("/home", request.url));
+    }
+  }
+
   return NextResponse.next();
 }
 
