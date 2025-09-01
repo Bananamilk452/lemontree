@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useTransition } from "react";
+import { Suspense, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -34,7 +34,15 @@ const formSchema = z.object({
   password: z.string().nonempty(),
 });
 
-export default function SignIn() {
+export default function SignInPage() {
+  return (
+    <Suspense>
+      <SignIn />
+    </Suspense>
+  );
+}
+
+function SignIn() {
   const searchParams = useSearchParams();
 
   const [isPending, startTransition] = useTransition();
