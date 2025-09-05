@@ -64,6 +64,8 @@ export function DiaryWriter(props: DiaryWriterProps) {
     queryKey: ["diary", date],
     queryFn: () => getDiaryByDate(date),
     enabled: !!date,
+    // 작성 중인 일기 초기화 막기 위해 비활성화
+    refetchOnWindowFocus: false,
   });
 
   useEffect(() => {
