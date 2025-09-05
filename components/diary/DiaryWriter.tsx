@@ -240,24 +240,26 @@ function DiaryWriterDatePicker({
           )}
         />
 
-        <button
-          className="hover:cursor-pointer"
-          onClick={(e) => {
-            e.preventDefault();
-            handleDateChange(-1);
-          }}
-        >
-          <ChevronLeftIcon />
-        </button>
-        <button
-          className="hover:cursor-pointer"
-          onClick={(e) => {
-            e.preventDefault();
-            handleDateChange(1);
-          }}
-        >
-          <ChevronRightIcon />
-        </button>
+        <div className="hidden items-center gap-2 sm:flex">
+          <button
+            className="hover:cursor-pointer"
+            onClick={(e) => {
+              e.preventDefault();
+              handleDateChange(-1);
+            }}
+          >
+            <ChevronLeftIcon />
+          </button>
+          <button
+            className="hover:cursor-pointer"
+            onClick={(e) => {
+              e.preventDefault();
+              handleDateChange(1);
+            }}
+          >
+            <ChevronRightIcon />
+          </button>
+        </div>
       </div>
     </div>
   );

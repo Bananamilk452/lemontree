@@ -13,6 +13,8 @@ import { useMemo, useState } from "react";
 import { getSentimentByDate } from "~/app/actions/diary";
 import { Spinner } from "~/components/Spinner";
 
+import { Button } from "../ui/button";
+
 echarts.use([LineChart, GridComponent, TitleComponent, CanvasRenderer]);
 
 export function SentimentChart() {
@@ -33,6 +35,11 @@ export function SentimentChart() {
           fontSize: 16,
           fontFamily: "gyonggiBatangFont",
         },
+      },
+      grid: {
+        left: 25,
+        right: 10,
+        bottom: 40,
       },
       xAxis: {
         type: "category",
@@ -55,8 +62,11 @@ export function SentimentChart() {
   );
 
   return (
-    <div className="flex">
-      <button onClick={() => setPage((p) => p + 1)} className="cursor-pointer">
+    <div className="flex flex-col gap-2 sm:flex-row">
+      <button
+        onClick={() => setPage((p) => p + 1)}
+        className="hidden cursor-pointer sm:block"
+      >
         <ChevronLeft />
       </button>
       {status === "pending" ? (
@@ -73,10 +83,28 @@ export function SentimentChart() {
       <button
         onClick={() => setPage((p) => Math.max(1, p - 1))}
         disabled={page === 1}
-        className="cursor-pointer disabled:cursor-auto disabled:text-gray-400"
+        className="hidden cursor-pointer disabled:cursor-auto disabled:text-gray-400 sm:block"
       >
         <ChevronRight />
       </button>
+
+      <div className="flex justify-center gap-2 sm:hidden">
+        <Button
+          variant="secondary"
+          onClick={() => setPage((p) => p + 1)}
+          className="cursor-pointer"
+        >
+          <ChevronLeft />
+        </Button>
+        <Button
+          variant="secondary"
+          onClick={() => setPage((p) => Math.max(1, p - 1))}
+          disabled={page === 1}
+          className="cursor-pointer disabled:cursor-auto disabled:text-gray-400"
+        >
+          <ChevronRight />
+        </Button>
+      </div>
     </div>
   );
 }
