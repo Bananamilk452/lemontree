@@ -32,7 +32,7 @@ export async function semanticSearch(
 
     return {
       memories: result,
-      total: Number(result[0].total),
+      total: result[0] ? Number(result[0].total) : 0,
     };
   } else if (sort === "latest") {
     const result = await prisma.$queryRawTyped(
@@ -47,7 +47,7 @@ export async function semanticSearch(
 
     return {
       memories: result,
-      total: Number(result[0].total),
+      total: result[0] ? Number(result[0].total) : 0,
     };
   } else if (sort === "oldest") {
     const result = await prisma.$queryRawTyped(
@@ -62,7 +62,7 @@ export async function semanticSearch(
 
     return {
       memories: result,
-      total: Number(result[0].total),
+      total: result[0] ? Number(result[0].total) : 0,
     };
   } else {
     throw new Error(`Unknown sort option: ${sort}`);
