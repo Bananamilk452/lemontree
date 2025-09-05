@@ -60,12 +60,12 @@ export default function UsersPage() {
   return (
     <MainContainer>
       <Header>
-        <h1 className="text-2xl font-bold">유저 관리</h1>
+        <h1 className="text-2xl font-bold">사용자 관리</h1>
       </Header>
 
       <Card>
         <CardHeader>
-          <CardTitle>계정 목록</CardTitle>
+          <CardTitle>사용자 목록</CardTitle>
           <CardDescription>
             등록된 모든 사용자 계정을 확인하고 관리할 수 있습니다.
           </CardDescription>
