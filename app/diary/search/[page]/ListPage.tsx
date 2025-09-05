@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 
 import { fullTextSearch, semanticSearch } from "~/app/actions/diary";
 import { AppPagination } from "~/components/AppPagination";
@@ -58,6 +58,10 @@ export function SearchListPage(props: { page: number }) {
     },
   });
 
+  useEffect(() => {
+    console.log(data);
+  }, [data]);
+
   return (
     <>
       <SearchBar
@@ -75,7 +79,7 @@ export function SearchListPage(props: { page: number }) {
       )}
       {status === "error" && <p>검색 중 오류가 발생했습니다.</p>}
 
-      {status === "success" && data && data.diaries.length > 0 && (
+      {status === "success" && data && data.total > 0 && (
         <div className="flex flex-col gap-7">
           {data.diaries.map((diary, i) => (
             <Fragment key={diary.id}>
@@ -85,7 +89,7 @@ export function SearchListPage(props: { page: number }) {
           ))}
         </div>
       )}
-      {status === "success" && data && data.diaries.length < 0 && (
+      {status === "success" && data && data.total === 0 && (
         <p>검색 결과가 없습니다.</p>
       )}
 

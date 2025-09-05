@@ -86,14 +86,14 @@ export function SearchListPage(props: { page: number }) {
       )}
       {status === "error" && <p>검색 중 오류가 발생했습니다.</p>}
 
-      {status === "success" && data && data.memories.length > 0 && (
+      {status === "success" && data && data.total > 0 && (
         <MemoryList
           memories={data.memories}
           sort={sort}
           isSemantic={isSemantic}
         />
       )}
-      {status === "success" && data && data.memories.length < 0 && (
+      {status === "success" && data && data.total === 0 && (
         <p>검색 결과가 없습니다.</p>
       )}
 
