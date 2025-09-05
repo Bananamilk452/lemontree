@@ -3,6 +3,7 @@
 import {
   ChevronUpIcon,
   HomeIcon,
+  LayoutDashboardIcon,
   LogOutIcon,
   MemoryStickIcon,
   NotebookIcon,
@@ -10,6 +11,7 @@ import {
   SearchIcon,
   TableOfContentsIcon,
   UserIcon,
+  UsersIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -113,6 +115,7 @@ export function AppSidebarClient({ initialSession }: AppSidebarClientProps) {
                 </SidebarMenuItem>
               </SidebarMenu>
             </SidebarGroup>
+
             <SidebarGroup>
               <SidebarGroupLabel>
                 <MemoryStickIcon className="mr-1.5" />
@@ -137,6 +140,25 @@ export function AppSidebarClient({ initialSession }: AppSidebarClientProps) {
                 </SidebarMenuItem>
               </SidebarMenu>
             </SidebarGroup>
+
+            {session.user.role === "admin" && (
+              <SidebarGroup>
+                <SidebarGroupLabel>
+                  <LayoutDashboardIcon className="mr-1.5" />
+                  대시보드
+                </SidebarGroupLabel>
+                <SidebarMenu>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton size="lg" asChild>
+                      <Link href="/dashboard/users">
+                        <UsersIcon />
+                        <span>사용자 목록</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </SidebarMenu>
+              </SidebarGroup>
+            )}
           </SidebarContent>
           <SidebarFooter>
             <SidebarMenu>
