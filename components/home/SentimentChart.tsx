@@ -8,16 +8,18 @@ import { GridComponent, TitleComponent } from "echarts/components";
 import * as echarts from "echarts/core";
 import { CanvasRenderer } from "echarts/renderers";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
 import { getSentimentByDate } from "~/app/actions/diary";
 import { Spinner } from "~/components/Spinner";
-
-import { Button } from "../ui/button";
+import { Button } from "~/components/ui/button";
 
 echarts.use([LineChart, GridComponent, TitleComponent, CanvasRenderer]);
 
 export function SentimentChart() {
+  const router = useRouter();
+
   const limit = 7;
   const [page, setPage] = useState(1);
 
@@ -61,6 +63,12 @@ export function SentimentChart() {
     [data],
   );
 
+  function onChartClick(event: echarts.ECElementEvent) {
+    if (data) {
+      router.push(`/diary/${data[event.dataIndex].id}`);
+    }
+  }
+
   return (
     <div className="flex flex-col gap-2 sm:flex-row">
       <button
@@ -78,6 +86,9 @@ export function SentimentChart() {
           className="w-full"
           echarts={echarts}
           option={options}
+          onEvents={{
+            click: onChartClick,
+          }}
         />
       )}
       <button
