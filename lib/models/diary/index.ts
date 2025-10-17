@@ -269,6 +269,35 @@ export const diary = {
     return diarys;
   },
 
+  async getDiariesExistenceByMonth(
+    userId: string,
+    year: number,
+    month: number,
+  ) {
+    const startDate = new Date(Date.UTC(year, month - 1, 1));
+    const endDate = new Date(Date.UTC(year, month, 1));
+
+    const diaries = await prisma.diary.findMany({
+      where: {
+        userId,
+        date: {
+          gte: startDate,
+          lt: endDate,
+        },
+      },
+      select: {
+        date: true,
+      },
+    });
+
+    const diaryMap: Record<number, boolean> = {};
+    for (const d of diaries) {
+      diaryMap[d.date.getUTCDate()] = true;
+    }
+
+    return diaryMap;
+  },
+
   semanticSearch: diarySemanticSearch,
 
   fullTextSearch: diaryFullTextSearch,

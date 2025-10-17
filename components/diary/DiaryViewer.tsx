@@ -1,14 +1,15 @@
 "use client";
 
-import { utcDateNow } from "~/utils";
+import { useQuery } from "@tanstack/react-query";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { getDiaryByDate } from "~/app/actions/diary";
 import { DatePicker } from "~/components/DatePicker";
 import { DiaryEmpty } from "~/components/diary/DiaryEmpty";
 import { DiaryPaper } from "~/components/diary/DiaryPaper";
 import { Spinner } from "~/components/Spinner";
+import { utcDateNow } from "~/utils";
 
 import type { Diary } from "~/lib/models/diary";
 
@@ -18,23 +19,13 @@ interface DiaryViewerProps {
 
 export function DiaryViewer({ diary: initialDiary }: DiaryViewerProps) {
   const [date, setDate] = useState(initialDiary?.date ?? utcDateNow);
-  const [currentDiary, setCurrentDiary] = useState<Diary | null>(
-    initialDiary || null,
-  );
-  const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    // SSR로 첫 로딩되면 패스
-    if (initialDiary?.date == date) {
-      return;
-    }
-
-    setIsLoading(true);
-    getDiaryByDate(date).then((d) => {
-      setCurrentDiary(d);
-      setIsLoading(false);
-    });
-  }, [date, initialDiary]);
+  const { data: currentDiary, status } = useQuery({
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
+    queryKey: ["diary", date.toISOString().slice(0, 10)],
+    queryFn: () => getDiaryByDate(date),
+    initialData: initialDiary,
+  });
 
   function handlePreviousDiary() {
     const newDate = new Date(date);
@@ -50,10 +41,10 @@ export function DiaryViewer({ diary: initialDiary }: DiaryViewerProps) {
 
   return (
     <div className="space-y-4">
-      <div className="w-full flex justify-center items-center gap-4">
+      <div className="flex w-full items-center justify-center gap-4">
         <button
           onClick={handlePreviousDiary}
-          className="p-1 shadow rounded-md border border-gray-300 cursor-pointer"
+          className="cursor-pointer rounded-md border border-gray-300 p-1 shadow"
         >
           <ChevronLeftIcon strokeWidth={1.5} className="size-6" />
         </button>
@@ -69,14 +60,18 @@ export function DiaryViewer({ diary: initialDiary }: DiaryViewerProps) {
 
         <button
           onClick={handleNextDiary}
-          className="p-1 shadow rounded-md border border-gray-300 cursor-pointer"
+          className="cursor-pointer rounded-md border border-gray-300 p-1 shadow"
         >
           <ChevronRightIcon strokeWidth={1.5} className="size-6" />
         </button>
       </div>
-      {isLoading ? (
-        <div className="flex justify-center items-center h-48">
+      {status === "pending" ? (
+        <div className="flex h-48 items-center justify-center">
           <Spinner className="size-6" />
+        </div>
+      ) : status === "error" ? (
+        <div className="flex h-48 items-center justify-center">
+          <p>일기를 불러오는 중 오류가 발생했습니다.</p>
         </div>
       ) : currentDiary ? (
         <DiaryPaper diary={currentDiary} />
