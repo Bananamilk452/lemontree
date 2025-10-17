@@ -11,13 +11,13 @@ export function DiaryPaper({ diary, className }: DiaryCardProps) {
   return (
     <article
       className={cn(
-        "bg-white border border-gray-300 rounded-xl shadow-md max-h-96 overflow-scroll",
+        "max-h-96 overflow-scroll rounded-xl border border-gray-300 bg-white shadow-md",
         className,
       )}
     >
       <div className="p-4">
         <p
-          className="whitespace-pre-wrap break-keep-all"
+          className="break-keep-all whitespace-pre-wrap"
           style={{
             backgroundImage: "linear-gradient(#ccc 1px, transparent 1px)",
             backgroundSize: "100% 26px",

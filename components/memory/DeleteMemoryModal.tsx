@@ -50,7 +50,7 @@ export function DeleteMemoryModal({
           <DialogTitle>메모리 삭제</DialogTitle>
         </DialogHeader>
         <div>해당 메모리를 삭제하시겠습니까?</div>
-        <DialogFooter className="flex justify-end gap-2 items-center">
+        <DialogFooter className="flex items-center justify-end gap-2">
           {isLoading && <Spinner className="mr-2 size-5" />}
           <Button
             variant="destructive"

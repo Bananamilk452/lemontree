@@ -1,6 +1,6 @@
-import { MEMORY_MAX_LENGTH } from "~/constants";
 import { z } from "zod";
 
+import { MEMORY_MAX_LENGTH } from "~/constants";
 import { zodErrorMap } from "~/lib/messages";
 
 export const EditMemoryModalFormSchema = z.object({
