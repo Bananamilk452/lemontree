@@ -4,6 +4,7 @@ import {
   ChevronUpIcon,
   HomeIcon,
   LayoutDashboardIcon,
+  LockIcon,
   LogOutIcon,
   MemoryStickIcon,
   NotebookIcon,
@@ -181,6 +182,13 @@ export function AppSidebarClient({ initialSession }: AppSidebarClientProps) {
                     >
                       <LogOutIcon />
                       <span>로그아웃</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      className="cursor-pointer"
+                      onClick={handleSignOut}
+                    >
+                      <LockIcon />
+                      <span>비밀번호 변경</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
