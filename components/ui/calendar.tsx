@@ -1,20 +1,23 @@
 "use client";
 
-import { cn } from "~/utils";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import * as React from "react";
-import { DayPicker } from "react-day-picker";
+import { DayPicker, DayProps, useDayRender } from "react-day-picker";
 
 import { buttonVariants } from "~/components/ui/button";
+import { cn } from "~/utils";
 
 function Calendar({
   className,
   classNames,
   showOutsideDays = true,
+  diaryMap,
   ...props
-}: React.ComponentProps<typeof DayPicker>) {
+}: React.ComponentProps<typeof DayPicker> & {
+  diaryMap?: Record<number, boolean>;
+}) {
   return (
     <DayPicker
       locale={ko}
@@ -57,7 +60,7 @@ function Calendar({
         day_range_end:
           "day-range-end aria-selected:bg-primary aria-selected:text-primary-foreground",
         day_selected:
-          "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
+          "!bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
         day_today: "bg-accent text-accent-foreground",
         day_outside:
           "day-outside text-muted-foreground aria-selected:text-muted-foreground",
@@ -74,8 +77,36 @@ function Calendar({
         IconRight: ({ className, ...props }) => (
           <ChevronRight className={cn("size-4", className)} {...props} />
         ),
+        Day: (props: DayProps) => <Day {...props} diaryMap={diaryMap} />,
       }}
       {...props}
+    />
+  );
+}
+
+function Day(props: DayProps & { diaryMap?: Record<number, boolean> }) {
+  const buttonRef = React.useRef<HTMLButtonElement>(
+    document.createElement("button"),
+  );
+  const dayRender = useDayRender(props.date, props.displayMonth, buttonRef);
+
+  if (dayRender.isHidden) {
+    return <div role="gridcell"></div>;
+  }
+  if (!dayRender.isButton) {
+    return <div {...dayRender.divProps} />;
+  }
+
+  return (
+    <button
+      {...dayRender.buttonProps}
+      className={cn(
+        dayRender.buttonProps.className,
+        // 날짜에 일기가 있으면 하이라이팅
+        props.diaryMap?.[props.date.getDate()] ? "bg-primary/25" : "",
+      )}
+      type="button"
+      name="day"
     />
   );
 }
