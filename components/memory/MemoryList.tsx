@@ -27,7 +27,7 @@ export function MemoryList({ memories }: MemoryListProps) {
             </h3>
           </AccordionTrigger>
           <AccordionContent>
-            <div className="flex flex-col gap-3 border rounded-xl p-4">
+            <div className="flex flex-col gap-3 rounded-xl border p-4">
               {memories.map((memory, i) => (
                 <Fragment key={memory.id}>
                   <Memory memory={memory} />

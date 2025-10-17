@@ -1,7 +1,6 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ComponentVariant } from "~/utils";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
@@ -28,6 +27,7 @@ import { Input } from "~/components/ui/input";
 import { Note } from "~/components/ui/note";
 import { authClient } from "~/lib/auth-client";
 import { AUTH_MESSAGES } from "~/lib/messages";
+import { ComponentVariant } from "~/utils";
 
 import type { AuthMessageKeys } from "~/lib/messages";
 

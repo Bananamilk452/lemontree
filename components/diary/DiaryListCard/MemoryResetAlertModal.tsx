@@ -70,7 +70,7 @@ export function MemoryResetAlertModal({
             (해당 일기의 메모리들이 삭제되고, 새로운 메모리를 생성합니다.)
           </strong>
         </div>
-        <DialogFooter className="flex justify-end gap-2 items-center">
+        <DialogFooter className="flex items-center justify-end gap-2">
           {isLoading && <Spinner className="mr-2 size-5" />}
           <Button type="submit" onClick={handleReset} disabled={isLoading}>
             재메모리화

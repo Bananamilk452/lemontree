@@ -8,7 +8,7 @@ export function AuthBox({
   return (
     <div
       className={cn(
-        "flex w-96 flex-col gap-4 rounded-xl bg-white p-8 shadow-lg max-w-[calc(100dvw-24px)]",
+        "flex w-96 max-w-[calc(100dvw-24px)] flex-col gap-4 rounded-xl bg-white p-8 shadow-lg",
         className,
       )}
       {...props}

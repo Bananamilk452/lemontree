@@ -50,7 +50,7 @@ export function MemoryPastFirstModal({
           정상적인 메모리화를 위해서는 과거 일기를 먼저 메모리화 하는 것을
           추천합니다.
         </div>
-        <DialogFooter className="flex justify-end gap-2 items-center">
+        <DialogFooter className="flex items-center justify-end gap-2">
           <Button type="submit" onClick={handleConfirm}>
             무시하고 메모리화하기
           </Button>
