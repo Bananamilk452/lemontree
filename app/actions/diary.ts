@@ -140,3 +140,10 @@ export async function getSentimentByDate(options: {
 
   return await diaryService.getSentiment(options);
 }
+
+export async function getDiariesExistenceByMonth(year: number, month: number) {
+  const session = await getValidSession();
+  const diaryService = new DiaryService({ userId: session.user.id });
+
+  return await diaryService.getDiariesExistenceByMonth(year, month);
+}

@@ -210,6 +210,10 @@ export class DiaryService {
     return await diary.getSentiment(this.userId, { take, skip });
   }
 
+  async getDiariesExistenceByMonth(year: number, month: number) {
+    return await diary.getDiariesExistenceByMonth(this.userId, year, month);
+  }
+
   async deleteAllDiaries() {
     await diary.deleteAllDiaries(this.userId);
   }
