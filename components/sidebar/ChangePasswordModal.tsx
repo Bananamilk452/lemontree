@@ -11,7 +11,6 @@ import { Button } from "~/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -26,17 +25,15 @@ import {
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import { authClient } from "~/lib/auth-client";
-import { UserWithRole } from "~/types/auth";
 
 interface ChangePasswordModalProps {
   open: boolean;
   setOpen: (open: boolean) => void;
-  onSuccess: () => void;
-  user: UserWithRole;
 }
 
 const changePasswordFormSchema = z
   .object({
+    currentPassword: z.string().min(1, "현재 비밀번호를 입력해주세요."),
     password: z.string().min(6, "비밀번호는 최소 6자 이상이어야 합니다."),
     passwordConfirm: z.string().min(1, "비밀번호 확인을 입력해주세요."),
   })
@@ -50,12 +47,11 @@ type ChangePasswordFormSchema = z.infer<typeof changePasswordFormSchema>;
 export function ChangePasswordModal({
   open,
   setOpen,
-  onSuccess,
-  user,
 }: ChangePasswordModalProps) {
   const form = useForm<ChangePasswordFormSchema>({
     resolver: zodResolver(changePasswordFormSchema),
     defaultValues: {
+      currentPassword: "",
       password: "",
       passwordConfirm: "",
     },
@@ -63,9 +59,10 @@ export function ChangePasswordModal({
 
   const { mutate: setPassword, status } = useMutation({
     mutationFn: (values: ChangePasswordFormSchema) =>
-      authClient.admin.setUserPassword({
+      authClient.changePassword({
+        currentPassword: values.currentPassword,
         newPassword: values.password,
-        userId: user?.id,
+        revokeOtherSessions: true,
       }),
   });
 
@@ -75,7 +72,6 @@ export function ChangePasswordModal({
         toast.success("비밀번호가 성공적으로 변경되었습니다.");
         form.reset();
         setOpen(false);
-        onSuccess();
       },
       onError: () => {
         toast.error("비밀번호 변경에 실패했습니다.");
@@ -90,9 +86,6 @@ export function ChangePasswordModal({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>비밀번호 변경</DialogTitle>
-          <DialogDescription>
-            {user?.email}의 비밀번호를 변경합니다
-          </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
@@ -103,15 +96,34 @@ export function ChangePasswordModal({
           >
             <FormField
               control={form.control}
+              name="currentPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>현재 비밀번호</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      autoComplete="password"
+                      placeholder="현재 비밀번호"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>비밀번호</FormLabel>
+                  <FormLabel>새 비밀번호</FormLabel>
                   <FormControl>
                     <Input
                       type="password"
                       autoComplete="new-password"
-                      placeholder="비밀번호"
+                      placeholder="새 비밀번호"
                       {...field}
                     />
                   </FormControl>
