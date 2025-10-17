@@ -3,7 +3,6 @@ import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 import { vectorStore } from "~/lib/langchain";
 import { prisma } from "~/utils/db";
 import { ApplicationError } from "~/utils/error";
-import { logger } from "~/utils/logger";
 
 export async function createEmbedding(diaryId: string, content: string) {
   const separators = ["\n\n", "\n", ".", "!", "?", ",", " ", ""];
@@ -26,9 +25,6 @@ export async function createEmbedding(diaryId: string, content: string) {
   try {
     await vectorStore.addModels(vectors);
 
-    logger.info(
-      `[${diaryId}] createEmbedding 작업 완료: diaryId: ${diaryId}, vectorCounts: ${vectors.length}`,
-    );
     return {
       content,
       vectorCounts: vectors.length,
@@ -41,9 +37,7 @@ export async function createEmbedding(diaryId: string, content: string) {
       },
     });
 
-    logger.error(
-      `[${diaryId}] createEmbedding 작업 중 에러로 임베딩 생성이 롤백됨. 에러: ${vectorError}`,
-    );
+    console.error("createEmbedding error:", vectorError);
     throw new ApplicationError(
       "createEmbedding 작업 중 에러로 임베딩 생성이 롤백됨.",
     );
