@@ -3,7 +3,6 @@ import { fullTextSearch as memoryFullTextSearch } from "~/lib/models/memory/full
 import { semanticSearch as memorySemanticSearch } from "~/lib/models/memory/semanticSearch";
 import { prisma } from "~/utils/db";
 import { ApplicationError, NotFoundError } from "~/utils/error";
-import { logger } from "~/utils/logger";
 
 export const memory = {
   async isOwner(memoryId: string, userId: string) {
@@ -82,7 +81,7 @@ export const memory = {
         where: { memoryId },
       });
 
-      logger.error(error);
+      console.error(error);
       throw new ApplicationError(
         "메모리 업데이트 중 오류가 발생했습니다. 다시 시도해주세요.",
       );

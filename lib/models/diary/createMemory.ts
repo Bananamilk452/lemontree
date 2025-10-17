@@ -7,7 +7,6 @@ import { Memory } from "~/prisma/generated/client";
 import { getRelatedMemories as getRelatedMemoriesQuery } from "~/prisma/generated/client/sql";
 import { prisma } from "~/utils/db";
 import { ApplicationError, NotFoundError } from "~/utils/error";
-import { logger } from "~/utils/logger";
 
 export async function createMemory(diaryId: string, userId: string) {
   const diary = await prisma.diary.findUnique({
@@ -36,9 +35,6 @@ export async function createMemory(diaryId: string, userId: string) {
   });
 
   const relatedMemories = await getRelatedMemories(diary.id);
-  logger.info(
-    `[${diary.id}] 관련 메모리: ${JSON.stringify(relatedMemories, null, 2)}`,
-  );
 
   const promptValue = await createMemoryPromptTemplate.invoke({
     user_text: diary.content,
@@ -59,18 +55,10 @@ export async function createMemory(diaryId: string, userId: string) {
 
   const { memories } = JSON.parse(rawMemories) as { memories: string[] };
 
-  logger.info(
-    `[${diary.id}] 추론한 메모리: ${JSON.stringify(memories, null, 2)}`,
-  );
-
   const newMemories = await addNewMemories(diaryId, userId, memories);
 
   try {
     const result = await createMemoryEmbedding(newMemories);
-
-    logger.info(
-      `[${diary.id}] createMemory 작업 완료: diaryId: ${diaryId}, vectorCounts: ${result.embeddings.length}`,
-    );
     return result;
   } catch (error) {
     const memoryIds = newMemories.map((memory) => memory.id);
@@ -81,9 +69,7 @@ export async function createMemory(diaryId: string, userId: string) {
       },
     });
 
-    logger.error(
-      `[${diary.id}] createMemory 작업 중 에러로 메모리 생성이 롤백됨. 에러: ${error}`,
-    );
+    console.error("createMemoryEmbedding error:", error);
     throw new ApplicationError(
       "createMemory 작업 중 에러로 메모리 생성이 롤백됨",
     );
