@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 
 import { AuthBox } from "~/components/auth/AuthBox";
 import { AuthContainer } from "~/components/auth/AuthContainer";
@@ -24,15 +23,11 @@ import { Input } from "~/components/ui/input";
 import { Note } from "~/components/ui/note";
 import { authClient } from "~/lib/auth-client";
 import { AUTH_MESSAGES } from "~/lib/messages";
+import { SignInForm, SignInFormSchema } from "~/types/zod/SignInFormSchema";
 import { safeRedirect } from "~/utils";
 
 import type { AuthMessageKeys } from "~/lib/messages";
 import type { ComponentVariant } from "~/utils";
-
-const formSchema = z.object({
-  email: z.string().email(),
-  password: z.string().nonempty(),
-});
 
 export default function SignInPage() {
   return (
@@ -58,15 +53,15 @@ function SignIn() {
 
   const router = useRouter();
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<SignInForm>({
+    resolver: zodResolver(SignInFormSchema),
     defaultValues: {
       email: "",
       password: "",
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: SignInForm) {
     setNote({ ...note, visible: false });
 
     const { error } = await authClient.signIn.email(

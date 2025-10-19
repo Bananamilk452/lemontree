@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import z from "zod";
 
 import { Spinner } from "~/components/Spinner";
 import { Button } from "~/components/ui/button";
@@ -25,31 +24,22 @@ import {
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import { authClient } from "~/lib/auth-client";
+import {
+  UserChangePasswordForm,
+  UserChangePasswordFormSchema,
+} from "~/types/zod/UserChangePasswordFormSchema";
 
 interface ChangePasswordModalProps {
   open: boolean;
   setOpen: (open: boolean) => void;
 }
 
-const changePasswordFormSchema = z
-  .object({
-    currentPassword: z.string().min(1, "현재 비밀번호를 입력해주세요."),
-    password: z.string().min(6, "비밀번호는 최소 6자 이상이어야 합니다."),
-    passwordConfirm: z.string().min(1, "비밀번호 확인을 입력해주세요."),
-  })
-  .refine((data) => data.password === data.passwordConfirm, {
-    message: "비밀번호가 일치하지 않습니다.",
-    path: ["passwordConfirm"],
-  });
-
-type ChangePasswordFormSchema = z.infer<typeof changePasswordFormSchema>;
-
 export function ChangePasswordModal({
   open,
   setOpen,
 }: ChangePasswordModalProps) {
-  const form = useForm<ChangePasswordFormSchema>({
-    resolver: zodResolver(changePasswordFormSchema),
+  const form = useForm<UserChangePasswordForm>({
+    resolver: zodResolver(UserChangePasswordFormSchema),
     defaultValues: {
       currentPassword: "",
       password: "",
@@ -58,7 +48,7 @@ export function ChangePasswordModal({
   });
 
   const { mutate: setPassword, status } = useMutation({
-    mutationFn: (values: ChangePasswordFormSchema) =>
+    mutationFn: (values: UserChangePasswordForm) =>
       authClient.changePassword({
         currentPassword: values.currentPassword,
         newPassword: values.password,
@@ -66,7 +56,7 @@ export function ChangePasswordModal({
       }),
   });
 
-  function onSubmit(values: ChangePasswordFormSchema) {
+  function onSubmit(values: UserChangePasswordForm) {
     setPassword(values, {
       onSuccess: () => {
         toast.success("비밀번호가 성공적으로 변경되었습니다.");

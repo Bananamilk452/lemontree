@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 
 import {
   AuthBox,
@@ -25,16 +24,14 @@ import {
 import { Input } from "~/components/ui/input";
 import { Note } from "~/components/ui/note";
 import { authClient } from "~/lib/auth-client";
-import { AUTH_MESSAGES, zodErrorMap } from "~/lib/messages";
+import { AUTH_MESSAGES } from "~/lib/messages";
+import {
+  ForgotPasswordForm,
+  ForgotPasswordFormSchema,
+} from "~/types/zod/ForgotPasswordFormSchema";
 import { ComponentVariant } from "~/utils";
 
 import type { AuthMessageKeys } from "~/lib/messages";
-
-const formSchema = z.object({
-  email: z.string().email(),
-});
-
-z.setErrorMap(zodErrorMap);
 
 export default function ForgotPassword() {
   const [note, setNote] = useState<{
@@ -47,14 +44,14 @@ export default function ForgotPassword() {
     visible: false,
   });
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<ForgotPasswordForm>({
+    resolver: zodResolver(ForgotPasswordFormSchema),
     defaultValues: {
       email: "",
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: ForgotPasswordForm) {
     setNote({ ...note, visible: false });
 
     const { error } = await authClient.forgetPassword({

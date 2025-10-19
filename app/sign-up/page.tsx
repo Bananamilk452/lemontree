@@ -5,7 +5,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 
 import { AuthBox, AuthBoxTitle } from "~/components/auth/AuthBox";
 import { AuthContainer } from "~/components/auth/AuthContainer";
@@ -22,24 +21,11 @@ import {
 import { Input } from "~/components/ui/input";
 import { Note } from "~/components/ui/note";
 import { authClient } from "~/lib/auth-client";
-import { AUTH_MESSAGES, zodErrorMap } from "~/lib/messages";
+import { AUTH_MESSAGES } from "~/lib/messages";
+import { SignUpForm, SignUpFormSchema } from "~/types/zod/SignUpFormSchema";
 import { ComponentVariant } from "~/utils";
 
 import type { AuthMessageKeys } from "~/lib/messages";
-
-const formSchema = z
-  .object({
-    name: z.string().nonempty(),
-    email: z.string().email(),
-    password: z.string().min(8),
-    passwordConfirm: z.string().min(8),
-  })
-  .refine(({ password, passwordConfirm }) => password === passwordConfirm, {
-    params: { code: "passwords-do-not-match" },
-    path: ["passwordConfirm"],
-  });
-
-z.setErrorMap(zodErrorMap);
 
 export default function SignUp() {
   // 회원가입 비활성화
@@ -55,8 +41,8 @@ export default function SignUp() {
     visible: false,
   });
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<SignUpForm>({
+    resolver: zodResolver(SignUpFormSchema),
     defaultValues: {
       name: "",
       email: "",
@@ -65,7 +51,7 @@ export default function SignUp() {
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: SignUpForm) {
     setNote({ ...note, visible: false });
 
     const { error } = await authClient.signUp.email({

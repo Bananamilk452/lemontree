@@ -5,7 +5,6 @@ import { DialogDescription } from "@radix-ui/react-dialog";
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import z from "zod";
 
 import { removeUser as removeUserAction } from "~/app/actions/admin";
 import { Spinner } from "~/components/Spinner";
@@ -28,6 +27,10 @@ import {
   FormMessage,
 } from "~/components/ui/form";
 import { UserWithRole } from "~/types/auth";
+import {
+  DeleteUserForm,
+  DeleteUserFormSchema,
+} from "~/types/zod/DeleteUserFormSchema";
 
 interface ChangePasswordModalProps {
   open: boolean;
@@ -36,31 +39,25 @@ interface ChangePasswordModalProps {
   user: UserWithRole;
 }
 
-const deleteUserFormSchema = z.object({
-  removeData: z.boolean().default(false),
-});
-
-type DeleteUserFormSchema = z.infer<typeof deleteUserFormSchema>;
-
 export function DeleteUserModal({
   open,
   setOpen,
   onSuccess,
   user,
 }: ChangePasswordModalProps) {
-  const form = useForm<DeleteUserFormSchema>({
-    resolver: zodResolver(deleteUserFormSchema),
+  const form = useForm<DeleteUserForm>({
+    resolver: zodResolver(DeleteUserFormSchema),
     defaultValues: {
       removeData: false,
     },
   });
 
   const { mutate: removeUser, status } = useMutation({
-    mutationFn: (values: DeleteUserFormSchema) =>
+    mutationFn: (values: DeleteUserForm) =>
       removeUserAction(user.id, values.removeData),
   });
 
-  function onSubmit(values: DeleteUserFormSchema) {
+  function onSubmit(values: DeleteUserForm) {
     removeUser(values, {
       onSuccess: () => {
         toast.success("사용자가 성공적으로 삭제되었습니다.");
