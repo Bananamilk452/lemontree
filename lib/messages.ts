@@ -18,6 +18,10 @@ export const zodErrorMap: z.ZodErrorMap = (issue, ctx) => {
       if (issue.validation === "email")
         return { message: "올바른 이메일 주소를 입력하세요." };
       break;
+    case z.ZodIssueCode.invalid_enum_value:
+      return { message: "올바른 값을 선택해주세요." };
+    case z.ZodIssueCode.invalid_date:
+      return { message: "올바른 날짜를 입력해주세요." };
     case z.ZodIssueCode.custom:
       if (issue.params?.code === "passwords-do-not-match") {
         return { message: "비밀번호가 일치하지 않습니다." };
