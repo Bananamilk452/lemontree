@@ -34,5 +34,6 @@ This is a [Next.js](https://nextjs.org/) application using the App Router.
 
 After implementing a feature or write some codes, please run the following commands to ensure code quality and consistency:
 
-1.  `pnpm lint`: Check for any linting errors.
-2.  `pnpm format`: Format the code.
+1.  `pnpm build`: Check for Typescript errors. ignore the `PrismaClientInitializationError` in build time.
+2.  `pnpm lint`: Check for any linting errors.
+3.  `pnpm format`: Format the code.
