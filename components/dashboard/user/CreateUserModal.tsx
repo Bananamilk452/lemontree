@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import z from "zod";
 
 import { Spinner } from "~/components/Spinner";
 import { Button } from "~/components/ui/button";
@@ -32,6 +31,10 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import { authClient } from "~/lib/auth-client";
+import {
+  CreateUserForm,
+  CreateUserFormSchema,
+} from "~/types/zod/CreateUserFormSchema";
 
 interface CreateUserModalProps {
   open: boolean;
@@ -39,28 +42,13 @@ interface CreateUserModalProps {
   onSuccess: () => void;
 }
 
-const createUserFormSchema = z
-  .object({
-    name: z.string().min(2, "이름은 최소 2자 이상이어야 합니다."),
-    email: z.string().email("유효한 이메일 주소를 입력해주세요."),
-    password: z.string().min(6, "비밀번호는 최소 6자 이상이어야 합니다."),
-    passwordConfirm: z.string(),
-    role: z.enum(["user", "admin"]),
-  })
-  .refine((data) => data.password === data.passwordConfirm, {
-    message: "비밀번호가 일치하지 않습니다.",
-    path: ["passwordConfirm"],
-  });
-
-type CreateUserFormSchema = z.infer<typeof createUserFormSchema>;
-
 export function CreateUserModal({
   open,
   setOpen,
   onSuccess,
 }: CreateUserModalProps) {
-  const form = useForm<CreateUserFormSchema>({
-    resolver: zodResolver(createUserFormSchema),
+  const form = useForm<CreateUserForm>({
+    resolver: zodResolver(CreateUserFormSchema),
     defaultValues: {
       name: "",
       email: "",
@@ -71,7 +59,7 @@ export function CreateUserModal({
   });
 
   const { mutate: createUser, status } = useMutation({
-    mutationFn: (values: CreateUserFormSchema) =>
+    mutationFn: (values: CreateUserForm) =>
       authClient.admin.createUser({
         name: values.name,
         email: values.email,
@@ -80,7 +68,7 @@ export function CreateUserModal({
       }),
   });
 
-  function onSubmit(values: CreateUserFormSchema) {
+  function onSubmit(values: CreateUserForm) {
     createUser(values, {
       onSuccess: () => {
         toast.success("유저가 성공적으로 생성되었습니다.");

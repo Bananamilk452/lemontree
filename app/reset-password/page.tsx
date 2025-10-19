@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 
 import {
   AuthBox,
@@ -27,19 +26,13 @@ import { Input } from "~/components/ui/input";
 import { Note } from "~/components/ui/note";
 import { authClient } from "~/lib/auth-client";
 import { AUTH_MESSAGES } from "~/lib/messages";
+import {
+  ResetPasswordForm,
+  ResetPasswordFormSchema,
+} from "~/types/zod/ResetPasswordFormSchema";
 import { ComponentVariant } from "~/utils";
 
 import type { AuthMessageKeys } from "~/lib/messages";
-
-const formSchema = z
-  .object({
-    password: z.string().min(8),
-    passwordConfirm: z.string().min(8),
-  })
-  .refine(({ password, passwordConfirm }) => password === passwordConfirm, {
-    params: { code: "passwords-do-not-match" },
-    path: ["passwordConfirm"],
-  });
 
 export default function ResetPassword() {
   return (
@@ -71,15 +64,15 @@ function ResetPasswordPage() {
     });
   }
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<ResetPasswordForm>({
+    resolver: zodResolver(ResetPasswordFormSchema),
     defaultValues: {
       password: "",
       passwordConfirm: "",
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: ResetPasswordForm) {
     setNote({ ...note, visible: false });
 
     if (!token) {
