@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -50,22 +50,21 @@ export function EditMemoryModal({
     },
   });
 
-  const [isLoading, setIsLoading] = useState(false);
+  const { mutate: updateMemory, isPending: isLoading } = useMutation({
+    mutationFn: (content: string) => updateMemoryById(memory.id, content),
+    onSuccess: (updatedMemory) => {
+      onSuccess?.(updatedMemory);
+      toast.success("메모리가 수정되었습니다.");
+      setOpen(false);
+    },
+    onError: (error) => {
+      toast.error("메모리 수정에 실패했습니다.");
+      console.error("Error editing memory:", error);
+    },
+  });
 
   function onSubmit(data: z.infer<typeof EditMemoryModalFormSchema>) {
-    setIsLoading(true);
-    updateMemoryById(memory.id, data.content)
-      .then((updatedMemory) => {
-        onSuccess?.(updatedMemory);
-        toast.success("메모리가 수정되었습니다.");
-        setOpen(false);
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        toast.error("메모리 수정에 실패했습니다.");
-        console.error("Error editing memory:", error);
-        setIsLoading(false);
-      });
+    updateMemory(data.content);
   }
 
   return (

@@ -1,5 +1,6 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -20,40 +21,32 @@ interface DiaryListProps {
 }
 
 export default function DiaryList(props: DiaryListProps) {
-  const [diarys, setDiarys] = useState<DiaryWithCount[]>(props.diarys);
   const [page, setPage] = useState(props.page);
-  const [total, setTotal] = useState(props.total);
-  const [isLoading, setIsLoading] = useState(false);
 
   // 상위 페이지 revalidate 시에 props이 바뀌면 여기서도 바뀌게
   useEffect(() => {
-    setDiarys(props.diarys);
     setPage(props.page);
-    setTotal(props.total);
-  }, [props.diarys, props.page, props.total]);
+  }, [props.page]);
+
+  const {
+    data,
+    isFetching: isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["diarys", { page, limit: props.limit }],
+    queryFn: () => getDiarys({ limit: props.limit, page }),
+    enabled: page !== props.page,
+  });
 
   useEffect(() => {
-    // SSR로 첫 로딩되면 패스
-    if (page === props.page) return;
+    if (error) {
+      console.error(error);
+      toast.error("일기 목록을 불러오는 데 실패했습니다.");
+    }
+  }, [error]);
 
-    setIsLoading(true);
-    getDiarys({
-      limit: props.limit,
-      page,
-    })
-      .then((data) => {
-        setDiarys(data.diarys);
-        setTotal(data.total);
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        console.error(error);
-        toast.error("일기 목록을 불러오는 데 실패했습니다.");
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, [page, props.limit, props.page]);
+  const diarys = data?.diarys ?? props.diarys;
+  const total = data?.total ?? props.total;
   return (
     <>
       {isLoading ? (
