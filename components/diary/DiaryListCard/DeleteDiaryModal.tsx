@@ -1,11 +1,11 @@
 "use client";
 
+import { useMutation } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { toast } from "sonner";
 
-import { deleteDiary } from "~/app/actions/diary";
+import { deleteDiary as deleteDiaryAction } from "~/app/actions/diary";
 import { DiaryModalType } from "~/components/diary/DiaryListCard/Provider";
 import { Spinner } from "~/components/Spinner";
 import { Button } from "~/components/ui/button";
@@ -31,7 +31,22 @@ export function DeleteDiaryModal({
 }: DeleteDiaryModalProps) {
   const router = useRouter();
 
-  const [isLoading, setIsLoading] = useState(false);
+  const { mutate: deleteDiary, isPending: isLoading } = useMutation({
+    mutationFn: () => deleteDiaryAction(diary.id),
+    onSuccess: () => {
+      toast.success("일기가 삭제되었습니다.");
+      setActiveModal(null);
+
+      // 일기 상세보기에서 삭제 시 목록으로 돌아감
+      if (location.pathname.includes("/diary/")) {
+        router.push("/diary/list/1");
+      }
+    },
+    onError: (error) => {
+      toast.error("일기 삭제에 실패했습니다.");
+      console.error("Error deleting diary:", error);
+    },
+  });
 
   function handleCloseModal(open: boolean) {
     if (!open) {
@@ -40,23 +55,7 @@ export function DeleteDiaryModal({
   }
 
   function handleDelete() {
-    setIsLoading(true);
-    deleteDiary(diary.id)
-      .then(() => {
-        toast.success("일기가 삭제되었습니다.");
-        setActiveModal(null);
-        setIsLoading(false);
-
-        // 일기 상세보기에서 삭제 시 목록으로 돌아감
-        if (location.pathname.includes("/diary/")) {
-          router.push("/diary/list/1");
-        }
-      })
-      .catch((error) => {
-        toast.error("일기 삭제에 실패했습니다.");
-        console.error("Error deleting diary:", error);
-        setIsLoading(false);
-      });
+    deleteDiary();
   }
 
   return (

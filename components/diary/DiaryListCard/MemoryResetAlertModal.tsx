@@ -1,7 +1,7 @@
 "use client";
 
+import { useMutation } from "@tanstack/react-query";
 import { format } from "date-fns";
-import { useState } from "react";
 import { toast } from "sonner";
 
 import { processDiary } from "~/app/actions/diary";
@@ -28,7 +28,19 @@ export function MemoryResetAlertModal({
   activeModal,
   setActiveModal,
 }: MemoryResetAlertModalProps) {
-  const [isLoading, setIsLoading] = useState(false);
+  const { mutate: resetMemory, isPending: isLoading } = useMutation({
+    mutationFn: () => processDiary(diary.id),
+    onSuccess: ({ memories }) => {
+      toast.success(
+        `일기 재메모리화가 완료되었습니다. (메모리 ${memories.length}개)`,
+      );
+      handleCloseModal(false);
+    },
+    onError: (error) => {
+      toast.error("일기 재메모리화에 실패했습니다.");
+      console.error("Error re-memorizing diary:", error);
+    },
+  });
 
   function handleCloseModal(open: boolean) {
     if (!open) {
@@ -37,20 +49,7 @@ export function MemoryResetAlertModal({
   }
 
   function handleReset() {
-    setIsLoading(true);
-    processDiary(diary.id)
-      .then(({ memories }) => {
-        toast.success(
-          `일기 재메모리화가 완료되었습니다. (메모리 ${memories.length}개)`,
-        );
-        handleCloseModal(false);
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        toast.error("일기 재메모리화에 실패했습니다.");
-        console.error("Error re-memorizing diary:", error);
-        setIsLoading(false);
-      });
+    resetMemory();
   }
 
   return (

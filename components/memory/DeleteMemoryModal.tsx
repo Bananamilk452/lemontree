@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { deleteMemoryById } from "~/app/actions/memory";
@@ -26,21 +26,20 @@ export function DeleteMemoryModal({
   open,
   setOpen,
 }: DeleteMemoryModalProps) {
-  const [isLoading, setIsLoading] = useState(false);
+  const { mutate: deleteMemory, isPending: isLoading } = useMutation({
+    mutationFn: () => deleteMemoryById(memory.id),
+    onSuccess: () => {
+      toast.success("메모리가 삭제되었습니다.");
+      setOpen(false);
+    },
+    onError: (error) => {
+      toast.error("메모리 삭제에 실패했습니다.");
+      console.error("Error deleting memory:", error);
+    },
+  });
 
   function handleDelete() {
-    setIsLoading(true);
-    deleteMemoryById(memory.id)
-      .then(() => {
-        toast.success("메모리가 삭제되었습니다.");
-        setOpen(false);
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        toast.error("메모리 삭제에 실패했습니다.");
-        console.error("Error deleting memory:", error);
-        setIsLoading(false);
-      });
+    deleteMemory();
   }
 
   return (
