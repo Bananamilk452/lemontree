@@ -6,7 +6,6 @@ WORKDIR /app
 RUN npm install -g pnpm
 
 COPY package.json pnpm-lock.yaml* ./
-COPY patches/ ./patches
 RUN pnpm install --frozen-lockfile
 
 COPY . .
@@ -34,5 +33,6 @@ COPY --from=builder /app/prisma ./prisma
 # Copy other necessary files
 COPY --from=builder /app/assets ./assets
 COPY --from=builder /app/credentials.json ./credentials.json
+
 
 CMD ["sh", "-c", "pnpm migrateandstart"]
