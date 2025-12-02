@@ -26,7 +26,7 @@ export function Memory(props: MemoryProps) {
     for (const segment of segments) {
       if (segment.type === "date") {
         memoryContents.push(
-          <MemoryDateButton key={segment.content} date={segment.content} />,
+          <MemoryDateButton key={crypto.randomUUID()} date={segment.content} />,
         );
       } else {
         memoryContents.push(segment.content);
