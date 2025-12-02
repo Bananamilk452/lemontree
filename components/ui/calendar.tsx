@@ -16,7 +16,7 @@ function Calendar({
   diaryMap,
   ...props
 }: React.ComponentProps<typeof DayPicker> & {
-  diaryMap?: Record<number, boolean>;
+  diaryMap?: Record<string, boolean>;
 }) {
   return (
     <DayPicker
@@ -84,7 +84,7 @@ function Calendar({
   );
 }
 
-function Day(props: DayProps & { diaryMap?: Record<number, boolean> }) {
+function Day(props: DayProps & { diaryMap?: Record<string, boolean> }) {
   const buttonRef = React.useRef<HTMLButtonElement>(
     document.createElement("button"),
   );
@@ -103,7 +103,9 @@ function Day(props: DayProps & { diaryMap?: Record<number, boolean> }) {
       className={cn(
         dayRender.buttonProps.className,
         // 날짜에 일기가 있으면 하이라이팅
-        props.diaryMap?.[props.date.getDate()] ? "bg-primary/25" : "",
+        props.diaryMap?.[format(props.date, "yyyy-MM-dd")]
+          ? "bg-primary/25"
+          : "",
       )}
       type="button"
       name="day"
