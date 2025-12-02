@@ -58,7 +58,7 @@ export function removeTimeFromDate(date: Date) {
 }
 
 export function parseMemoryDate(content: string) {
-  const regex = /(\d{4}-\d{2}-\d{2})/g;
+  const regex = /(\d{4}-\d{2}-\d{2})|(\d{4}년 \d{1,2}월 \d{1,2}일)/g;
   const splited = content.split(regex);
 
   const segments = splited.map((seg) => {

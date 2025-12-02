@@ -17,7 +17,17 @@ interface DiaryViewModalProps {
 export function DiaryViewModal({ date, open, setOpen }: DiaryViewModalProps) {
   const { data, status } = useQuery({
     queryKey: ["diary", date],
-    queryFn: () => getDiaryByDate(new Date(date)),
+    queryFn: () => {
+      const match = date.match(/(\d{4})년 (\d{1,2})월 (\d{1,2})일/);
+      if (match) {
+        const parsedDate = new Date(
+          Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3])),
+        );
+        return getDiaryByDate(parsedDate);
+      }
+
+      return getDiaryByDate(new Date(date));
+    },
   });
 
   return (
