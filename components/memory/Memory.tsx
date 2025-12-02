@@ -1,7 +1,7 @@
 "use client";
 
 import { PencilIcon, Trash2Icon } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { DiaryViewModal } from "~/components/diary/DiaryViewModal";
 import { DeleteMemoryModal } from "~/components/memory/DeleteMemoryModal";
@@ -19,18 +19,22 @@ export function Memory(props: MemoryProps) {
   const [isEditMemoryModalOpen, setIsEditMemoryModalOpen] = useState(false);
   const [memory, setMemory] = useState(props.memory);
 
-  const segments = parseMemoryDate(memory.content);
-  const contents = [];
+  const contents = useMemo(() => {
+    const segments = parseMemoryDate(memory.content);
+    const memoryContents = [];
 
-  for (const segment of segments) {
-    if (segment.type === "date") {
-      contents.push(
-        <MemoryDateButton key={segment.content} date={segment.content} />,
-      );
-    } else {
-      contents.push(segment.content);
+    for (const segment of segments) {
+      if (segment.type === "date") {
+        memoryContents.push(
+          <MemoryDateButton key={segment.content} date={segment.content} />,
+        );
+      } else {
+        memoryContents.push(segment.content);
+      }
     }
-  }
+
+    return memoryContents;
+  }, [memory.content]);
 
   return (
     <div className="flex items-start justify-between gap-4">
