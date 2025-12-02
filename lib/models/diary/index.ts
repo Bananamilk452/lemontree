@@ -1,3 +1,11 @@
+import {
+  endOfMonth,
+  endOfWeek,
+  format,
+  startOfMonth,
+  startOfWeek,
+} from "date-fns";
+
 import { createEmbedding } from "~/lib/models/diary/createEmbedding";
 import { createMemory } from "~/lib/models/diary/createMemory";
 import { fullTextSearch as diaryFullTextSearch } from "~/lib/models/diary/fullTextSearch";
@@ -274,15 +282,17 @@ export const diary = {
     year: number,
     month: number,
   ) {
-    const startDate = new Date(Date.UTC(year, month - 1, 1));
-    const endDate = new Date(Date.UTC(year, month, 1));
+    const startMonth = startOfMonth(new Date(Date.UTC(year, month - 1, 1)));
+    const startDate = startOfWeek(startMonth);
+    const endMonth = endOfMonth(startMonth);
+    const endDate = endOfWeek(endMonth);
 
     const diaries = await prisma.diary.findMany({
       where: {
         userId,
         date: {
           gte: startDate,
-          lt: endDate,
+          lte: endDate,
         },
       },
       select: {
@@ -290,9 +300,9 @@ export const diary = {
       },
     });
 
-    const diaryMap: Record<number, boolean> = {};
+    const diaryMap: Record<string, boolean> = {};
     for (const d of diaries) {
-      diaryMap[d.date.getUTCDate()] = true;
+      diaryMap[format(d.date, "yyyy-MM-dd")] = true;
     }
 
     return diaryMap;
