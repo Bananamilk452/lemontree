@@ -9,7 +9,8 @@ const program = new Command();
 program
   .requiredOption("-e, --email <email>", "user email address")
   .requiredOption("-n, --name [name]", "user name")
-  .requiredOption("-p, --password [password]", "user password");
+  .requiredOption("-p, --password [password]", "user password")
+  .option("--admin", "set user as admin");
 
 program.parse();
 const options = program.opts();
@@ -20,6 +21,7 @@ async function createUser() {
       email: options.email,
       name: options.name,
       password: options.password,
+      role: options.admin ? "admin" : "user",
     },
   });
 
