@@ -1,8 +1,13 @@
 import { ChatVertexAI } from "@langchain/google-vertexai";
 import { format } from "date-fns";
+import { createAgent, providerStrategy } from "langchain";
 
 import { vectorStore } from "~/lib/langchain";
-import { createMemoryPromptTemplate, CreateMemorySchema } from "~/lib/prompts";
+import {
+  createMemorySchema,
+  CreateMemorySchema,
+  createMemorySystemPrompt,
+} from "~/lib/prompts";
 import { Memory } from "~/prisma/generated/client";
 import { getRelatedMemories as getRelatedMemoriesQuery } from "~/prisma/generated/client/sql";
 import { prisma } from "~/utils/db";
@@ -34,28 +39,39 @@ export async function createMemory(diaryId: string, userId: string) {
     maxReasoningTokens: 0,
   });
 
-  const relatedMemories = await getRelatedMemories(diary.id);
-
-  const promptValue = await createMemoryPromptTemplate.invoke({
-    user_text: diary.content,
-    current_date: format(diary.date, "yyyy-MM-dd"),
-    similar_memories: JSON.stringify(
-      relatedMemories.map((memory) => ({
-        date: format(memory.date, "yyyy-MM-dd"),
-        content: memory.content,
-      })),
-      null,
-      2,
-    ),
+  const agent = createAgent({
+    model,
+    tools: [],
+    systemPrompt: createMemorySystemPrompt,
+    responseFormat: providerStrategy(createMemorySchema),
   });
 
-  let rawMemories = (await model.invoke(promptValue)).text;
-  rawMemories = rawMemories.replace("```json", "");
-  rawMemories = rawMemories.replace("```", "");
+  const relatedMemories = await getRelatedMemories(diary.id);
+  const similarMemories = JSON.stringify(
+    relatedMemories.map((memory) => ({
+      date: format(memory.date, "yyyy-MM-dd"),
+      content: memory.content,
+    })),
+    null,
+    2,
+  );
 
-  const { memories } = JSON.parse(rawMemories) as { memories: string[] };
+  const { structuredResponse } = await agent.invoke({
+    messages: [
+      {
+        role: "user",
+        content: `user_text: ${diary.content}
+current_date: ${format(diary.date, "yyyy-MM-dd")}
+similar_memories: ${similarMemories}`,
+      },
+    ],
+  });
 
-  const newMemories = await addNewMemories(diaryId, userId, memories);
+  const newMemories = await addNewMemories(
+    diaryId,
+    userId,
+    structuredResponse.memories,
+  );
 
   try {
     const result = await createMemoryEmbedding(newMemories);
