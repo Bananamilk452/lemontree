@@ -33,6 +33,7 @@ COPY --from=builder /app/prisma ./prisma
 # Copy other necessary files
 COPY --from=builder /app/assets ./assets
 COPY --from=builder /app/credentials.json ./credentials.json
+COPY --from=builder /app/scripts ./scripts
 
 
 CMD ["sh", "-c", "pnpm migrateandstart"]
