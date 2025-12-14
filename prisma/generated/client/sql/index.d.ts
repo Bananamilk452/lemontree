@@ -14,4 +14,6 @@ export * from "./memoryFullTextSearchByDate"
 
 export * from "./memorySemanticSearchByAccuracy"
 
+export * from "./memorySemanticSearchByAccuracyUntilDate"
+
 export * from "./memorySemanticSearchByDate"

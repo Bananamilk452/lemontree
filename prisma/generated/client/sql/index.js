@@ -10,4 +10,5 @@ exports.getRelatedMemories = require("./getRelatedMemories.js").getRelatedMemori
 exports.memoryFullTextSearchByAccuracy = require("./memoryFullTextSearchByAccuracy.js").memoryFullTextSearchByAccuracy
 exports.memoryFullTextSearchByDate = require("./memoryFullTextSearchByDate.js").memoryFullTextSearchByDate
 exports.memorySemanticSearchByAccuracy = require("./memorySemanticSearchByAccuracy.js").memorySemanticSearchByAccuracy
+exports.memorySemanticSearchByAccuracyUntilDate = require("./memorySemanticSearchByAccuracyUntilDate.js").memorySemanticSearchByAccuracyUntilDate
 exports.memorySemanticSearchByDate = require("./memorySemanticSearchByDate.js").memorySemanticSearchByDate
