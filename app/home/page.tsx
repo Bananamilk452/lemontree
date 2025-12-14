@@ -8,6 +8,7 @@ import { DiaryViewer } from "~/components/diary/DiaryViewer";
 import { Header } from "~/components/Header";
 import { SentimentChart } from "~/components/home/SentimentChart";
 import { MainContainer } from "~/components/ui/container";
+import { UpdateNotice } from "~/components/UpdateNotice";
 
 import { getSentimentByDate } from "../actions/diary";
 
@@ -31,6 +32,7 @@ export default async function Home() {
           <SentimentChart />
         </HydrationBoundary>
       </MainContainer>
+      <UpdateNotice />
     </>
   );
 }
