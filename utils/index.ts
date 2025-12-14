@@ -95,3 +95,11 @@ export const reformDiary = (
       embeddings: Number(d.embeddingCount),
     },
   }));
+
+export async function checkUpdate() {
+  const response = await fetch(
+    "https://api.github.com/repos/Bananamilk452/lemontree/releases/latest",
+  );
+  const data = await response.json();
+  return data.tag_name as string;
+}
