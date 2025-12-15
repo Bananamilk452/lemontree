@@ -1,5 +1,6 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
 import {
   ChevronUpIcon,
   HomeIcon,
@@ -10,6 +11,7 @@ import {
   NotebookIcon,
   PencilLineIcon,
   SearchIcon,
+  SquarePenIcon,
   TableOfContentsIcon,
   UserIcon,
   UsersIcon,
@@ -37,6 +39,7 @@ import {
 } from "~/components/ui/sidebar";
 import { authClient, Session } from "~/lib/auth-client";
 
+import { ChangeNameModal } from "./ChangeNameModal";
 import { ChangePasswordModal } from "./ChangePasswordModal";
 
 interface AppSidebarClientProps {
@@ -45,11 +48,17 @@ interface AppSidebarClientProps {
 
 export function AppSidebarClient({ initialSession }: AppSidebarClientProps) {
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
+  const [isChangeNameOpen, setIsChangeNameOpen] = useState(false);
 
-  const { data } = authClient.useSession();
+  const { data: session } = useQuery({
+    queryKey: ["session"],
+    queryFn: async () => {
+      const result = await authClient.getSession();
+      return result.data;
+    },
+    initialData: initialSession,
+  });
   const router = useRouter();
-
-  const session = initialSession || data;
 
   function handleSignOut() {
     authClient.signOut({
@@ -196,6 +205,13 @@ export function AppSidebarClient({ initialSession }: AppSidebarClientProps) {
                         <LockIcon />
                         <span>비밀번호 변경</span>
                       </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="cursor-pointer"
+                        onClick={() => setIsChangeNameOpen(true)}
+                      >
+                        <SquarePenIcon />
+                        <span>이름 변경</span>
+                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </SidebarMenuItem>
@@ -209,6 +225,7 @@ export function AppSidebarClient({ initialSession }: AppSidebarClientProps) {
         open={isChangePasswordOpen}
         setOpen={setIsChangePasswordOpen}
       />
+      <ChangeNameModal open={isChangeNameOpen} setOpen={setIsChangeNameOpen} />
     </>
   );
 }
