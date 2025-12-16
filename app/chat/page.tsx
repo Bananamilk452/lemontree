@@ -1,6 +1,5 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
 import { ChatBox } from "~/components/chat/ChatBox";
@@ -9,18 +8,8 @@ import { Header } from "~/components/Header";
 import { MainContainer } from "~/components/ui/container";
 import { Chat } from "~/prisma/generated/client";
 
-import { getChatById } from "../actions/chat";
-
 export default function ChatPage() {
   const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
-
-  const { data } = useQuery({
-    queryKey: ["chat", selectedChat?.id],
-    enabled: !!selectedChat,
-    queryFn: async () => getChatById(selectedChat!.id),
-  });
-
-  const chat = selectedChat ? data : null;
 
   return (
     <>
@@ -37,7 +26,6 @@ export default function ChatPage() {
         <hr />
 
         <ChatBox
-          chat={chat!}
           selectedChat={selectedChat}
           setSelectedChat={setSelectedChat}
         />
