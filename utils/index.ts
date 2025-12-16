@@ -103,3 +103,13 @@ export async function checkUpdate() {
   const data = await response.json();
   return data.tag_name as string;
 }
+
+export function stringToUTCDate(dateString: string) {
+  return new Date(
+    Date.UTC(
+      parseInt(dateString.slice(0, 4)),
+      parseInt(dateString.slice(5, 7)) - 1,
+      parseInt(dateString.slice(8, 10)),
+    ),
+  );
+}
