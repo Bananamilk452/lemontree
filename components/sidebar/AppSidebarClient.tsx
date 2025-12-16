@@ -8,6 +8,7 @@ import {
   LockIcon,
   LogOutIcon,
   MemoryStickIcon,
+  MessageCircleMoreIcon,
   NotebookIcon,
   PencilLineIcon,
   SearchIcon,
@@ -94,6 +95,14 @@ export function AppSidebarClient({ initialSession }: AppSidebarClientProps) {
                       <Link href="/home">
                         <HomeIcon />
                         <span>홈</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton size="lg" asChild>
+                      <Link href="/chat">
+                        <MessageCircleMoreIcon />
+                        <span>채팅</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
