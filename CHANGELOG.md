@@ -1,3 +1,19 @@
+#### 1.1.1 (2025-12-18)
+
+##### Continuous Integration
+
+*  add postinstall step (11c40444)
+*  cache nextjs build (9bc0d75a)
+*  Create basic CI workflow (db2968d9)
+
+##### Bug Fixes
+
+*  채팅 안되는 버그 수정 (a433bc67)
+
+##### Other Changes
+
+*  fix ci error (c8223a89)
+
 ### 1.1.0 (2025-12-16)
 
 ##### New Features
