@@ -7,7 +7,7 @@ interface ChatMessageProps {
 export function ChatAgentMessage({ message }: ChatMessageProps) {
   return (
     <div className="flex w-full justify-start">
-      <div className="max-w-4/5 rounded-lg border p-3 text-sm leading-relaxed">
+      <div className="max-w-4/5 rounded-lg border p-3 text-sm leading-relaxed whitespace-pre-wrap">
         {message}
       </div>
     </div>
@@ -17,7 +17,7 @@ export function ChatAgentMessage({ message }: ChatMessageProps) {
 export function ChatUserMessage({ message }: ChatMessageProps) {
   return (
     <div className="flex w-full justify-end">
-      <div className="max-w-4/5 rounded-lg border p-3 text-sm leading-relaxed">
+      <div className="max-w-4/5 rounded-lg border p-3 text-sm leading-relaxed whitespace-pre-wrap">
         {message}
       </div>
     </div>

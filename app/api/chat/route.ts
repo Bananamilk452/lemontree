@@ -75,7 +75,7 @@ export async function POST(request: Request) {
 
             if (contents[0].type === "ai") {
               fullResponse += contents[0].content;
-              await writer.write(value);
+              await writer.write(contents[0].content);
             }
           }
         }

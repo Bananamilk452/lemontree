@@ -39,6 +39,20 @@ export function ChatBox({ selectedChat, setSelectedChat }: ChatBoxProps) {
   }, [selectedChat?.id]);
 
   async function streamMessage(chatId: string, content: string) {
+    const id = crypto.randomUUID();
+    let chatContent = "";
+
+    const message = {
+      id,
+      chatId,
+      role: "assistant",
+      content: chatContent,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    setAddedMessages((prev) => [...prev, message]);
+
     const response = await fetch("/api/chat", {
       method: "POST",
       headers: {
@@ -49,34 +63,20 @@ export function ChatBox({ selectedChat, setSelectedChat }: ChatBoxProps) {
     const reader = response.body?.getReader();
 
     if (reader) {
-      const id = crypto.randomUUID();
-      let content = "";
-
       while (true) {
         const { done, value } = await reader.read();
+        const text = new TextDecoder().decode(value);
         if (done) break;
-        const contents = JSON.parse(
-          new TextDecoder().decode(value).split("data: ")[1],
-        ) as { content: string }[];
 
-        content += contents[0].content;
-        const message = {
-          id,
-          chatId,
-          role: "assistant",
-          content,
-          createdAt: new Date(),
-          updatedAt: new Date(),
+        chatContent += text;
+
+        const newMessage = {
+          ...message,
+          content: chatContent,
         };
 
         setAddedMessages((prev) => {
-          const lastMessage = prev[prev.length - 1];
-          // 마지막 메세지가 ID와 같다면 덮어쓰기
-          if (lastMessage && lastMessage.id === id) {
-            return [...prev.slice(0, -1), message];
-          }
-          // 아니면 새로 추가
-          return [...prev, message];
+          return [...prev.slice(0, -1), newMessage];
         });
       }
     }
