@@ -27,7 +27,9 @@ jobs:
           cache: "pnpm"
           cache-dependency-path: "pnpm-lock.yaml"
       - name: Install deps
-        run: pnpm install --frozen-lockfile
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm rebuild
       
       - name: Cache Next.js build
         uses: actions/cache@v4
@@ -39,5 +41,6 @@ jobs:
             ${{ runner.os }}-nextjs-${{ hashFiles('**/pnpm-lock.yaml') }}-
       - name: Build
         run: pnpm build
+
       - name: Lint
         run: pnpm lint
