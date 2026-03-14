@@ -1,5 +1,6 @@
 "use server";
 
+import { chat } from "~/lib/models/chat";
 import { ChatService } from "~/lib/services";
 import { getValidSession } from "~/utils/action";
 
@@ -34,4 +35,22 @@ export async function createMessage(
   const chatService = new ChatService({ userId: session.user.id });
 
   return await chatService.createMessage(chatId, data);
+}
+
+export async function getMessagesAction(chatId: string) {
+  try {
+    const session = await getValidSession();
+    const userId = session.user.id;
+
+    const isOwner = await chat.isOwner(chatId, userId);
+    if (!isOwner) {
+      return { success: false as const, error: "Unauthorized" };
+    }
+
+    const messages = await chat.findMessagesByChatId(chatId);
+    return { success: true as const, data: messages };
+  } catch (error) {
+    console.error("getMessagesAction error:", error);
+    return { success: false as const, error: "Failed to fetch messages" };
+  }
 }

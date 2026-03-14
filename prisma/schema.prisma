@@ -78,6 +78,8 @@ model Message {
   id        String    @id @default(uuid(7))
   content   String
   role      String
+  thinking  String?
+  toolCalls Json?
   createdAt DateTime  @default(now())
   updatedAt DateTime? @updatedAt
   chatId    String

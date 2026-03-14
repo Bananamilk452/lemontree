@@ -62,12 +62,22 @@ export const chat = {
     });
   },
 
-  async createMessage(chatId: string, data: { content: string; role: string }) {
+  async createMessage(
+    chatId: string,
+    data: { content: string; role: string; thinking?: string; toolCalls?: object[] },
+  ) {
     return await prisma.message.create({
       data: {
         chatId,
         ...data,
       },
+    });
+  },
+
+  async findMessagesByChatId(chatId: string) {
+    return await prisma.message.findMany({
+      where: { chatId },
+      orderBy: { createdAt: "asc" },
     });
   },
 };

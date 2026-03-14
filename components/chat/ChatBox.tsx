@@ -1,11 +1,12 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+"use client";
+
 import { SendHorizonalIcon } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 
-import { createChat, createMessage, getChatById } from "~/app/actions/chat";
-import { Chat, Message } from "~/prisma/generated/client";
+import { createChat } from "~/app/actions/chat";
+import { useSendMessage, useMessages } from "~/hooks/use-messages";
+import { Chat } from "~/prisma/generated/client";
 
-import { getQueryClient } from "../Providers";
 import { Spinner } from "../Spinner";
 import { Textarea } from "../ui/textarea";
 import {
@@ -20,102 +21,34 @@ interface ChatBoxProps {
 }
 
 export function ChatBox({ selectedChat, setSelectedChat }: ChatBoxProps) {
-  const queryClient = getQueryClient();
-
-  const { data: chat, isLoading } = useQuery({
-    queryKey: ["chat", selectedChat?.id],
-    enabled: !!selectedChat,
-    queryFn: async () => getChatById(selectedChat!.id),
-  });
-
   const [input, setInput] = useState("");
-  const [addedMessages, setAddedMessages] = useState<Message[]>([]);
-  const messages = useMemo(() => {
-    if (!chat) return addedMessages;
-    return [...chat.messages, ...addedMessages];
-  }, [chat, addedMessages]);
-  useEffect(() => {
-    setAddedMessages([]);
-  }, [selectedChat?.id]);
 
-  async function streamMessage(chatId: string, content: string) {
-    const id = crypto.randomUUID();
-    let chatContent = "";
+  const { data: messages = [], isLoading } = useMessages(
+    selectedChat?.id ?? "",
+  );
+  const { mutate: sendMessage, isPending } = useSendMessage();
 
-    const message = {
-      id,
-      chatId,
-      role: "assistant",
-      content: chatContent,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!input.trim()) return;
 
-    setAddedMessages((prev) => [...prev, message]);
+    const content = input;
+    setInput("");
 
-    const response = await fetch("/api/chat", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ chatId, message: content }),
-    });
-    const reader = response.body?.getReader();
-
-    if (reader) {
-      while (true) {
-        const { done, value } = await reader.read();
-        const text = new TextDecoder().decode(value);
-        if (done) break;
-
-        chatContent += text;
-
-        const newMessage = {
-          ...message,
-          content: chatContent,
-        };
-
-        setAddedMessages((prev) => {
-          return [...prev.slice(0, -1), newMessage];
-        });
-      }
+    if (!selectedChat) {
+      const newChat = await createChat(content.slice(0, 30));
+      setSelectedChat(newChat);
+      sendMessage({ chatId: newChat.id, content });
+    } else {
+      sendMessage({ chatId: selectedChat.id, content });
     }
   }
-
-  const { mutate: sendChat } = useMutation({
-    mutationFn: async () => {
-      if (!selectedChat) {
-        const chat = await createChat(input);
-        await createMessage(chat.id, { role: "user", content: input });
-        streamMessage(chat.id, input);
-        setSelectedChat(chat);
-      } else {
-        await createMessage(selectedChat.id, { role: "user", content: input });
-        streamMessage(selectedChat.id, input);
-        setAddedMessages((prev) => [
-          ...prev,
-          {
-            id: crypto.randomUUID(),
-            chatId: selectedChat.id,
-            role: "user",
-            content: input,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          },
-        ]);
-      }
-    },
-    onSuccess: () => {
-      setInput("");
-      queryClient.invalidateQueries({ queryKey: ["chatList"] });
-    },
-  });
 
   return (
     <div className="flex h-full min-h-0 flex-col">
       <div className="flex min-h-0 grow flex-col items-start gap-4 overflow-y-auto">
         {messages.map((message) =>
-          message.content.length === 0 ? (
+          message.content.length === 0 && message.isStreaming ? (
             <ChatMessageSkeleton key={message.id} />
           ) : message.role === "assistant" ? (
             <ChatAgentMessage key={message.id} message={message.content} />
@@ -140,13 +73,7 @@ export function ChatBox({ selectedChat, setSelectedChat }: ChatBoxProps) {
         )}
       </div>
       <hr className="my-4" />
-      <form
-        className="flex items-start gap-4"
-        onSubmit={(e) => {
-          e.preventDefault();
-          sendChat();
-        }}
-      >
+      <form className="flex items-start gap-4" onSubmit={handleSubmit}>
         <Textarea
           placeholder="이번 달 내 일기 어때? 등의 질문을 해보세요."
           className="h-24 w-full resize-none"
@@ -154,7 +81,7 @@ export function ChatBox({ selectedChat, setSelectedChat }: ChatBoxProps) {
           onChange={(e) => setInput(e.target.value)}
         />
         <button
-          disabled={!input}
+          disabled={!input || isPending}
           type="submit"
           className="cursor-pointer rounded-full border p-2 disabled:cursor-auto disabled:opacity-50"
         >

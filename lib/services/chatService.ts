@@ -42,7 +42,10 @@ export class ChatService {
     return await chat.getChatById(chatId);
   }
 
-  async createMessage(chatId: string, data: { content: string; role: string }) {
+  async createMessage(
+    chatId: string,
+    data: { content: string; role: string; thinking?: string; toolCalls?: object[] },
+  ) {
     await this.checkOwnership(chatId);
     return await chat.createMessage(chatId, data);
   }
