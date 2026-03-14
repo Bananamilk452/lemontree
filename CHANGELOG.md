@@ -1,3 +1,9 @@
+#### 1.1.2 (2026-03-14)
+
+##### Bug Fixes
+
+*  chat related bugs (25cf1cca)
+
 #### 1.1.1 (2025-12-18)
 
 ##### Continuous Integration
