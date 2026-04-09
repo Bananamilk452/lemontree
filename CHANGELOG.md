@@ -1,3 +1,9 @@
+#### 1.1.3 (2026-04-09)
+
+##### New Features
+
+*  change gemini version (86655cfa)
+
 #### 1.1.2 (2026-03-14)
 
 ##### Bug Fixes
