@@ -7,13 +7,14 @@ import { z } from "zod";
 import { chat } from "~/lib/models/chat";
 import { agentSystemPrompt } from "~/lib/prompts";
 import { ChatService } from "~/lib/services";
-import type { ToolCallEvent } from "~/lib/types";
 import {
   createGetDiariesByDateTool,
   createGetMemoriesByDateTool,
   createSearchMemoriesTool,
 } from "~/lib/tools";
 import { getValidSession } from "~/utils/action";
+
+import type { ToolCallEvent } from "~/lib/types";
 
 const chatSchema = z.object({
   chatId: z.string().min(1),
@@ -62,7 +63,7 @@ export async function POST(request: Request) {
   await chatService.createMessage(chatId, { role: "user", content });
 
   const model = new ChatVertexAI({
-    model: "gemini-2.5-flash",
+    model: "gemini-3-flash-preview",
     temperature: 0.2,
     maxReasoningTokens: 0,
   });
@@ -81,10 +82,7 @@ export async function POST(request: Request) {
 
   const stream = await agent.stream(
     {
-      messages: [
-        ...historyMessages,
-        new HumanMessage(content),
-      ],
+      messages: [...historyMessages, new HumanMessage(content)],
     },
     {
       streamMode: ["messages", "updates"],
@@ -101,9 +99,7 @@ export async function POST(request: Request) {
     const toolCallsBuffer: ToolCallEvent[] = [];
 
     function sendChunk(chunk: object) {
-      return writer.write(
-        encoder.encode(`data: ${JSON.stringify(chunk)}\n\n`),
-      );
+      return writer.write(encoder.encode(`data: ${JSON.stringify(chunk)}\n\n`));
     }
 
     try {
@@ -114,7 +110,10 @@ export async function POST(request: Request) {
           await chatService.createMessage(chatId, {
             role: "assistant",
             content: fullResponse,
-            toolCalls: toolCallsBuffer.length > 0 ? (toolCallsBuffer as object[]) : undefined,
+            toolCalls:
+              toolCallsBuffer.length > 0
+                ? (toolCallsBuffer as object[])
+                : undefined,
           });
           break;
         }
@@ -140,11 +139,10 @@ export async function POST(request: Request) {
               const tc: ToolCallEvent = {
                 id: toolMsg.tool_call_id,
                 name: toolMsg.name ?? "",
-                content: typeof toolMsg.content === "string" ? toolMsg.content : "",
+                content:
+                  typeof toolMsg.content === "string" ? toolMsg.content : "",
               };
-              const existing = toolCallsBuffer.find(
-                (t) => t.id === tc.id,
-              );
+              const existing = toolCallsBuffer.find((t) => t.id === tc.id);
               if (existing) {
                 existing.content = tc.content;
                 existing.status = "done";
