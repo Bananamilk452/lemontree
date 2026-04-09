@@ -66,6 +66,7 @@ export async function POST(request: Request) {
     model: "gemini-3-flash-preview",
     temperature: 0.2,
     maxReasoningTokens: 0,
+    location: "global",
   });
 
   const getMemoriesByDateTool = createGetMemoriesByDateTool(userId);
