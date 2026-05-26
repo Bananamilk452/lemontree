@@ -41,6 +41,7 @@ export async function createMemory(diaryId: string, userId: string) {
     model: "gemini-3-flash-preview",
     temperature: 0.2,
     maxReasoningTokens: 0,
+    location: "global",
   });
 
   const getMemoriesByDateTool = createGetMemoriesByDateTool(userId);
