@@ -63,7 +63,7 @@ export async function POST(request: Request) {
   await chatService.createMessage(chatId, { role: "user", content });
 
   const model = new ChatVertexAI({
-    model: "gemini-3-flash-preview",
+    model: "gemini-3.6-flash",
     temperature: 0.2,
     maxReasoningTokens: 0,
     location: "global",
